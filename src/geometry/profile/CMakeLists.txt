@@ -2,14 +2,10 @@
 #
 # See the LICENSE file for license information
 
-# add all subdirectories
-add_subdirectory(basic)
-add_subdirectory(manipulation)
-add_subdirectory(profile)
-
 # add sources
 set(SRC
-	Airfoil.cpp
+	NacaProfileGenerator.cpp
+	ProfileGeneratorInterface.cpp
 	)
 
 # append to sources

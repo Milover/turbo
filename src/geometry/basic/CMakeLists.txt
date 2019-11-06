@@ -2,14 +2,12 @@
 #
 # See the LICENSE file for license information
 
-# add all subdirectories
-add_subdirectory(basic)
-add_subdirectory(manipulation)
-add_subdirectory(profile)
-
 # add sources
 set(SRC
-	Airfoil.cpp
+	Line.cpp
+	Point.cpp
+	Shape.cpp
+	Vector.cpp
 	)
 
 # append to sources

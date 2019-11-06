@@ -1,9 +1,10 @@
 /*---------------------------------------------------------------------------*\
 
-Header
+	turbo - Copyright (C) 2019 P. Milovic
 
 -------------------------------------------------------------------------------
 License
+	See the LICENSE file for license information.
 
 \*---------------------------------------------------------------------------*/
 
@@ -11,6 +12,7 @@ License
 #include <stdexcept>
 
 #include "Axis.h"
+#include "Utility.h"
 #include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -32,7 +34,7 @@ namespace geometry
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-Vector::Vector()
+Vector::Vector() noexcept
 :
 	x {0.0},
 	y {0.0},
@@ -45,7 +47,7 @@ Vector::Vector
 	const double x,
 	const double y,
 	const double z
-)
+) noexcept
 :
 	x {x},
 	y {y},
@@ -53,15 +55,7 @@ Vector::Vector
 {}
 
 
-Vector::Vector(const Vector& vector)
-:
-	x {vector.x},
-	y {vector.y},
-	z {vector.z}
-{}
-
-
-Vector::Vector(const Axis& axis)
+Vector::Vector(const Axis& axis) noexcept
 :
 	x {0.0},
 	y {0.0},
@@ -83,6 +77,14 @@ Vector::Vector(const Axis& axis)
 }
 
 
+Vector::Vector(const Vector& vector) noexcept
+:
+	x {vector.x},
+	y {vector.y},
+	z {vector.z}
+{}
+
+
 // * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
 
 Vector::~Vector()
@@ -91,32 +93,21 @@ Vector::~Vector()
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-double Vector::getMagnitude() const
+double Vector::getMagnitude() const noexcept
 {
 	return std::hypot(x, y, z);
 }
 
 
-Vector Vector::getUnitVector() const noexcept(false)
+Vector Vector::getUnitVector() const
 {
 	double magnitude {getMagnitude()};
 
-	if (magnitude == 0)
-		throw std::domain_error
-		(
-			"Vector::getUnitVector(): Divide by zero"
-		);
-
-	return Vector
-	{
-		x / magnitude,
-		y / magnitude,
-		z / magnitude
-	};
+	return *this / magnitude;
 }
 
 
-double Vector::dot(const Vector& vector) const
+double Vector::dot(const Vector& vector) const noexcept
 {
 	return x * vector.x +
 		   y * vector.y +
@@ -124,7 +115,7 @@ double Vector::dot(const Vector& vector) const
 }
 
 
-Vector Vector::ex(const Vector& vector) const
+Vector Vector::ex(const Vector& vector) const noexcept
 {
 	return Vector
 	{
@@ -137,7 +128,7 @@ Vector Vector::ex(const Vector& vector) const
 
 // * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
 
-Vector& Vector::operator=(const Vector& vector)
+Vector& Vector::operator=(const Vector& vector) noexcept
 {
 	x = vector.x;
 	y = vector.y;
@@ -147,7 +138,7 @@ Vector& Vector::operator=(const Vector& vector)
 }
 
 
-Vector Vector::operator+(const Vector& vector) const
+Vector Vector::operator+(const Vector& vector) const noexcept
 {
 	return Vector
 	{
@@ -158,13 +149,23 @@ Vector Vector::operator+(const Vector& vector) const
 }
 
 
-Vector Vector::operator+() const
+Vector Vector::operator+() const noexcept
 {
 	return Vector {*this};
 }
 
 
-Vector Vector::operator-(const Vector& vector) const
+Vector& Vector::operator+=(const Vector& vector) noexcept
+{
+	x += vector.x;
+	y += vector.y;
+	z += vector.z;
+
+	return *this;
+}
+
+
+Vector Vector::operator-(const Vector& vector) const noexcept
 {
 	return Vector
 	{
@@ -175,7 +176,7 @@ Vector Vector::operator-(const Vector& vector) const
 }
 
 
-Vector Vector::operator-() const
+Vector Vector::operator-() const noexcept
 {
 	return Vector
 	{
@@ -186,7 +187,17 @@ Vector Vector::operator-() const
 }
 
 
-Vector Vector::operator*(const double d) const
+Vector& Vector::operator-=(const Vector& vector) noexcept
+{
+	x -= vector.x;
+	y -= vector.y;
+	z -= vector.z;
+
+	return *this;
+}
+
+
+Vector Vector::operator*(const double d) const noexcept
 {
 	return Vector
 	{
@@ -197,12 +208,23 @@ Vector Vector::operator*(const double d) const
 }
 
 
-Vector Vector::operator/(const double d) const noexcept(false)
+Vector& Vector::operator*=(const double d) noexcept
 {
-	if (d == 0)
+	x *= d;
+	y *= d;
+	z *= d;
+
+	return *this;
+}
+
+
+Vector Vector::operator/(const double d) const
+{
+	if (isEqual(d, 0.0))
 		throw std::invalid_argument
 		(
-			"Vector::operator/(const double): Divide by zero"
+			"turbo::geometry::Vector::operator/(const double): "
+			"Divide by zero"
 		);
 
 	return Vector
@@ -211,6 +233,23 @@ Vector Vector::operator/(const double d) const noexcept(false)
 		y / d,
 		z / d
 	};
+}
+
+
+Vector& Vector::operator/=(const double d) noexcept
+{
+	if (isEqual(d, 0.0))
+		throw std::invalid_argument
+		(
+			"turbo::geometry::Vector::operator/=(const double): "
+			"Divide by zero"
+		);
+
+	x /= d;
+	y /= d;
+	z /= d;
+
+	return *this;
 }
 
 

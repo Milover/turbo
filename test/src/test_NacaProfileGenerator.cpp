@@ -6,34 +6,30 @@
 License
 	See the LICENSE file for license information.
 
+Description
+	Testing NacaProfileGenerator class basic funtionality.
+
 \*---------------------------------------------------------------------------*/
 
-#include <iostream>
+#include "NacaProfileGenerator.h"
+#include "Utility.h"
 
-#include "Main.h"
-#include "turbo.h"
+#include "Test.h"
 
-#include "Point.h"
-#include "Line.h"
-#include "Airfoil.h"
-#include "ProfileGeneratorInterface.h"
+using namespace turbo;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int main(int argc, char* argv[])
-{
+int main() {
 	
-	// print header
-	std::cout << turbo::HEADER;
+	bool pass {true};
 
-	// print usage
-	std::cout << turbo::USAGE;
 
-	// work
-	turbo::turbo();
 
-	return 0;
+	// test pass or fail
+	if (pass)
+		test::echo(1);
+	else
+		test::echo(0);
 }
 
-
-// ************************************************************************* //

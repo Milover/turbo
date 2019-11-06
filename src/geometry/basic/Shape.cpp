@@ -1,19 +1,20 @@
 /*---------------------------------------------------------------------------*\
 
-Header
+	turbo - Copyright (C) 2019 P. Milovic
 
 -------------------------------------------------------------------------------
 License
+	See the LICENSE file for license information.
 
 \*---------------------------------------------------------------------------*/
 
-#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "Axis.h"
 #include "gmsh.h"
+
+#include "Axis.h"
 #include "Shape.h"
 #include "Utility.h"
 
@@ -27,9 +28,9 @@ namespace geometry
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
-void Shape::remove() const
+void Shape::remove() const noexcept
 {
-	gmsh::model::occ::remove
+	gmsh::model::geo::remove
 	(
 		Vectorpair<int> {dimTag_},
 		true	// recursive
@@ -37,11 +38,11 @@ void Shape::remove() const
 }
 
 
-int Shape::copy() const
+int Shape::copy() const noexcept
 {
 	Vectorpair<int> outDimTags;
 
-	gmsh::model::occ::copy
+	gmsh::model::geo::copy
 	(
 		Vectorpair<int> {dimTag_},
 		outDimTags
@@ -53,13 +54,13 @@ int Shape::copy() const
 
 // * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
 
-Shape::Shape(const std::pair<int, int> dimTag)
+Shape::Shape(const std::pair<int, int> dimTag) noexcept
 :
 	dimTag_ {dimTag}
 {}
 
 
-Shape::Shape(const Shape& shape)
+Shape::Shape(const Shape& shape) noexcept
 :
 	dimTag_ {shape.dimTag_.first, shape.copy()}
 {}
@@ -73,7 +74,7 @@ Shape::Shape(const Shape& shape)
 
 // * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
 
-Shape::~Shape()
+Shape::~Shape() noexcept
 {
 	remove();
 }
@@ -81,13 +82,13 @@ Shape::~Shape()
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-std::pair<int, int> Shape::getDimTag() const
+std::pair<int, int> Shape::getDimTag() const noexcept
 {
 	return dimTag_;
 }
 
 
-void Shape::getBoundary(Vectorpair<int>& dimTags) const
+void Shape::getBoundary(Vectorpair<int>& dimTags) const noexcept
 {
 	gmsh::model::getBoundary
 	(
@@ -99,7 +100,7 @@ void Shape::getBoundary(Vectorpair<int>& dimTags) const
 }
 
 
-Vectorpair<double> Shape::getBoundingBox() const
+Vectorpair<double> Shape::getBoundingBox() const noexcept
 {
 	Vectorpair<double> minMax (3);
 
@@ -119,24 +120,7 @@ Vectorpair<double> Shape::getBoundingBox() const
 }
 
 
-std::vector<double> Shape::getCenterOfMass() const
-{
-	std::vector<double> centerOfMass (3);
-
-	gmsh::model::occ::getCenterOfMass
-	(
-		dimTag_.first,
-		dimTag_.second,
-		centerOfMass[toUnderlying(Axis::X)],
-		centerOfMass[toUnderlying(Axis::Y)],
-		centerOfMass[toUnderlying(Axis::Z)]
-	);
-
-	return centerOfMass;
-}
-
-
-std::string Shape::getName() const
+std::string Shape::getName() const noexcept
 {
 	std::string name;
 
@@ -151,7 +135,7 @@ std::string Shape::getName() const
 }
 
 
-void Shape::setName(const std::string& name)
+void Shape::setName(const std::string& name) noexcept
 {
 	gmsh::model::setEntityName
 	(

@@ -1,9 +1,10 @@
 /*---------------------------------------------------------------------------*\
 
-Header
+	turbo - Copyright (C) 2019 P. Milovic
 
 -------------------------------------------------------------------------------
 License
+	See the LICENSE file for license information.
 
 Class
 	turbo::geometry::Shape
@@ -23,9 +24,7 @@ SourceFiles
 #include <utility>
 #include <vector>
 
-#include "gmsh.h"
 #include "Utility.h"
-//#include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -53,10 +52,10 @@ private:
 	// Member functions
 
 		//- Remove Shape geometry
-		void remove() const;
+		void remove() const noexcept;
 
 		//- Copy Shape geometry and return tag
-		int copy() const;
+		int copy() const noexcept;
 
 
 protected:
@@ -67,10 +66,10 @@ protected:
 	// Constructors
 		
 		//- Construct from tag
-		Shape(const std::pair<int, int> dimTag);
+		Shape(const std::pair<int, int> dimTag) noexcept;
 
 		//- Construct from a Shape
-		Shape(const Shape&);
+		Shape(const Shape&) noexcept;
 
 
 	// Member functions
@@ -82,31 +81,31 @@ public:
 	
 
 	//- Destructor
-	virtual ~Shape();
+	virtual ~Shape() noexcept;
 
 
 	// Member functions
 		
 		//- Return Shape dimTag
-		std::pair<int, int> getDimTag() const;
+		std::pair<int, int> getDimTag() const noexcept;
 
 		//- Get dimTags of Shapes on boundary of Shape
-		void getBoundary(Vectorpair<int>& dimTags) const;
+		void getBoundary(Vectorpair<int>& dimTags) const noexcept;
 
 		//- Get Shape bounding box coordinates (min, max)
-		Vectorpair<double> getBoundingBox() const;
+		Vectorpair<double> getBoundingBox() const noexcept;
 
 		//- Get Shape center of mass coordinates
-		std::vector<double> getCenterOfMass() const;
+		//std::vector<double> getCenterOfMass() const noexcept;		// implement later
 
 		//- Return minimum distance vector to Shape
-		//virtual Vector getMinDistance(const Shape&) const = 0;
+		//virtual Vector getMinDistance(const Shape&) const = 0;	// implement later
 
 		//- Return name of Shape
-		std::string getName() const;
+		std::string getName() const noexcept;
 
 		//- Set name of Shape
-		void setName(const std::string& name);
+		void setName(const std::string& name) noexcept;
 
 
 	// Member operators

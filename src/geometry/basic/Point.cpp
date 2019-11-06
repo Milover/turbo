@@ -1,18 +1,18 @@
 /*---------------------------------------------------------------------------*\
 
-Header
+	turbo - Copyright (C) 2019 P. Milovic
 
 -------------------------------------------------------------------------------
 License
+	See the LICENSE file for license information.
 
 \*---------------------------------------------------------------------------*/
 
-#include <cmath>
 #include <vector>
 
-#include "Axis.h"
 #include "gmsh.h"
-#include "Line.h"
+
+#include "Axis.h"
 #include "Point.h"
 #include "Utility.h"
 
@@ -24,72 +24,70 @@ namespace geometry
 {
 
 
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+
 // * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
 
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-int Line::construct
+int Point::construct
 (
-	const int startTag,
-	const int endTag
-) const
+	const double x,
+	const double y,
+	const double z
+) const noexcept
 {
-	return gmsh::model::occ::addLine
-	(
-		startTag,
-		endTag
-	);
+	return gmsh::model::geo::addPoint(x, y, z);
 }
 
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-Line::Line
+Point::Point
 (
-	Point start,
-	Point end
-)
+	const double x,
+	const double y,
+	const double z
+) noexcept
 :
 	Shape
 	{
 		std::pair<int, int>
 		{
-			1,		// dimension
-			construct
-			(
-				start.getDimTag().second,
-				end.getDimTag().second
-			)
+			0,		// dimension
+			construct(x, y, z)
 		}
 	}
 {}
 
 
-Line::Line(const Line& line)
+Point::Point(const Point& point) noexcept
 :
-	Shape {line}
+	Shape {point}
 {}
 
 
 // * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
 
-Line::~Line()
+Point::~Point()
 {}
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-double Line::getLength() const
+std::vector<double> Point::getCoordinates() const noexcept
 {
 	Vectorpair<double> minMax {getBoundingBox()};
+	
+	return std::vector<double>
+	{
+		minMax[toUnderlying(Axis::X)].first,
+		minMax[toUnderlying(Axis::Y)].first,
+		minMax[toUnderlying(Axis::Z)].first
+	};
 
-	return std::hypot
-	(
-		minMax[toUnderlying(Axis::X)].first - minMax[toUnderlying(Axis::X)].second,
-		minMax[toUnderlying(Axis::Y)].first - minMax[toUnderlying(Axis::Y)].second,
-		minMax[toUnderlying(Axis::Z)].first - minMax[toUnderlying(Axis::Z)].second
-	);
 }
 
 

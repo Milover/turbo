@@ -1,104 +1,78 @@
 /*---------------------------------------------------------------------------*\
 
-Header
+	turbo - Copyright (C) 2019 P. Milovic
 
 -------------------------------------------------------------------------------
 License
+	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::Line
+	turbo::GenericInterface
 
 Description
-	Line class
-
-SourceFiles
-	Line.cpp
+	Abstract base class template for interface classes
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef LINE_H
-#define LINE_H
+#ifndef GENERIC_INTERFACE_H
+#define GENERIC_INTERFACE_H
 
-#include "gmsh.h"
-#include "Shape.h"
-#include "Point.h"
+#include <memory>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace turbo
 {
-namespace geometry
-{
-
-// Forward declarations
 
 /*---------------------------------------------------------------------------*\
-						Class Line Declaration
+					Class GenericInterface Declaration
 \*---------------------------------------------------------------------------*/
 
-class Line
-:
-	public Shape
+template<class U, class V>
+class GenericInterface
 {
-private:
-
-	// Private data
-
-
-	// Member functions
-	
-
 protected:
 
 	// Protected data
+		
+		std::unique_ptr<U> interfaceObject_;
+
+
+	// Constructors
+		
+		//- Default constructor
+		GenericInterface() = default;
 
 
 	// Member functions
-
-		//- Construct Line geometry
-		virtual int construct
-		(
-			const int startTag,
-			const int endTag
-		) const;
+		
+		//- Create underlying object to interface
+		virtual void createInterfaceObject(const V&) = 0;
 
 
 public:
 	
 	// Constructors
 		
-		//- Construct from copies of two Points
-		Line
-		(
-			Point start,
-			Point end
-		);
-
-		//- Construct from a Line
-		Line(const Line&);
+		//- Disallow copy construction
+		GenericInterface(const GenericInterface&) = delete;
 
 
 	//- Destructor
-	virtual ~Line();
-
-
-	// Member functions
-
-		//- Get Line length
-		virtual double getLength() const;
+	virtual ~GenericInterface() = default;
 
 
 	// Member operators
-	
+
 		//- Disallow assignment
-		Line& operator=(const Line&) = delete;
+		GenericInterface& operator=(const GenericInterface&) = delete;
+
 
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace geometry
 } // End namespace turbo
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

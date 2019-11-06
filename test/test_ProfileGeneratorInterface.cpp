@@ -7,122 +7,19 @@
 		- copying
 		- member functions
 
-	Testing Line class basic funtionality:
-		- initialization
-		- destruction
-		- copying
-		- member functions
-
 \* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-#include <chrono>
-#include <cmath>
-#include <iomanip>
-#include <iostream>
-#include <limits>
-#include <thread>
-#include <type_traits>
-#include <utility>
 
 #include "gmsh.h"
 
 #include "Axis.h"
-#include <Line.h>
+#include "Line.h"
 #include "Point.h"
 #include "Utility.h"
 
+#include "Test.h"
+
 namespace t = turbo;
 namespace tg = turbo::geometry;
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-void initialize(std::string s)
-{
-	gmsh::initialize();
-	gmsh::fltk::initialize();
-	gmsh::option::setNumber("General.Terminal", 1);
-	gmsh::model::add(s);
-}
-
-
-void update()
-{
-	gmsh::model::occ::synchronize();
-	gmsh::fltk::update();
-	gmsh::graphics::draw();
-}
-
-
-void finalize()
-{
-	update();
-	gmsh::fltk::run();
-	gmsh::finalize();
-}
-
-
-void updateAndWait(const int d)
-{
-	update();
-
-    std::chrono::seconds time(d);
-    std::this_thread::sleep_for(time);
-}
-
-
-template<typename... Args>
-void echo(Args&&... args)
-{
-    (std::cout << ... << args) << '\n';
-}
-
-
-void listEntities()
-{
-	t::Vectorpair<int> v;
-	gmsh::model::getEntities(v);
-
-	for (auto p : v)
-	{
-		echo ("entity dimTag: ", p.first, ' ', p.second);
-	}
-}
-
-
-int getNumberOfEntities()
-{
-	t::Vectorpair<int> v;
-	gmsh::model::getEntities(v);
-
-	return v.size();
-}
-
-
-void testResult(std::string s, bool pass)
-{
-	std::cout << s;
-
-	int width {50};
-	width -= s.size();
-
-	if (pass)
-		std::cout << std::setw(width) << "PASS\n";
-	else
-		std::cout << std::setw(width) << "FAIL\n";
-}
-
-
-template<class T>
-typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type
-    almostEqual(T x, T y, int ulp = 2)
-{
-    // the machine epsilon has to be scaled to the magnitude of the values used
-    // and multiplied by the desired precision in ULPs (units in the last place)
-    return std::abs(x-y) <= std::numeric_limits<T>::epsilon() * std::fabs(x+y) * ulp
-        // unless the result is subnormal
-        || std::abs(x-y) < std::numeric_limits<T>::min();
-}
-
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 

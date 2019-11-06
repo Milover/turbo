@@ -1,29 +1,27 @@
 /*---------------------------------------------------------------------------*\
 
-Header
+	turbo - Copyright (C) 2019 P. Milovic
 
 -------------------------------------------------------------------------------
 License
+	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::Point
+	turbo::geometry::Line
 
 Description
-	Point class
+	Line class
 
 SourceFiles
-	Point.cpp
+	Line.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef POINT_H
-#define POINT_H
+#ifndef LINE_H
+#define LINE_H
 
-#include <string>
-#include <vector>
-
-#include "gmsh.h"
 #include "Shape.h"
+#include "Point.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -32,13 +30,11 @@ namespace turbo
 namespace geometry
 {
 
-// Forward declarations
-
 /*---------------------------------------------------------------------------*\
 						Class Line Declaration
 \*---------------------------------------------------------------------------*/
 
-class Point
+class Line
 :
 	public Shape
 {
@@ -46,55 +42,54 @@ private:
 
 	// Private data
 
-	
-	// Member functions
 
+	// Member functions
+	
 
 protected:
 
 	// Protected data
-	
+
 
 	// Member functions
 
-		//- Construct Point geometry
+		//- Construct Line geometry
 		virtual int construct
 		(
-			const double x,
-			const double y,
-			const double z
-		) const;
+			const int startTag,
+			const int endTag
+		) const noexcept;
 
 
 public:
 	
 	// Constructors
 		
-		//- Construct from coordinates
-		Point
+		//- Construct from copies of two Points
+		Line
 		(
-			const double x,
-			const double y,
-			const double z = 0.0
-		);
+			Point start,
+			Point end
+		) noexcept;
 
-		//- Construct from a Point
-		Point(const Point&);
+		//- Construct from a Line
+		Line(const Line&) noexcept;
 
 
 	//- Destructor
-	virtual ~Point();
+	virtual ~Line();
+
 
 	// Member functions
-		
-		//- Get Point coordinates
-		std::vector<double> getCoordinates() const;
+
+		//- Get Line length
+		virtual double getLength() const noexcept;
 
 
 	// Member operators
 	
 		//- Disallow assignment
-		Point& operator=(const Point&) = delete;
+		Line& operator=(const Line&) = delete;
 
 };
 
