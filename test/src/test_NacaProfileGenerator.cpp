@@ -116,9 +116,9 @@ std::string badSeries()
 	}
 }
 
-Stringmap constructInput()
+Stringmap constructInput(int type)
 {
-	switch (test::randomInt(1, 5))
+	switch (type)
 	{
 		// all good
 		case 1:
@@ -196,9 +196,15 @@ int main(int argc, char* argv[])
 	// input testing
 
 	// the loop should finish by itself i.e. all exceptions should be caught
+	int countGood {0};		// number of good inputs
+	int countTryGood {0};	// number of good inputs parsed correctly
 	for (std::size_t i {0}; i < 250; i++)
 	{
-		Stringmap input {constructInput()};
+		int type {test::randomInt(1, 5)};
+		if (type == 1)
+			countGood++;
+
+		Stringmap input {constructInput(type)};
 
 		if (output)
 			test::echo
@@ -212,14 +218,90 @@ int main(int argc, char* argv[])
 		try
 		{
 			geometry::NacaProfileGenerator g {input};
+			countTryGood++;
 		}
 		catch(std::invalid_argument& e)
 		{}
 		catch(std::runtime_error& e)
 		{}
 	}
+	// all good inputs should be parsed correctly
+	if (countGood != countTryGood)
+		pass = false;
 
 	// profile generation testing
+	Vectorpair<double> xyUpper;
+	Vectorpair<double> xyLower;
+	std::vector<Stringmap> inputs;
+	std::vector<geometry::NacaProfileGenerator> generators;
+
+	// build inputs
+	// 10 camber line points
+	inputs.push_back
+	(
+		Stringmap
+		{
+			{"series", "0020-63"},
+			{"spacingType", "linear"}
+		}
+	);
+	// 5 camber line points, cosine
+	inputs.push_back
+	(
+		Stringmap
+		{
+			{"series", "0020-63"}
+		}
+	);
+	// 10 camber line points, linear
+	inputs.push_back
+	(
+		Stringmap
+		{
+			{"series", "0012-63"},
+			{"spacingType", "linear"}
+		}
+	);
+
+	// build generators
+	for (auto i : inputs)
+	{
+		generators.push_back
+		(
+			geometry::NacaProfileGenerator {i}
+		);
+	}
+
+	// should be empty
+	for (auto g : generators)
+		if (!g.isEmpty())
+			pass = false;
+
+	// generate profiles
+	for (auto g : generators)
+		g.generate();
+
+	// should be full
+	for (auto g : generators)
+		if (g.isEmpty())
+			pass = false;
+	
+	// check points
+	for (auto g : generators)
+		if (g.getSize() != 10)
+			pass = false;
+
+	// check results
+	for (auto g : generators)
+	{
+		for (int i {0}; i < g.getSize(); i++)
+		{
+			xyUpper.push_back(g.getUpperAt(i));
+			xyLower.push_back(g.getLowerAt(i));
+		}
+
+		// compare
+	}
 
 
 	// test pass or fail

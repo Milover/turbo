@@ -34,7 +34,7 @@ typedef std::map<std::string, std::string> Stringmap;
 
 
 // Constants
-static constexpr double pi {std::atan(1.0) * 4.0};
+static constexpr double pi {3.141592653589793238463};
 
 
 //- Vector of pairs template alias

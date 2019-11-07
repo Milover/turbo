@@ -42,12 +42,13 @@
 **/CMakeScripts
 **/compile_commands.json
 
-bin/*
-build/*
-doc/html/
-doc/latex/
-include/*
-lib/*
+bin
+build
+test/bin
+doc/html
+doc/latex
+include
+lib
 
 notes*
 *.swp

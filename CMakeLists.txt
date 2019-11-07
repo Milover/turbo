@@ -44,7 +44,6 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/tools/cmake")
 
 # prerequisites
 find_package(Gmsh REQUIRED)
-include_directories(${GMSH_INCLUDE_DIRS})
 
 set(TURBO_INCLUDE_DIRS ${GMSH_INCLUDE_DIRS})
 set(TURBO_LIBRARIES ${GMSH_LIBRARIES})

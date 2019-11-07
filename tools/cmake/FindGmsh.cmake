@@ -1,4 +1,4 @@
-# - Try to find LibXml2
+# - Try to find Gmsh
 # Once done this will define
 #  GMSH_FOUND - System has Gmsh
 #  GMSH_INCLUDE_DIRS - The Gmsh include directories
