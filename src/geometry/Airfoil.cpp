@@ -31,7 +31,7 @@ Airfoil::Airfoil
 	const ProfileGeneratorInterface& generator
 )
 {
-	for (int i {0}; i < generator.size(); i++)
+	for (int i {0}; i < generator.getSize(); i++)
 	{
 		surfacePoints_.push_back
 		(
@@ -58,29 +58,6 @@ Airfoil::~Airfoil()
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
-
-void Airfoil::scaleToChord(const double chord) const
-{}
-
-
-void Airfoil::translateAlongVector(const Vector& vector) const
-{}
-
-
-void Airfoil::centerOnPoint(const Point& point) const
-{}
-
-
-void Airfoil::rotateAroundCenter(const double angle) const
-{}
-
-
-void Airfoil::projectAlongVector
-(
-	const Shape& shape,
-	const Vector& vector
-) const
-{}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

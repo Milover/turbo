@@ -33,6 +33,10 @@ namespace turbo
 typedef std::map<std::string, std::string> Stringmap;
 
 
+// Constants
+static constexpr double pi {std::atan(1.0) * 4.0};
+
+
 //- Vector of pairs template alias
 template<typename T>
 using Vectorpair = std::vector<std::pair<T, T>>;

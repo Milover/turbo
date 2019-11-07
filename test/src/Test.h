@@ -20,6 +20,7 @@ Description
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <random>
 #include <string>
 #include <thread>
 
@@ -133,11 +134,46 @@ bool parseCommandLineArgs
 	if
 	(
 		argc > 1 &&
-		(std::strcmp(argv[1], "--no-gui")) == 0
+		(std::strcmp(argv[1], "--result-only")) == 0
 	)
 		return false;
 
 	return true;
+}
+
+
+int randomInt
+(
+	int min,
+	int max
+)
+{
+    std::random_device randomDevice;
+    std::mt19937 generator {randomDevice()};
+    std::uniform_int_distribution<> distribution {min, max};
+
+	return distribution(generator);
+}
+
+
+std::string randomString
+(
+	std::size_t length,
+	std::string characters = "0123456789"
+							 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+							 "abcdefghijklmnopqrstuvwxyz"
+)
+{
+	std::string s;
+    for (std::size_t i {0}; i < length; ++i)
+    {
+        s += characters
+		[
+			randomInt(0, characters.size() - 1)
+		];
+    }
+
+    return s;
 }
 
 

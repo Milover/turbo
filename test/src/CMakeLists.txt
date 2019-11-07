@@ -25,7 +25,7 @@ foreach(TESTFILE ${TEST_SRC})
 	)
 
 	add_test(NAME ${FILENAME}
-		COMMAND ${FILENAME} "--no-gui"
+		COMMAND ${FILENAME} "--result-only"
 		WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/test/bin"
 	)
 	set_tests_properties(${FILENAME}

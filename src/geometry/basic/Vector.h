@@ -115,7 +115,7 @@ struct Vector
 		Vector operator/(const double) const;
 
 		//- Scalar multiplication assignment operator
-		Vector& operator/=(const double) noexcept;
+		Vector& operator/=(const double);
 
 
 };

@@ -39,6 +39,9 @@ const std::map<int, double> NacaProfileGenerator::d1Table_
 const double NacaProfileGenerator::scale_ {5.0};
 
 
+const double NacaProfileGenerator::chord_ {1.0};
+
+
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
 void NacaProfileGenerator::parseSeries(const std::string& series)
@@ -49,13 +52,10 @@ void NacaProfileGenerator::parseSeries(const std::string& series)
 	};
 
 	auto pos {series.find('-')};
-	
+
 	// 4-digit series
-	if (series.size() == 4 && pos != std::string::npos)
-	{
-		I_ = 6.0;
-		M_ = 0.3;
-	}
+	if (series.size() == 4 && pos == std::string::npos)
+	{}
 	// 4-digit modified series
 	else if (series.size() == 7 && pos == 4)
 	{
@@ -78,10 +78,22 @@ void NacaProfileGenerator::parseSeries(const std::string& series)
 			"parseSeries(const std::string&): "
 			"Invalid value of keyword \"series\""
 		);
-	
+
+	// see the Description section of
+	// the header file for an explanation
 	m_ = toDouble(0, 1) * 0.01;
 	p_ = toDouble(1, 1) * 0.1;
 	t_ = toDouble(2, 2) * 0.01;
+}
+
+
+void NacaProfileGenerator::setSpacingIncrement()
+{
+	if (spacingType_ == spacing_::linear)
+		spacingIncrement_ = chord_ / static_cast<double>(numberOfPoints_);
+	// spacing_::cosine is default
+	else
+		spacingIncrement_ = pi / static_cast<double>(numberOfPoints_);
 }
 
 
@@ -104,7 +116,7 @@ void NacaProfileGenerator::lookUpD1()
 
 void NacaProfileGenerator::computeD2()
 {
-	double B {1.0 - M_};
+	double B {chord_ - M_};
 
 	d_[2] = (-3.0*d_[0] - 2.0*d_[1]*B + 1.5*t_) / std::pow(B, 2);
 }
@@ -112,7 +124,7 @@ void NacaProfileGenerator::computeD2()
 
 void NacaProfileGenerator::computeD3()
 {
-	double B {1.0 - M_};
+	double B {chord_ - M_};
 
 	d_[3] = (-d_[1]/std::pow(B, 2) - 2.0*d_[2]/B) / 3.0;
 }
@@ -133,7 +145,11 @@ void NacaProfileGenerator::generateCamberLine()
 	double x {0.0};
 	double y {0.0};
 
-	while (!isEqual(x, 1.0))
+	while
+	(
+		x < chord_ ||
+		isEqual(x, chord_)
+	)
 	{
 		camberLine_.push_back
 		(
@@ -142,28 +158,29 @@ void NacaProfileGenerator::generateCamberLine()
 
 		x = computeCamberX(x);
 		y = computeCamberY(x);
-
-		// if we made a big error
-		if (x > 1.0)
-			break;
 	}
 }
 
 
 double NacaProfileGenerator::computeCamberX(const double x)
 {
-	double increment;
-	
-	// see the Description section in
-	// the header file for an explanation
-	if (x < 0.0125)
-		increment = deltaX_ / 40.0;
-	else if (x < 0.1)
-		increment = deltaX_ / 4.0;
+	if (spacingType_ == spacing_::linear)
+	{
+		return x + spacingIncrement_;
+	}
+	// spacing_::cosine is default
 	else
-		increment = deltaX_;
+	{
+		double angle
+		{
+			pi +
+			static_cast<double>(camberLine_.size()) * spacingIncrement_ +
+			spacingIncrement_
+		};
 
-	return x + increment;
+		// scale and shift the unit circle
+		return 0.5 * chord_ * (1 - std::cos(angle));
+	}
 }
 
 
@@ -225,7 +242,8 @@ double NacaProfileGenerator::computeDY
 void NacaProfileGenerator::parseInput(const Stringmap& input)
 {
 	auto series {input.find("series")};
-	auto deltaX {input.find("deltaX")};
+	auto numberOfPoints {input.find("numberOfPoints")};
+	auto spacingType {input.find("spacingType")};
 
 	if (series == input.end())
 		throw std::runtime_error
@@ -237,16 +255,31 @@ void NacaProfileGenerator::parseInput(const Stringmap& input)
 
 	parseSeries(series->second);
 	
-	if (deltaX != input.end())
+	if (numberOfPoints != input.end())
 	{
-		deltaX_ = std::stod(deltaX->second);
+		numberOfPoints_ = std::stoi(numberOfPoints->second);
 
-		if (deltaX_ < 0.0 || deltaX_ > 1.0)
+		if (numberOfPoints_ < 0)
 			throw std::invalid_argument
 			(
 				"turbo::geometry::NacaProfileGenerator::"
 				"parseInput(const turbo::Stringmap&): "
-				"Value of keyword \"deltaX\" out of range [0,1]"
+				"Invalid value for keyword \"numberOfPoints\""
+			);
+	}
+
+	if (spacingType != input.end())
+	{
+		if (spacingType->second == "linear")
+			spacingType_ = spacing_::linear;
+		else if (spacingType->second == "cosine")
+			spacingType_ = spacing_::cosine;
+		else
+			throw std::invalid_argument
+			(
+				"turbo::geometry::NacaProfileGenerator::"
+				"parseInput(const turbo::Stringmap&): "
+				"Invalid value for keyword \"spacingType\""
 			);
 	}
 }
@@ -272,9 +305,12 @@ NacaProfileGenerator::NacaProfileGenerator(const Stringmap& input)
 	},
 	I_ {6.0},
 	M_ {0.3},
-	deltaX_ {0.01}
+	numberOfPoints_ {40},
+	spacingType_ {spacing_::cosine}
 {
 	parseInput(input);
+
+	setSpacingIncrement();
 
 	computeA0();
 	lookUpD1();
@@ -295,7 +331,7 @@ NacaProfileGenerator::~NacaProfileGenerator()
 
 void NacaProfileGenerator::generate()
 {
-	if (!empty())
+	if (!isEmpty())
 		return;
 
 	double thickness;

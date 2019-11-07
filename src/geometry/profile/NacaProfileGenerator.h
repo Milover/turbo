@@ -39,12 +39,13 @@ Description
 	where $t$ is max thickness and $c$ is chord length, to obtain ordinates
 	of profiles with a thickness-chord ratio other than 0.2.
 
-	The number of evaluation (cambe line) points is set via the ``deltaX''
-	keyword which specifies the spacing between the points. Note however
-	that the scaling is nonuniform as per \cite{}. The scaling is set to
-	$\Delta x / 40$ for $x < 0.0125$, to $\Delta x / 4$ for $0.0125 \geq x < 0.1$
-	and to $\Delta x$ for $x \geq 0.1$ up to the trailing egde. This is done
-	to resolve the leading edge radius properly.
+	The number of evaluation (cambe line) points is set via the
+	``numberOfPoints'' keyword and must be an integer number. The type of
+	scaling can be specified via the ``spacingType'' keyword. Currently
+	``linear'' and ``cosine'' spacing are available. Note that cosine spacing
+	is recommended as it gives appropriate resoultions (geometry and mesh) at
+	both the leading and the trailing edge. The default values for the
+	``numberOfPoints'' and ``spacingType'' are 40 and ``cosine'' respectively.
 
 	NOTE:
 		Currently only symmetrical profiles are supported (eg. ``0012'').
@@ -88,6 +89,7 @@ private:
 
 	static const std::map<int, double> d1Table_;
 	static const double scale_;
+	static const double chord_;
 
 	double m_;		// 1st digit / 100
 	double p_;		// 2nd digit / 10
@@ -95,7 +97,16 @@ private:
 	double I_;		// 5th digit
 	double M_;		// 6th digit / 10
 
-	double deltaX_;
+	int numberOfPoints_;
+	int spacingType_;
+	double spacingIncrement_;
+
+	enum spacing_
+	{
+		linear,
+		cosine
+	};
+
 	Vectorpair<double> camberLine_;
 
 
@@ -103,6 +114,9 @@ private:
 
 		//- Parse profile series
 		void parseSeries(const std::string& series);
+
+		//- Set spacing increment
+		void setSpacingIncrement();
 
 		//- Compute $a_0$ coefficient
 		void computeA0();

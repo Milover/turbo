@@ -72,15 +72,15 @@ ProfileGeneratorInterface::~ProfileGeneratorInterface()
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-int ProfileGeneratorInterface::size() const noexcept
+int ProfileGeneratorInterface::getSize() const noexcept
 {
-	return interfaceObject_->size();
+	return interfaceObject_->getSize();
 }
 
 
-bool ProfileGeneratorInterface::empty() const noexcept
+bool ProfileGeneratorInterface::isEmpty() const noexcept
 {
-	return interfaceObject_->empty();
+	return interfaceObject_->isEmpty();
 }
 
 

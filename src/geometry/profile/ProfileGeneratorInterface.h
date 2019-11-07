@@ -68,10 +68,10 @@ public:
 	// Member functions
 		
 		//- Get number of (camber line) points
-		int size() const noexcept;
+		int getSize() const noexcept;
 
 		//- Check if coordinates have beed generated
-		bool empty() const noexcept;
+		bool isEmpty() const noexcept;
 
 		//- Get a point on the upper surface at ``pos''
 		Point getUpperPointAt(const int pos) const;

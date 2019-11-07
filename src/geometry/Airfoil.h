@@ -69,6 +69,9 @@ public:
 	// Member functions
 
 		// Maybe try and implement through ManipulatorInterface?
+		// should be a ShapeBase (reimplement shape after
+		// NacaProfileGenerator is tested
+		// should also give some way to access surfacePoints_
 
 		//- Scale to chord
 		void scaleToChord(const double chord) const;			// not implemented
@@ -87,7 +90,7 @@ public:
 		(
 			const Shape& shape,
 			const Vector& vector
-		) const;		// not implemented
+		) const;												// not implemented
 
 
 	// Member operators

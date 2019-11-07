@@ -236,7 +236,7 @@ Vector Vector::operator/(const double d) const
 }
 
 
-Vector& Vector::operator/=(const double d) noexcept
+Vector& Vector::operator/=(const double d)
 {
 	if (isEqual(d, 0.0))
 		throw std::invalid_argument

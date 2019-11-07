@@ -70,13 +70,13 @@ public:
 		virtual void generate() = 0;
 
 		//- Get number of (camber line) points
-		inline int size() const noexcept
+		inline int getSize() const noexcept
 		{
 			return xyUpper_.size();
 		}
 
 		//- Check if coordinates have beed generated
-		inline bool empty() const noexcept
+		inline bool isEmpty() const noexcept
 		{
 			return xyUpper_.empty() && xyLower_.empty();
 		}
