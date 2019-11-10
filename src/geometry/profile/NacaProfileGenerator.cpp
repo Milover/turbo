@@ -53,16 +53,13 @@ void NacaProfileGenerator::parseSeries(const std::string& series)
 
 	auto pos {series.find('-')};
 
-	// 4-digit series
-	if (series.size() == 4 && pos == std::string::npos)
-	{}
-	// 4-digit modified series
-	else if (series.size() == 7 && pos == 4)
+	// if 4-digit modified series
+	if (series.size() == 7 && pos == 4)
 	{
 		I_ = toDouble(5, 1);
 		M_ = toDouble(6, 1) * 0.1;
 
-		if (M_ < 0.2 || M_ > 0.6)
+		if (!isInRange(M_, 0.2, 0.6))
 			throw std::invalid_argument
 			(
 				"turbo::geometry::NacaProfileGenerator::"
@@ -71,7 +68,12 @@ void NacaProfileGenerator::parseSeries(const std::string& series)
 				"position of max thickness out of range [2,6]"
 			);
 	}
-	else
+	// if not 4-digit series
+	else if
+	(
+		series.size() != 4 &&
+		pos != std::string::npos
+	)
 		throw std::invalid_argument
 		(
 			"turbo::geometry::NacaProfileGenerator::"
@@ -84,16 +86,36 @@ void NacaProfileGenerator::parseSeries(const std::string& series)
 	m_ = toDouble(0, 1) * 0.01;
 	p_ = toDouble(1, 1) * 0.1;
 	t_ = toDouble(2, 2) * 0.01;
+
+	if
+	(
+		isEqual(m_, 0.0) ||
+		isEqual(p_, 0.0)
+	)
+		if
+		(
+			!isEqual(m_, 0.0) ||
+			!isEqual(p_, 0.0)
+		)
+			throw std::invalid_argument
+			(
+				"turbo::geometry::NacaProfileGenerator::"
+				"parseSeries(const std::string&): "
+				"Invalid value of keyword \"series\""
+			);
 }
 
 
-void NacaProfileGenerator::setSpacingIncrement()
+void NacaProfileGenerator::setSpacingIncrement
+(
+	const int numberOfPoints = 40
+)
 {
-	if (spacingType_ == spacing_::linear)
-		spacingIncrement_ = chord_ / static_cast<double>(numberOfPoints_);
-	// spacing_::cosine is default
+	if (spacingType_ == spacing_::LINEAR)
+		spacingIncrement_ = chord_ / static_cast<double>(numberOfPoints - 1);
+	// spacing_::COSINE is default
 	else
-		spacingIncrement_ = pi / static_cast<double>(numberOfPoints_);
+		spacingIncrement_ = pi / static_cast<double>(numberOfPoints - 1);
 }
 
 
@@ -118,7 +140,7 @@ void NacaProfileGenerator::computeD2()
 {
 	double B {chord_ - M_};
 
-	d_[2] = (-3.0*d_[0] - 2.0*d_[1]*B + 1.5*t_) / std::pow(B, 2);
+	d_[2] = (-3.0*d_[0] - 2.0*d_[1]*B + 0.3) / std::pow(B, 2);
 }
 
 
@@ -145,11 +167,7 @@ void NacaProfileGenerator::generateCamberLine()
 	double x {0.0};
 	double y {0.0};
 
-	while
-	(
-		x < chord_ ||
-		isEqual(x, chord_)
-	)
+	while (isLessOrEqual(x, chord_))
 	{
 		camberLine_.push_back
 		(
@@ -158,36 +176,52 @@ void NacaProfileGenerator::generateCamberLine()
 
 		x = computeCamberX(x);
 		y = computeCamberY(x);
+
+		// don't go in circles
+		if (camberLine_.back().first > x)
+			break;
 	}
 }
 
 
-double NacaProfileGenerator::computeCamberX(const double x)
+double NacaProfileGenerator::computeCamberX(const double x) const
 {
-	if (spacingType_ == spacing_::linear)
+	if (spacingType_ == spacing_::LINEAR)
 	{
 		return x + spacingIncrement_;
 	}
-	// spacing_::cosine is default
+	// spacing_::COSINE is default
 	else
 	{
 		double angle
 		{
-			pi +
-			static_cast<double>(camberLine_.size()) * spacingIncrement_ +
-			spacingIncrement_
+			pi + static_cast<double>(camberLine_.size()) * spacingIncrement_
 		};
 
 		// scale and shift the unit circle
-		return 0.5 * chord_ * (1 - std::cos(angle));
+		return 0.5 * chord_ * (1.0 + std::cos(angle));
 	}
 }
 
 
-// temporary implementation
-double NacaProfileGenerator::computeCamberY(const double x)
+double NacaProfileGenerator::computeCamberY(const double x) const
 {
-	return 0.0;
+	if
+	(
+		isEqual(p_, 0.0) ||
+		isEqual(m_, 0.0)
+	)
+		return 0.0;
+	else if (x < M_)
+		return m_ / std::pow(p_, 2) *
+			(
+				2.0 * p_ * x - std::pow(x, 2)
+			);
+	else
+		return m_ / std::pow((1.0 - p_), 2) *
+			(
+				1.0 - 2.0 * p_ + 2.0 * p_ * x - std::pow(x, 2)
+			);
 }
 
 
@@ -202,38 +236,48 @@ double NacaProfileGenerator::computeThickness(const double x) const
 	// M to trailing edge
 	else
 		return d_[0] +
-			   d_[1] * (1.0 - x) +
-			   d_[2] * std::pow((1.0 - x), 2) +
-			   d_[3] * std::pow((1.0 - x), 3);
+			   d_[1] * (chord_ - x) +
+			   d_[2] * std::pow((chord_ - x), 2) +
+			   d_[3] * std::pow((chord_ - x), 3);
 }
 
 
-// temporary implementation
 double NacaProfileGenerator::computeInclination(const double x) const
 {
-	return 0.0;
+	double dydx;
+
+	if
+	(
+		isEqual(p_, 0.0) ||
+		isEqual(m_, 0.0)
+	)
+		dydx = 0.0;
+	else if (x < M_)
+		dydx = 2.0 * m_ / std::pow(p_, 2) * (p_ - x);
+	else
+		dydx = 2.0 * m_ / std::pow((1.0 - p_), 2) * (p_ - x);
+	
+	return std::atan(dydx);
 }
 
 
-// temporary implementation
 double NacaProfileGenerator::computeDX
 (
 	const double thickness,
 	const double inclination
 ) const
 {
-	return 0.0;
+	return - thickness * std::sin(inclination);
 }
 
 
-// temporary implementation
 double NacaProfileGenerator::computeDY
 (
 	const double thickness,
 	const double inclination
 ) const
 {
-	return 0.0;
+	return thickness * std::cos(inclination);
 }
 
 
@@ -254,26 +298,13 @@ void NacaProfileGenerator::parseInput(const Stringmap& input)
 		);
 
 	parseSeries(series->second);
-	
-	if (numberOfPoints != input.end())
-	{
-		numberOfPoints_ = std::stoi(numberOfPoints->second);
-
-		if (numberOfPoints_ < 0)
-			throw std::invalid_argument
-			(
-				"turbo::geometry::NacaProfileGenerator::"
-				"parseInput(const turbo::Stringmap&): "
-				"Invalid value for keyword \"numberOfPoints\""
-			);
-	}
 
 	if (spacingType != input.end())
 	{
 		if (spacingType->second == "linear")
-			spacingType_ = spacing_::linear;
+			spacingType_ = spacing_::LINEAR;
 		else if (spacingType->second == "cosine")
-			spacingType_ = spacing_::cosine;
+			spacingType_ = spacing_::COSINE;
 		else
 			throw std::invalid_argument
 			(
@@ -282,6 +313,22 @@ void NacaProfileGenerator::parseInput(const Stringmap& input)
 				"Invalid value for keyword \"spacingType\""
 			);
 	}
+	
+	if (numberOfPoints != input.end())
+	{
+		int number {std::stoi(numberOfPoints->second)};
+		if (number <= 0)
+			throw std::invalid_argument
+			(
+				"turbo::geometry::NacaProfileGenerator::"
+				"parseInput(const turbo::Stringmap&): "
+				"Invalid value for keyword \"numberOfPoints\""
+			);
+
+		setSpacingIncrement(number);
+	}
+	else
+		setSpacingIncrement();
 }
 
 
@@ -305,12 +352,9 @@ NacaProfileGenerator::NacaProfileGenerator(const Stringmap& input)
 	},
 	I_ {6.0},
 	M_ {0.3},
-	numberOfPoints_ {40},
-	spacingType_ {spacing_::cosine}
+	spacingType_ {spacing_::COSINE}
 {
 	parseInput(input);
-
-	setSpacingIncrement();
 
 	computeA0();
 	lookUpD1();
@@ -344,7 +388,7 @@ void NacaProfileGenerator::generate()
 	for (auto p : camberLine_)
 	{
 		thickness = computeThickness(p.first);
-		inclination = computeThickness(p.first);
+		inclination = computeInclination(p.first);
 
 		dx = computeDX(thickness, inclination);
 		dy = computeDY(thickness, inclination);

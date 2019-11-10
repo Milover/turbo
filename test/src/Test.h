@@ -177,6 +177,33 @@ std::string randomString
 }
 
 
+void compareTest
+(
+	bool& pass,
+	const bool test,
+	const bool output,
+	const std::string& testString
+)
+{
+	auto totalWidth {30};
+	auto outputWidth {totalWidth - testString.size() - 3};
+
+	if (output)
+		std::cout << testString << "...";
+
+	if (test)
+	{
+		if (output)
+			std::cout << std::setw(outputWidth) << "PASS\n";
+	}
+	else
+	{
+		if (output)
+			std::cout << std::setw(outputWidth) << "FAIL\n";
+		pass = false;
+	}
+}
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace test

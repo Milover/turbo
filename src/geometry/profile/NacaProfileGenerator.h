@@ -97,14 +97,13 @@ private:
 	double I_;		// 5th digit
 	double M_;		// 6th digit / 10
 
-	int numberOfPoints_;
 	int spacingType_;
 	double spacingIncrement_;
 
 	enum spacing_
 	{
-		linear,
-		cosine
+		LINEAR,
+		COSINE
 	};
 
 	Vectorpair<double> camberLine_;
@@ -116,7 +115,7 @@ private:
 		void parseSeries(const std::string& series);
 
 		//- Set spacing increment
-		void setSpacingIncrement();
+		void setSpacingIncrement(const int numberOfPoints);
 
 		//- Compute $a_0$ coefficient
 		void computeA0();
@@ -137,30 +136,30 @@ private:
 		void generateCamberLine();
 
 		//- Compute camber abscissa at a given point
-		double computeCamberX(const double x);
+		double computeCamberX(const double x) const;
 
 		//- Compute camber ordinate at a given point
-		double computeCamberY(const double x);				// temporary implementation
+		double computeCamberY(const double x) const;
 
 		//- Compute profile thickness at ``x''
 		double computeThickness(const double x) const;
 
 		//- Compute camber inclination at ``x''
-		double computeInclination(const double x) const;	// temporary implementation
+		double computeInclination(const double x) const;
 
 		//- Compute surface x-coordinate offset
 		double computeDX
 		(
 			const double thickness,
 			const double inclination
-		) const;											// temporary implementation
+		) const;
 
 		//- Compute surface y-coordinate offset
 		double computeDY
 		(
 			const double thickness,
 			const double inclination
-		) const;											// temporary implementation
+		) const;
 
 
 protected:
@@ -178,8 +177,8 @@ public:
 		//- Default constructor
 		NacaProfileGenerator(const Stringmap& input);
 	
-		//- Disallow copy construction
-		NacaProfileGenerator(const NacaProfileGenerator&) = delete;
+		//- Copy constructor
+		NacaProfileGenerator(const NacaProfileGenerator&) = default;
 
 
 	//- Destructor

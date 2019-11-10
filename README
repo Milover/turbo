@@ -11,7 +11,7 @@ License
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 /*---------------------------------------------------------------------------*\
-								DESCRIPTION
+                                DESCRIPTION
 \*---------------------------------------------------------------------------*/
 
 Under construction :D
@@ -19,7 +19,7 @@ Under construction :D
 
 
 /*---------------------------------------------------------------------------*\
-								DEPENDENCIES
+                                DEPENDENCIES
 \*---------------------------------------------------------------------------*/
 
 The following are dependencies to build the sources:
@@ -29,7 +29,7 @@ The following are dependencies to build the sources:
 	Doxygen (v1.8 or higher) - for documentation only
 
 
-	Linux:
+Linux:
 
 If building on Linux machines both CMake and Gmsh are available as packages
 from the repositories:
@@ -42,7 +42,7 @@ Alternatively see instructions for Mac machines for piecewise building.
 Once installed see the Building section for the build procedure.
 
 
-	Mac:
+Mac:
 
 If building on Mac machines the CMake binary (and sources) is available at
 the following website:
@@ -71,13 +71,13 @@ Doxygen is available at ...
 
 
 /*---------------------------------------------------------------------------*\
-								BUILDING
+                                BUILDING
 \*---------------------------------------------------------------------------*/
 
 The 'turbo' sources are available at the following repositories:
 
 	github.com/Milover/turbo
-	bitbucket.com/Milover/turbo
+	bitbucket.com/pmilovic/turbo
 
 Either clone or download them and then execute the following commands:
 

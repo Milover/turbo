@@ -56,9 +56,9 @@ public:
 	
 	// Constructors
 		
-		//- Disallow copy construction
-		ProfileGeneratorBase(const ProfileGeneratorBase&) = delete;
-	
+		//- Copy constructor
+		ProfileGeneratorBase(const ProfileGeneratorBase&) = default;
+
 
 	//- Destructor
 	virtual ~ProfileGeneratorBase() = default;

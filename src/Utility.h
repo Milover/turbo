@@ -50,7 +50,7 @@ constexpr auto toUnderlying(T t) noexcept
 }
 
 
-//- Compare two numbers (up to ''about`` machine precision)
+//- Compare two numbers (up to ``about'' machine precision)
 template<class T>
 typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type
 isEqual
@@ -64,9 +64,53 @@ isEqual
 	// of the values used and multiplied by the desired precision
 	// in ULPs (units in the last place)
 	return std::abs(x - y) <=
-		std::numeric_limits<T>::epsilon() * std::fabs(x + y) * ulp
+		std::numeric_limits<T>::epsilon() * std::abs(x + y) * ulp
 		// unless the result is subnormal
 		|| std::abs(x - y) < std::numeric_limits<T>::min();
+}
+
+
+//- Check if 'x' is less or equal to 'y'
+template<class T>
+typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type
+isLessOrEqual
+(
+	T x,
+	T y,
+	int ulp = 2
+)
+{
+	return x < y || isEqual(x, y, ulp);
+}
+
+
+//- Check if 'x' is greater or equal to 'y'
+template<class T>
+typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type
+isGreaterOrEqual
+(
+	T x,
+	T y,
+	int ulp = 2
+)
+{
+	return x > y || isEqual(x, y, ulp);
+}
+
+
+//- Check if 'x' is in range [min, max] (inclusive)
+template<class T>
+typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type
+isInRange
+(
+	T x,
+	T min,
+	T max,
+	int ulp = 2
+)
+{
+	return isGreaterOrEqual(x, min, ulp) ||
+		   isLessOrEqual(x, max, ulp);
 }
 
 
