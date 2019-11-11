@@ -28,7 +28,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 # compiler flags
 add_compile_options(
 		"-Wall" "-Wextra"
-		"$<$<CONFIG:DEBUG>:-O0>"
+		"$<$<CONFIG:DEBUG>:-O2>"
 		"$<$<CONFIG:RELEASE>:-O3>"
 )
 

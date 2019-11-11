@@ -60,9 +60,6 @@ private:
 
 protected:
 
-	// Protected data
-	
-
 	// Constructors
 		
 		//- Construct from tag
@@ -72,13 +69,7 @@ protected:
 		Shape(const Shape&) noexcept;
 
 
-	// Member functions
-
-
 public:
-
-	// Constructors
-	
 
 	//- Destructor
 	virtual ~Shape() noexcept;

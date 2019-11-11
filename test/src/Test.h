@@ -54,6 +54,7 @@ void initialize
 	{
 		gmsh::initialize(0, 0, false);
 	}
+	gmsh::option::setNumber("Geometry.AutoCoherence", 0);
 	gmsh::model::add(s);
 }
 

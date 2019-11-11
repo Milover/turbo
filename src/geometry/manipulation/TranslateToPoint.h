@@ -7,19 +7,21 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::ManipulatorBase
+	turbo::geometry::TranslateToPoint
 
 Description
-	Abstract base class template for manipulation of geometry.
+	Class TranslateToPoint
+
+SourceFiles
+	TranslateToPoint.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef MANIPULATOR_BASE_H
-#define MANIPULATOR_BASE_H
+#ifndef TRANSLATE_TO_POINT_H
+#define TRANSLATE_TO_POINT_H
 
-#include <type_traits>
-
-#include "Utility.h"
+#include "TranslateBase.h"
+#include "Point.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -29,48 +31,42 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-						Class ManipulatorBase Declaration
+					Class TranslateToPoint Declaration
 \*---------------------------------------------------------------------------*/
 
-template<typename... T>
-class ManipulatorBase
+class TranslateToPoint final
+:
+	public TranslateBase<Point, Point>
 {
-protected:
-
-	// Constructors
-		
-		//- Default constructor
-		ManipulatorBase() = default;
-
-
 public:
 
 	// Constructors
 
+		//- Default constructor
+		TranslateToPoint() = default;
+
 		//- Disallow copy construction
-		ManipulatorBase(const ManipulatorBase&) = delete;
+		TranslateToPoint(const TranslateToPoint&) = delete;
 
 
 	//- Destructor
-	virtual ~ManipulatorBase() = default;
+	~TranslateToPoint();
 
 
 	// Member functions
 
-		//- Manipulate geometry
-		virtual void manipulate(const Vectorpair<int>& dimTags) const = 0;
-
-		//- Check if manipulation parameters are set
-		virtual bool isSet() const noexcept = 0;
-
-		//- Set manipulation parameter
-		virtual void setParameters(const T&... t) noexcept = 0;
+		//- Set translation vector
+		void setParameters
+		(
+			const Point& fromPoint,
+			const Point& toPoint
+		) noexcept override;
 
 
 	// Member operators
 
 		//- Disallow assignment
-		ManipulatorBase& operator=(const ManipulatorBase&) = delete;
+		TranslateToPoint& operator=(const TranslateToPoint&) = delete;
 
 
 };

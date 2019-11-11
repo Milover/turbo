@@ -9,7 +9,6 @@ add_subdirectory(profile)
 
 # add sources
 set(SRC
-	Airfoil.cpp
 	)
 
 # append to sources

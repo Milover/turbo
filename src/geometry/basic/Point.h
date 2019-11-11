@@ -41,18 +41,7 @@ class Point
 :
 	public Shape
 {
-private:
-
-	// Private data
-
-	
-	// Member functions
-
-
 protected:
-
-	// Protected data
-	
 
 	// Member functions
 

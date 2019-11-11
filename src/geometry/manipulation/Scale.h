@@ -7,19 +7,22 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::ManipulatorBase
+	turbo::geometry::Translate
 
 Description
-	Abstract base class template for manipulation of geometry.
+	Class Translate for translation of geometry and a base class for more
+	specialized translation classes.
+
+SourceFiles
+	Translate.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef MANIPULATOR_BASE_H
-#define MANIPULATOR_BASE_H
+#ifndef TRANSLATE_H
+#define TRANSLATE_H
 
-#include <type_traits>
-
-#include "Utility.h"
+#include "ManipulatorBase.h"
+#include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -29,48 +32,44 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-						Class ManipulatorBase Declaration
+						Class Translate Declaration
 \*---------------------------------------------------------------------------*/
 
-template<typename... T>
-class ManipulatorBase
+class Translate
+:
+	public ManipulatorBase<Vector>
 {
-protected:
-
-	// Constructors
-		
-		//- Default constructor
-		ManipulatorBase() = default;
-
-
 public:
 
 	// Constructors
 
+		//- Default constructor
+		Translate() = default;
+
 		//- Disallow copy construction
-		ManipulatorBase(const ManipulatorBase&) = delete;
+		Translate(const Translate&) = delete;
+
+		//- Construct with parameter
+		Translate(const Vector& vector);
 
 
 	//- Destructor
-	virtual ~ManipulatorBase() = default;
+	virtual ~Translate();
 
 
 	// Member functions
 
 		//- Manipulate geometry
-		virtual void manipulate(const Vectorpair<int>& dimTags) const = 0;
-
-		//- Check if manipulation parameters are set
-		virtual bool isSet() const noexcept = 0;
-
-		//- Set manipulation parameter
-		virtual void setParameters(const T&... t) noexcept = 0;
+		virtual void manipulate
+		(
+			const Vectorpair<int>& dimTags
+		) const override;
 
 
 	// Member operators
 
 		//- Disallow assignment
-		ManipulatorBase& operator=(const ManipulatorBase&) = delete;
+		Translate& operator=(const Translate&) = delete;
 
 
 };

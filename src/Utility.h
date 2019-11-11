@@ -17,6 +17,7 @@ Description
 #include <cmath>
 #include <limits>
 #include <map>
+#include <memory>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -27,20 +28,27 @@ Description
 namespace turbo
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * Constants * * * * * * * * * * * * * * * * //
 
-// Typedefs
-typedef std::map<std::string, std::string> Stringmap;
-
-
-// Constants
 static constexpr double pi {3.141592653589793238463};
 
 
-//- Vector of pairs template alias
-template<typename T>
+// * * * * * * * * * * * * * * * * Typedefs  * * * * * * * * * * * * * * * * //
+
+typedef std::map<std::string, std::string> Stringmap;
+
+
+// * * * * * * * * * * * * * * Template Aliases  * * * * * * * * * * * * * * //
+
+template <typename T>
 using Vectorpair = std::vector<std::pair<T, T>>;
 
+
+template <typename T>
+using Ptrvector = std::vector<std::unique_ptr<T>>;
+
+
+// * * * * * * * * * * * * * * * * Functions * * * * * * * * * * * * * * * * //
 
 //- Static cast (enum class) to underlying type
 template <typename T>

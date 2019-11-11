@@ -7,19 +7,23 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::ManipulatorBase
+	turbo::geometry::TranslateBase
 
 Description
-	Abstract base class template for manipulation of geometry.
+	Base class template for geometry translation operations.
+
+SourceFiles
+	TranslateBase.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef MANIPULATOR_BASE_H
-#define MANIPULATOR_BASE_H
+#ifndef TRANSLATE_BASE_H
+#define TRANSLATE_BASE_H
 
-#include <type_traits>
+#include <memory>
 
-#include "Utility.h"
+#include "ManipulatorBase.h"
+#include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -29,48 +33,59 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-						Class ManipulatorBase Declaration
+						Class TranslateBase Declaration
 \*---------------------------------------------------------------------------*/
 
 template<typename... T>
-class ManipulatorBase
+class TranslateBase
+:
+	public ManipulatorBase<T...>
 {
+private:
+
+	// Private data
+
+		std::unique_ptr<Vector> vector_;
+
 protected:
 
-	// Constructors
-		
-		//- Default constructor
-		ManipulatorBase() = default;
+	// Member functions
+
+		//- Set vector
+		void setVector(const Vector& vector) noexcept;
 
 
 public:
 
 	// Constructors
 
+		//- Default constructor
+		TranslateBase() = default;
+
 		//- Disallow copy construction
-		ManipulatorBase(const ManipulatorBase&) = delete;
+		TranslateBase(const TranslateBase&) = delete;
 
 
 	//- Destructor
-	virtual ~ManipulatorBase() = default;
+	virtual ~TranslateBase();
 
 
 	// Member functions
 
 		//- Manipulate geometry
-		virtual void manipulate(const Vectorpair<int>& dimTags) const = 0;
+		void manipulate(const Vectorpair<int>& dimTags) const final;
 
-		//- Check if manipulation parameters are set
-		virtual bool isSet() const noexcept = 0;
+		//- Check if translation vector is set
+		bool isSet() const noexcept final;
 
-		//- Set manipulation parameter
+		//- Set translation vector
 		virtual void setParameters(const T&... t) noexcept = 0;
 
 
 	// Member operators
 
 		//- Disallow assignment
-		ManipulatorBase& operator=(const ManipulatorBase&) = delete;
+		TranslateBase& operator=(const TranslateBase&) = delete;
 
 
 };

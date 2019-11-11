@@ -8,12 +8,9 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include <memory>
-
-#include "Airfoil.h"
+#include "CascadeComponentBase.h"
 #include "Point.h"
-#include "ProfileGeneratorInterface.h"
-#include "Utility.h"
+#include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -22,34 +19,9 @@ namespace turbo
 namespace geometry
 {
 
-
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-void Airfoil::generatePoints(const Stringmap& input)
-{
-	ProfileGeneratorInterface generator {input};
-
-	for (int i {0}; i < generator.getSize(); i++)
-	{
-		surfacePoints_.push_back
-		(
-			std::make_pair
-			(
-				std::make_unique<Point>
-				(
-					generator.getUpperPointAt(i)
-				),
-				std::make_unique<Point>
-				(
-					generator.getLowerPointAt(i)
-				)
-			)
-		);
-	}
-}
-
-
-Vectorpair<int> getDimTags() const noexcept override
+Vectorpair<int>  CascadeComponentBase::getDimTags() const noexcept
 {
 
 }
@@ -57,22 +29,45 @@ Vectorpair<int> getDimTags() const noexcept override
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-Airfoil::Airfoil
+CascadeComponentBase::CascadeComponentBase
 (
-	const Stringmap& input
+	const CascadeComponentBase& component
 )
 {
-	generatePoints(input);
+
 }
 
 
-// * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
-
-Airfoil::~Airfoil()
-{}
-
-
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+Point CascadeComponentBase::getCenter() const noexcept
+{
+
+}
+
+
+Point CascadeComponentBase::translate(const Vector& vector) const noexcept
+{
+
+}
+
+
+Point CascadeComponentBase::centerOnPoint(const Point& point) const noexcept
+{
+
+}
+
+
+Point CascadeComponentBase::rotate(const double angle) const noexcept
+{
+
+}
+
+
+Point CascadeComponentBase::scale(const double factor) const noexcept
+{
+
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

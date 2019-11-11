@@ -7,19 +7,21 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::ManipulatorBase
+	turbo::geometry::TranslateAlongVector
 
 Description
-	Abstract base class template for manipulation of geometry.
+	Class TranslateAlongVector
+
+SourceFiles
+	TranslateAlongVector.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef MANIPULATOR_BASE_H
-#define MANIPULATOR_BASE_H
+#ifndef TRANSLATE_ALONG_VECTOR_H
+#define TRANSLATE_ALONG_VECTOR_H
 
-#include <type_traits>
-
-#include "Utility.h"
+#include "TranslateBase.h"
+#include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -29,48 +31,38 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-						Class ManipulatorBase Declaration
+					Class TranslateAlongVector Declaration
 \*---------------------------------------------------------------------------*/
 
-template<typename... T>
-class ManipulatorBase
+class TranslateAlongVector final
+:
+	public TranslateBase<Vector>
 {
-protected:
-
-	// Constructors
-		
-		//- Default constructor
-		ManipulatorBase() = default;
-
-
 public:
 
 	// Constructors
 
+		//- Default constructor
+		TranslateAlongVector() = default;
+
 		//- Disallow copy construction
-		ManipulatorBase(const ManipulatorBase&) = delete;
+		TranslateAlongVector(const TranslateAlongVector&) = delete;
 
 
 	//- Destructor
-	virtual ~ManipulatorBase() = default;
+	~TranslateAlongVector();
 
 
 	// Member functions
 
-		//- Manipulate geometry
-		virtual void manipulate(const Vectorpair<int>& dimTags) const = 0;
-
-		//- Check if manipulation parameters are set
-		virtual bool isSet() const noexcept = 0;
-
-		//- Set manipulation parameter
-		virtual void setParameters(const T&... t) noexcept = 0;
+		//- Set translation vector
+		void setParameters(const Vector& vector) noexcept override;
 
 
 	// Member operators
 
 		//- Disallow assignment
-		ManipulatorBase& operator=(const ManipulatorBase&) = delete;
+		TranslateAlongVector& operator=(const TranslateAlongVector&) = delete;
 
 
 };

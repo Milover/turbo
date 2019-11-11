@@ -7,22 +7,22 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::Airfoil
+	turbo::geometry::CascadeComponentBase
 
 Description
-	Class Airfoil
+	Abstract base class for cascade components.
 
 SourceFiles
-	Airfoil.cpp
+	CascadeComponentBase.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef AIRFOIL_H
-#define AIRFOIL_H
+#ifndef CASCADE_COMPONENT_BASE_H
+#define CASCADE_COMPONENT_BASE_H
 
-#include "CascadeComponentBase.h"
+#include <memory>
+
 #include "Point.h"
-#include "Utility.h"
 #include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -33,63 +33,70 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-						Class Airfoil Declaration
+					Class CascadeComponentBase  Declaration
 \*---------------------------------------------------------------------------*/
 
-class Airfoil final
-:
-	public CascadeComponentBase
+class CascadeComponentBase
 {
-private:
-	
-	// Private data
-
-		bool evolved;
-
 protected:
+
+	// Protected data
+	
+		Ptrvector<Point> points_;
+
+
+	// Constructors
+		
+		//- Default constructor
+		CascadeComponentBase() = default;
+	
 
 	// Member functions
 
-		//- Build geometry
-		void generatePoints(const Stringmap& input) override;
+		//- Generate points from input map
+		virtual void generatePoints(const Stringmap& input) = 0;
 
 		//- Get vector of dimTags of underlying geometry
-		 Vectorpair<int> getDimTags() const noexcept override;
+		virtual Vectorpair<int> getDimTags() const noexcept;
 
 
 public:
 	
 	// Constructors
 
-		//- Construct from input map
-		Airfoil(const Stringmap& input);
-
 		//- Copy constructor
-		Airfoil(const Airfoil&);
+		CascadeComponentBase(const CascadeComponentBase&);
 
 
 	//- Destructor
-	~Airfoil();
+	virtual ~CascadeComponentBase() = default;
 
 
 	// Member functions
 
 		//- Build geometry
-		void build();
+		virtual void build() = 0;
 
-		//- Create cylindrical section and evolve,
-		//  cylinder radius is determined from current
-		//  geometric center
-		void evolveSection();							// not implemented
+		//- Get geometric center
+		Point getCenter() const noexcept;
 
-		//- Return evolved state
-		bool isEvolved() const noexcept;
+		//- Translate along vector
+		void translate(const Vector& vector) const noexcept;
+
+		//- Align geometric center with a point
+		void centerOnPoint(const Point& point) const noexcept;
+
+		//- Rotate around geometric center by 'angle' radians
+		void rotate(const double angle) const noexcept;
+
+		//- Scale uniformly about geometric center
+		void scale(const double factor) const noexcept;
 
 
 	// Member operators
 	
 		//- Disallow assignment
-		Airfoil& operator=(const Airfoil&) = delete;
+		CascadeComponentBase& operator=(const CascadeComponentBase&) = delete;
 
 
 };

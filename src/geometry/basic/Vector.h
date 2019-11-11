@@ -57,7 +57,7 @@ struct Vector
 		) noexcept;
 
 		//- Construct from an axis
-		Vector(const Axis&) noexcept;
+		Vector(const Axis& axis) noexcept;
 
 		//- Copy constructor
 		Vector(const Vector&) noexcept;
