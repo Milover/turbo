@@ -20,8 +20,6 @@ SourceFiles
 #ifndef PROFILE_GENERATOR_INTERFACE_H
 #define PROFILE_GENERATOR_INTERFACE_H
 
-#include <memory>
-
 #include "GenericInterface.h"
 #include "Point.h"
 #include "ProfileGeneratorBase.h"
@@ -35,7 +33,7 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-				Class ProfileGeneratorInterace Declaration
+				Class ProfileGeneratorInterface Declaration
 \*---------------------------------------------------------------------------*/
 
 class ProfileGeneratorInterface final
@@ -56,13 +54,10 @@ public:
 		
 		//- Construct from input data
 		ProfileGeneratorInterface(const Stringmap& input);
-
-		//- Disallow copy construction
-		ProfileGeneratorInterface(const ProfileGeneratorInterface&) = delete;
 	
 
 	//- Destructor
-	~ProfileGeneratorInterface();
+	~ProfileGeneratorInterface() = default;
 
 
 	// Member functions
@@ -78,16 +73,6 @@ public:
 
 		//- Get a point on the lower surface at ``pos''
 		Point getLowerPointAt(const int pos) const;
-
-
-	// Member operators
-
-		//- Disallow assignment
-		ProfileGeneratorInterface& operator=
-		(
-			const ProfileGeneratorInterface&
-		) = delete;
-
 
 };
 

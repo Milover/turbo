@@ -8,13 +8,10 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include <string>
 #include <utility>
-#include <vector>
 
 #include "gmsh.h"
 
-#include "Axis.h"
 #include "Shape.h"
 #include "Utility.h"
 
@@ -24,6 +21,10 @@ namespace turbo
 {
 namespace geometry
 {
+
+// * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * * //
+
+bool Shape::sync_ {false};
 
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
@@ -52,24 +53,29 @@ int Shape::copy() const noexcept
 }
 
 
+void Shape::sync() noexcept
+{
+	if (!sync_)
+		gmsh::model::geo::synchronize();
+}
+
+
 // * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
 
 Shape::Shape(const std::pair<int, int> dimTag) noexcept
 :
 	dimTag_ {dimTag}
-{}
+{
+	sync_ = false;
+}
 
 
 Shape::Shape(const Shape& shape) noexcept
 :
 	dimTag_ {shape.dimTag_.first, shape.copy()}
-{}
-
-
-// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
+{
+	sync_ = false;
+}
 
 
 // * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
@@ -77,6 +83,8 @@ Shape::Shape(const Shape& shape) noexcept
 Shape::~Shape() noexcept
 {
 	remove();
+
+	sync_ = false;
 }
 
 
@@ -88,65 +96,43 @@ std::pair<int, int> Shape::getDimTag() const noexcept
 }
 
 
-void Shape::getBoundary(Vectorpair<int>& dimTags) const noexcept
-{
-	gmsh::model::getBoundary
-	(
-		Vectorpair<int> {dimTag_},
-		dimTags,
-		false,		// combined
-		true		// oriented
-	);
-}
-
-
 Vectorpair<double> Shape::getBoundingBox() const noexcept
 {
-	Vectorpair<double> minMax (3);
+	sync();
+
+	double xmin, ymin, zmin, xmax, ymax, zmax;
 
 	gmsh::model::getBoundingBox
 	(
-		dimTag_.first,
-		dimTag_.second,
-		minMax[toUnderlying(Axis::X)].first,
-		minMax[toUnderlying(Axis::Y)].first,
-		minMax[toUnderlying(Axis::Z)].first,
-		minMax[toUnderlying(Axis::X)].second,
-		minMax[toUnderlying(Axis::Y)].second,
-		minMax[toUnderlying(Axis::Z)].second
+		getDimTag().first,
+		getDimTag().second,
+		xmin,
+		ymin,
+		zmin,
+		xmax,
+		ymax,
+		zmax
 	);
 
-	return minMax;
+	return Vectorpair<double>
+	{
+		std::make_pair(xmin, xmax),
+		std::make_pair(ymin, ymax),
+		std::make_pair(zmin, zmax)
+	};
 }
 
 
-std::string Shape::getName() const noexcept
+void Shape::setSync(const bool sync) noexcept
 {
-	std::string name;
-
-	gmsh::model::getEntityName
-	(
-		dimTag_.first,
-		dimTag_.second,
-		name
-	);
-
-	return name;
+	sync_ = sync;
 }
 
 
-void Shape::setName(const std::string& name) noexcept
+bool Shape::isSync() noexcept
 {
-	gmsh::model::setEntityName
-	(
-		dimTag_.first,
-		dimTag_.second,
-		name
-	);
+	return sync_;
 }
-
-
-// * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

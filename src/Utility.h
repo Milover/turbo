@@ -14,6 +14,7 @@ Description
 #ifndef UTILITY_H
 #define UTILITY_H
 
+#include <array>
 #include <cmath>
 #include <limits>
 #include <map>
@@ -30,12 +31,15 @@ namespace turbo
 
 // * * * * * * * * * * * * * * * * Constants * * * * * * * * * * * * * * * * //
 
-static constexpr double pi {3.141592653589793238463};
+static constexpr double pi {M_PI};
 
 
 // * * * * * * * * * * * * * * * * Typedefs  * * * * * * * * * * * * * * * * //
 
 typedef std::map<std::string, std::string> Stringmap;
+
+
+typedef std::array<double, 3> PointCoordinates;
 
 
 // * * * * * * * * * * * * * * Template Aliases  * * * * * * * * * * * * * * //
@@ -48,15 +52,7 @@ template <typename T>
 using Ptrvector = std::vector<std::unique_ptr<T>>;
 
 
-// * * * * * * * * * * * * * * * * Functions * * * * * * * * * * * * * * * * //
-
-//- Static cast (enum class) to underlying type
-template <typename T>
-constexpr auto toUnderlying(T t) noexcept
-{
-	return static_cast<typename std::underlying_type_t<T>>(t);
-}
-
+// * * * * * * * * * * * * * * Functions * * * * * * * * * * * * * * * * * * //
 
 //- Compare two numbers (up to ``about'' machine precision)
 template<class T>

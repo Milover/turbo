@@ -7,13 +7,13 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::TranslateBase
+	turbo::geometry::Translate
 
 Description
-	Base class template for geometry translation operations.
+	Translate class for translation of geometry
 
 SourceFiles
-	TranslateBase.cpp
+	Translate.cpp
 
 \*---------------------------------------------------------------------------*/
 
@@ -23,6 +23,8 @@ SourceFiles
 #include <memory>
 
 #include "ManipulatorBase.h"
+#include "Point.h"
+#include "Utility.h"
 #include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -33,13 +35,12 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-						Class TranslateBase Declaration
+						Class Translate Declaration
 \*---------------------------------------------------------------------------*/
 
-template<typename... T>
-class TranslateBase
+class Translate final
 :
-	public ManipulatorBase<T...>
+	public ManipulatorBase<Vector>
 {
 private:
 
@@ -47,12 +48,16 @@ private:
 
 		std::unique_ptr<Vector> vector_;
 
+
 protected:
 
 	// Member functions
 
-		//- Set vector
-		void setVector(const Vector& vector) noexcept;
+		//- Manipulate geometry
+		void executeManipulation
+		(
+			const Vectorpair<int>& dimTags
+		) const override;
 
 
 public:
@@ -60,33 +65,28 @@ public:
 	// Constructors
 
 		//- Default constructor
-		TranslateBase() = default;
-
-		//- Disallow copy construction
-		TranslateBase(const TranslateBase&) = delete;
+		Translate() = default;
 
 
 	//- Destructor
-	virtual ~TranslateBase();
+	~Translate() = default;
 
 
 	// Member functions
 
-		//- Manipulate geometry
-		void manipulate(const Vectorpair<int>& dimTags) const final;
+		//- Set translation vector
+		void setParameters(const Vector& vector) noexcept override;
+
+		//- Set translation vector from points,
+		//  'pTo' defaults to origin
+		void setParameters
+		(
+			const Point& pFrom,
+			const Point& pTo = Point {0.0, 0.0}
+		) noexcept;
 
 		//- Check if translation vector is set
-		bool isSet() const noexcept final;
-
-		//- Set translation vector
-		virtual void setParameters(const T&... t) noexcept = 0;
-
-
-	// Member operators
-
-		//- Disallow assignment
-		TranslateBase& operator=(const TranslateBase&) = delete;
-
+		bool isSet() const noexcept override;
 
 };
 

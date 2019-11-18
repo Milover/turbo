@@ -10,8 +10,7 @@ Class
 	turbo::geometry::Rotate
 
 Description
-	Class Rotate for rotation of geometry and a base class for more
-	specialized rotation classes.
+	Class Rotate for rotation of geometry
 
 SourceFiles
 	Rotate.cpp
@@ -21,9 +20,12 @@ SourceFiles
 #ifndef ROTATE_H
 #define ROTATE_H
 
+#include <memory>
+#include <optional>
+
+#include "Axis.h"
 #include "ManipulatorBase.h"
-#include "Point.h"
-#include "Vector.h"
+#include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -36,42 +38,53 @@ namespace geometry
 						Class Rotate Declaration
 \*---------------------------------------------------------------------------*/
 
-class Rotate
+class Rotate final
 :
-	public ManipulatorBase<Vector>
+	public ManipulatorBase<double, std::optional<Axis>>
 {
-public:
+private:
 
-	// Constructors
+	// Private data
 
-		//- Default constructor
-		Translate() = default;
-
-		//- Disallow copy construction
-		Translate(const Translate&) = delete;
-
-		//- Construct with parameter
-		Translate(const Vector& vector);
+		double angle_;
+		std::unique_ptr<Axis> axis_;
 
 
-	//- Destructor
-	virtual ~Translate();
-
+protected:
 
 	// Member functions
 
 		//- Manipulate geometry
-		virtual void manipulate
+		void executeManipulation
 		(
 			const Vectorpair<int>& dimTags
 		) const override;
 
 
-	// Member operators
+public:
 
-		//- Disallow assignment
-		Translate& operator=(const Translate&) = delete;
+	// Constructors
 
+		//- Default constructor
+		Rotate() = default;
+
+
+	//- Destructor
+	~Rotate() = default;
+
+
+	// Member functions
+
+		//- Set rotation parameters,
+		//  rotate by 'angle' radians around z-axis by default,
+		void setParameters
+		(
+			const double& angle,
+			const std::optional<Axis>& axis = std::nullopt
+		) noexcept override;
+
+		//- Check if parameters are set
+		bool isSet() const noexcept override;
 
 };
 

@@ -17,8 +17,8 @@ Description
 #ifndef MANIPULATOR_BASE_H
 #define MANIPULATOR_BASE_H
 
-#include <type_traits>
-
+#include "CascadeComponentBase.h"
+#include "Shape.h"
 #include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -43,6 +43,15 @@ protected:
 		ManipulatorBase() = default;
 
 
+	// Member functions
+
+		//- Execute geometry manipulation
+		virtual void executeManipulation
+		(
+			const Vectorpair<int>& dimTags
+		) const = 0;
+
+
 public:
 
 	// Constructors
@@ -57,21 +66,35 @@ public:
 
 	// Member functions
 
-		//- Manipulate geometry
-		virtual void manipulate(const Vectorpair<int>& dimTags) const = 0;
+		//- Set manipulation parameter
+		virtual void setParameters(const T&... t) noexcept = 0;
 
 		//- Check if manipulation parameters are set
 		virtual bool isSet() const noexcept = 0;
 
-		//- Set manipulation parameter
-		virtual void setParameters(const T&... t) noexcept = 0;
+		//- Manipulate primitive geometry
+		inline void manipulate(const Shape& shape) const
+		{
+			executeManipulation
+			(
+				Vectorpair<int> {shape.getDimTag()}
+			);
+		}
+
+		//- Manipulate cascade geometry
+		inline void manipulate
+		(
+			const CascadeComponentBase& component
+		) const
+		{
+			executeManipulation(component.getDimTags());
+		}
 
 
 	// Member operators
 
 		//- Disallow assignment
 		ManipulatorBase& operator=(const ManipulatorBase&) = delete;
-
 
 };
 

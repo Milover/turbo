@@ -7,15 +7,13 @@ License
 	See the LICENSE file for license information.
 
 Description
-	Testing TranslateAlongVector class basic functionality.
+	Testing Translate class basic functionality.
 
 \*---------------------------------------------------------------------------*/
 
-#include <vector>
-
 #include "Axis.h"
 #include "Point.h"
-#include "TranslateAlongVector.h"
+#include "Translate.h"
 #include "Utility.h"
 
 #include "Test.h"
@@ -30,7 +28,7 @@ int main(int argc, char* argv[])
 	test::initialize("test", output);
 	bool pass {true};
 
-	geometry::TranslateAlongVector translator;
+	geometry::Translate translator;
 
 	// test parameter setting
 	
@@ -43,8 +41,8 @@ int main(int argc, char* argv[])
 		"Checking if unset"
 	);
 
-	// set parameter
-	geometry::Vector v {Axis::Y};
+	// set vector
+	geometry::Vector v {0, 1};
 	translator.setParameters(v);
 
 	// should be set
@@ -57,25 +55,66 @@ int main(int argc, char* argv[])
 	);
 
 	// test manipulation
-	geometry::Point p1 {0, 0};
+	geometry::Point p {0, 0};
 	test::updateAndWait(1, output);
 
-	translator.manipulate
-	(
-		Vectorpair<int> {p1.getDimTag()}
-	);
+	translator.manipulate(p);
 	test::updateAndWait(1, output);
 
-	// p1 should have been translated
-	std::vector<double> coordinates {p1.getCoordinates()};
+	PointCoordinates coordinates {p.getCoordinates()};
 
 	test::compareTest
 	(
 		pass,
 		(
-			isEqual(coordinates[toUnderlying(Axis::X)], 0.0) &&
-			isEqual(coordinates[toUnderlying(Axis::Y)], 1.0) &&
-			isEqual(coordinates[toUnderlying(Axis::Z)], 0.0)
+			isEqual(coordinates[geometry::Axis::X], 0.0) &&
+			isEqual(coordinates[geometry::Axis::Y], 1.0) &&
+			isEqual(coordinates[geometry::Axis::Z], 0.0)
+		),
+		output,
+		"Checking point coordinates"
+	);
+
+	// set vector from points
+	translator.setParameters
+	(
+		p,
+		geometry::Point {1, 0}
+	);
+
+	translator.manipulate(p);
+	test::updateAndWait(1, output);
+
+	coordinates = p.getCoordinates();
+
+	test::compareTest
+	(
+		pass,
+		(
+			isEqual(coordinates[geometry::Axis::X], 1.0) &&
+			isEqual(coordinates[geometry::Axis::Y], 0.0) &&
+			isEqual(coordinates[geometry::Axis::Z], 0.0)
+		),
+		output,
+		"Checking point coordinates"
+	);
+
+	// set vector from point,
+	// i.e. move to origin
+	translator.setParameters(p);
+
+	translator.manipulate(p);
+	test::updateAndWait(1, output);
+
+	coordinates = p.getCoordinates();
+
+	test::compareTest
+	(
+		pass,
+		(
+			isEqual(coordinates[geometry::Axis::X], 0.0) &&
+			isEqual(coordinates[geometry::Axis::Y], 0.0) &&
+			isEqual(coordinates[geometry::Axis::Z], 0.0)
 		),
 		output,
 		"Checking point coordinates"
@@ -86,45 +125,6 @@ int main(int argc, char* argv[])
 	(
 		pass,
 		(test::getNumberOfEntities() == 1),
-		output,
-		"Checking number of entities"
-	);
-
-	// reset vector and try again
-	v.x = 1.0;
-	v.y = 0.0;
-	
-	translator.setParameters(v);
-
-	geometry::Point p2 {0, 0};
-	test::updateAndWait(1, output);
-
-	translator.manipulate
-	(
-		Vectorpair<int> {p2.getDimTag()}
-	);
-	test::updateAndWait(1, output);
-
-	// p2 should have been translated
-	coordinates = p2.getCoordinates();
-
-	test::compareTest
-	(
-		pass,
-		(
-			isEqual(coordinates[toUnderlying(Axis::X)], 1.0) &&
-			isEqual(coordinates[toUnderlying(Axis::Y)], 0.0) &&
-			isEqual(coordinates[toUnderlying(Axis::Z)], 0.0)
-		),
-		output,
-		"Checking point coordinates"
-	);
-
-	// we should only have 2 points
-	test::compareTest
-	(
-		pass,
-		(test::getNumberOfEntities() == 2),
 		output,
 		"Checking number of entities"
 	);

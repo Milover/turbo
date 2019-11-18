@@ -20,9 +20,8 @@ SourceFiles
 #ifndef POINT_H
 #define POINT_H
 
-#include <vector>
-
 #include "Shape.h"
+#include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -30,8 +29,6 @@ namespace turbo
 {
 namespace geometry
 {
-
-// Forward declarations
 
 /*---------------------------------------------------------------------------*\
 						Class Line Declaration
@@ -71,13 +68,13 @@ public:
 
 
 	//- Destructor
-	virtual ~Point();
+	virtual ~Point() = default;
+
 
 	// Member functions
-		
-		//- Get Point coordinates
-		std::vector<double> getCoordinates() const noexcept;
 
+		//- Get coordinates
+		PointCoordinates getCoordinates() const noexcept;
 
 	// Member operators
 	

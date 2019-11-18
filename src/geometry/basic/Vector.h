@@ -20,16 +20,12 @@ SourceFiles
 #ifndef VECTOR_H
 #define VECTOR_H
 
-#include "Axis.h"
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace turbo
 {
 namespace geometry
 {
-
-// Forward declarations
 
 /*---------------------------------------------------------------------------*\
 						Class Vector Declaration
@@ -53,22 +49,22 @@ struct Vector
 		(
 			const double x,
 			const double y,
-			const double z = 0
+			const double z = 0.0
 		) noexcept;
-
-		//- Construct from an axis
-		Vector(const Axis& axis) noexcept;
 
 		//- Copy constructor
 		Vector(const Vector&) noexcept;
 
 
 	//- Destructor
-	virtual ~Vector();
+	virtual ~Vector() = default;
 
 
 	// Member functions
 	
+		//- Check if empty
+		bool isEmpty() const noexcept;
+
 		//- Get Vector intensity
 		double getMagnitude() const noexcept;
 
@@ -116,6 +112,12 @@ struct Vector
 
 		//- Scalar multiplication assignment operator
 		Vector& operator/=(const double);
+
+		//- Equal to operator
+		bool operator==(const Vector&) const noexcept;
+
+		//- Not equal to operator
+		bool operator!=(const Vector&) const noexcept;
 
 
 };

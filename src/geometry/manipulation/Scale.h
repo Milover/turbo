@@ -7,22 +7,24 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::Translate
+	turbo::geometry::Scale
 
 Description
-	Class Translate for translation of geometry and a base class for more
-	specialized translation classes.
+	Class Scale for rotation of geometry
 
 SourceFiles
-	Translate.cpp
+	Scale.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef TRANSLATE_H
-#define TRANSLATE_H
+#ifndef SCALE_H
+#define SCALE_H
+
+#include <memory>
 
 #include "ManipulatorBase.h"
-#include "Vector.h"
+#include "Point.h"
+#include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -32,45 +34,69 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-						Class Translate Declaration
+						Class Scale Declaration
 \*---------------------------------------------------------------------------*/
 
-class Translate
+class Scale final
 :
-	public ManipulatorBase<Vector>
+	public ManipulatorBase<Point, double, double, double>
 {
-public:
+private:
 
-	// Constructors
+	// Private data
 
-		//- Default constructor
-		Translate() = default;
-
-		//- Disallow copy construction
-		Translate(const Translate&) = delete;
-
-		//- Construct with parameter
-		Translate(const Vector& vector);
+		std::unique_ptr<PointCoordinates> point_;
+		std::unique_ptr<PointCoordinates> scaleFactors_;
 
 
-	//- Destructor
-	virtual ~Translate();
-
+protected:
 
 	// Member functions
 
 		//- Manipulate geometry
-		virtual void manipulate
+		void executeManipulation
 		(
 			const Vectorpair<int>& dimTags
 		) const override;
 
 
-	// Member operators
+public:
 
-		//- Disallow assignment
-		Translate& operator=(const Translate&) = delete;
+	// Constructors
 
+		//- Default constructor
+		Scale() = default;
+
+
+	//- Destructor
+	~Scale() = default;
+
+
+	// Member functions
+
+		//- Set scale parameters,
+		//  2d scale by default
+		void setParameters
+		(
+			const Point& point,
+			const double& fx,
+			const double& fy,
+			const double& fz = 1.0
+		) noexcept override;
+
+		//- Set uniform 2d scale parameters
+		void setParameters
+		(
+			const Point& point,
+			const double factor
+		) noexcept;
+
+		//- Set uniform 2d scale factor,
+		//  scale about origin
+		void setParameters(const double factor) noexcept;
+
+		//- Check if parameters are set
+		bool isSet() const noexcept override;
 
 };
 

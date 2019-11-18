@@ -4,9 +4,7 @@
 
 # add sources
 set(SRC
-	Line.cpp
-	Point.cpp
-	Shape.cpp
+	Axis.cpp
 	Vector.cpp
 	)
 

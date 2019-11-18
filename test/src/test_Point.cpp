@@ -28,17 +28,15 @@ using namespace turbo;
 
 int main(int argc, char* argv[]) {
 
-	bool gui {test::parseCommandLineArgs(argc, argv)};
-		
-	test::initialize("test", gui);
-
+	bool output {test::parseCommandLineArgs(argc, argv)};
+	test::initialize("test", output);
 	bool pass {true};
 
 	// Test Point construction
 	geometry::Point p1 {0,0};	// construct from components
 	geometry::Point p2 {p1};	// construct from Point
 
-	test::updateAndWait(1, gui);
+	test::updateAndWait(1, output);
 
 	// try to modify
 	gmsh::model::geo::translate
@@ -49,74 +47,72 @@ int main(int argc, char* argv[]) {
 		0
 	);
 
-	test::updateAndWait(1, gui);
+	test::updateAndWait(1, output);
 
 	// Test Point member functions
-	if
+	test::compareTest
 	(
-		p1.getDimTag().first != 0 ||
-		p2.getDimTag().first != 0
-	)
-		pass = false;
+		pass,
+		(
+			p1.getDimTag().first == 0 &&
+			p2.getDimTag().first == 0
+		),
+		output,
+		"Checking dimension"
+	);
 
-	std::vector<double> coordinates;
+	PointCoordinates coordinates;
 	coordinates = p1.getCoordinates();
-	if
+	test::compareTest
 	(
-		coordinates.at(toUnderlying(Axis::X)) != 0 ||
-		coordinates.at(toUnderlying(Axis::Y)) != 0 ||
-		coordinates.at(toUnderlying(Axis::Z)) != 0
-	)
-		pass = false;
+		pass,
+		(
+			coordinates.at(geometry::Axis::X) == 0 &&
+			coordinates.at(geometry::Axis::Y) == 0 &&
+			coordinates.at(geometry::Axis::Z) == 0
+		),
+		output,
+		"Checking coordinates"
+	);
 
 	coordinates = p2.getCoordinates();
-	if
+	test::compareTest
 	(
-		coordinates.at(toUnderlying(Axis::X)) != 2 ||
-		coordinates.at(toUnderlying(Axis::Y)) != 0 ||
-		coordinates.at(toUnderlying(Axis::Z)) != 0
-	)
-		pass = false;
+		pass,
+		(
+			coordinates.at(geometry::Axis::X) == 2 &&
+			coordinates.at(geometry::Axis::Y) == 0 &&
+			coordinates.at(geometry::Axis::Z) == 0
+		),
+		output,
+		"Checking coordinates"
+	);
 	
-	Vectorpair<int> boundary;
-
-	p1.getBoundary(boundary);
-	if (!boundary.empty())
-		pass = false;
-	
-	boundary.clear();
-
-	p2.getBoundary(boundary);
-	if (!boundary.empty())
-		pass = false;
-	
-	Vectorpair<double> p1Box {p1.getBoundingBox()};
-	if
+	Vectorpair<double> pBox {p1.getBoundingBox()};
+	test::compareTest
 	(
-		!isEqual(p1Box[0].first, 0.0) ||
-		!isEqual(p1Box[1].first, 0.0) ||
-		!isEqual(p1Box[2].first, 0.0)
-	)
-		pass = false;
+		pass,
+		(
+			isEqual(pBox[0].first, 0.0) &&
+			isEqual(pBox[1].first, 0.0) &&
+			isEqual(pBox[2].first, 0.0)
+		),
+		output,
+		"Checking bounding box"
+	);
 	
-	Vectorpair<double> p2Box {p2.getBoundingBox()};
-	if
+	pBox = p2.getBoundingBox();
+	test::compareTest
 	(
-		!isEqual(p2Box[0].first, 2.0) ||
-		!isEqual(p2Box[1].first, 0.0) ||
-		!isEqual(p2Box[2].first, 0.0)
-	)
-		pass = false;
-	
-	if (p1.getName() != "")
-		pass = false;
-
-	if (p2.getName() != "")
-		pass = false;
-	
-	p1.setName("p1");
-	if (p1.getName() != "p1")
-		pass = false;
+		pass,
+		(
+			isEqual(pBox[0].first, 2.0) &&
+			isEqual(pBox[1].first, 0.0) &&
+			isEqual(pBox[2].first, 0.0)
+		),
+		output,
+		"Checking bounding box"
+	);
 
 	// test pass or fail
 	if (pass)
@@ -124,7 +120,7 @@ int main(int argc, char* argv[]) {
 	else
 		test::echo(0);
 
-	test::finalize(gui);
+	test::finalize(output);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

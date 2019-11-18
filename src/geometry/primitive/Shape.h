@@ -20,9 +20,7 @@ SourceFiles
 #ifndef SHAPE_H
 #define SHAPE_H
 
-#include <string>
 #include <utility>
-#include <vector>
 
 #include "Utility.h"
 
@@ -33,9 +31,6 @@ namespace turbo
 namespace geometry
 {
 
-
-// Forward declarations
-
 /*---------------------------------------------------------------------------*\
 						Class Shape Declaration
 \*---------------------------------------------------------------------------*/
@@ -45,8 +40,9 @@ class Shape
 private:
 
 	// Private data
-	
+
 		const std::pair<int, int> dimTag_;
+		static bool sync_;
 
 
 	// Member functions
@@ -57,11 +53,14 @@ private:
 		//- Copy Shape geometry and return tag
 		int copy() const noexcept;
 
+		//- Synchronize geometry
+		static void sync() noexcept;
+
 
 protected:
 
 	// Constructors
-		
+
 		//- Construct from tag
 		Shape(const std::pair<int, int> dimTag) noexcept;
 
@@ -76,34 +75,24 @@ public:
 
 
 	// Member functions
-		
+
 		//- Return Shape dimTag
 		std::pair<int, int> getDimTag() const noexcept;
 
-		//- Get dimTags of Shapes on boundary of Shape
-		void getBoundary(Vectorpair<int>& dimTags) const noexcept;
-
-		//- Get Shape bounding box coordinates (min, max)
+		//- Get bounding box
 		Vectorpair<double> getBoundingBox() const noexcept;
 
-		//- Get Shape center of mass coordinates
-		//std::vector<double> getCenterOfMass() const noexcept;		// implement later
+		//- Set synchronization
+		static void setSync(const bool sync) noexcept;
 
-		//- Return minimum distance vector to Shape
-		//virtual Vector getMinDistance(const Shape&) const = 0;	// implement later
-
-		//- Return name of Shape
-		std::string getName() const noexcept;
-
-		//- Set name of Shape
-		void setName(const std::string& name) noexcept;
+		//- Check if synchronized
+		static bool isSync() noexcept;
 
 
 	// Member operators
 
 		//- Disallow assignment
 		Shape& operator=(const Shape&) = delete;
-
 
 };
 

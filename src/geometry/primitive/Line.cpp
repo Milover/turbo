@@ -8,13 +8,12 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include <vector>
+#include <utility>
 
 #include "gmsh.h"
 
-#include "Axis.h"
+#include "Line.h"
 #include "Point.h"
-#include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -23,72 +22,49 @@ namespace turbo
 namespace geometry
 {
 
-
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
-
-
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-int Point::construct
+int Line::construct
 (
-	const double x,
-	const double y,
-	const double z
+	const int startTag,
+	const int endTag
 ) const noexcept
 {
-	return gmsh::model::geo::addPoint(x, y, z);
+	return gmsh::model::geo::addLine
+	(
+		startTag,
+		endTag
+	);
 }
 
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-Point::Point
+Line::Line
 (
-	const double x,
-	const double y,
-	const double z
+	Point start,
+	Point end
 ) noexcept
 :
 	Shape
 	{
 		std::pair<int, int>
 		{
-			0,		// dimension
-			construct(x, y, z)
+			1,		// dimension
+			construct
+			(
+				start.getDimTag().second,
+				end.getDimTag().second
+			)
 		}
 	}
 {}
 
 
-Point::Point(const Point& point) noexcept
+Line::Line(const Line& line) noexcept
 :
-	Shape {point}
+	Shape {line}
 {}
-
-
-// * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
-
-Point::~Point()
-{}
-
-
-// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
-
-std::vector<double> Point::getCoordinates() const noexcept
-{
-	Vectorpair<double> minMax {getBoundingBox()};
-	
-	return std::vector<double>
-	{
-		minMax[toUnderlying(Axis::X)].first,
-		minMax[toUnderlying(Axis::Y)].first,
-		minMax[toUnderlying(Axis::Z)].first
-	};
-
-}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

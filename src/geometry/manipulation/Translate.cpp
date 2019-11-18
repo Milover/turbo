@@ -12,8 +12,9 @@ License
 
 #include "gmsh.h"
 
+#include "Axis.h"
 #include "Point.h"
-#include "TranslateBase.h"
+#include "Translate.h"
 #include "Utility.h"
 #include "Vector.h"
 
@@ -24,35 +25,15 @@ namespace turbo
 namespace geometry
 {
 
-// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
+// * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * * * //
 
-template<typename... T>
-void TranslateBase<T...>::setVector(const Vector& vector) noexcept
+void Translate::executeManipulation(const Vectorpair<int>& dimTags) const
 {
-	vector_.reset
-	(
-		new Vector {vector}
-	);
-}
-
-
-// * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
-
-template<typename... T>
-TranslateBase<T...>::~TranslateBase()
-{}
-
-
-// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
-
-template<typename... T>
-void TranslateBase<T...>::manipulate(const Vectorpair<int>& dimTags) const
-{
-	if (!vector_)
+	if (!isSet())
 		throw std::runtime_error
 		(
-			"turbo::geometry::TranslateBase::"
-			"manipulate(const turbo::Vectorpair&): "
+			"turbo::geometry::Translate::"
+			"manipulate(const turbo::Vectorpair<int>&): "
 			"Translation vector unset"
 		);
 
@@ -66,18 +47,41 @@ void TranslateBase<T...>::manipulate(const Vectorpair<int>& dimTags) const
 }
 
 
-template<typename... T>
-bool TranslateBase<T...>::isSet() const noexcept
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+void Translate::setParameters(const Vector& vector) noexcept
 {
-	return static_cast<bool>(vector_);
+	vector_.reset
+	(
+		new Vector {vector}
+	);
 }
 
 
-// * * * * * * * * * * * * * Class Specializations * * * * * * * * * * * * * //
+void Translate::setParameters
+(
+	const Point& pFrom,
+	const Point& pTo
+) noexcept
+{
+	PointCoordinates p1 {pFrom.getCoordinates()};
+	PointCoordinates p2 {pTo.getCoordinates()};
 
-template class TranslateBase<Vector>;
+	Vector vector
+	{
+		p2[Axis::X] - p1[Axis::X],
+		p2[Axis::Y] - p1[Axis::Y],
+		p2[Axis::Z] - p1[Axis::Z]
+	};
 
-template class TranslateBase<Point, Point>;
+	setParameters(vector);
+}
+
+
+bool Translate::isSet() const noexcept
+{
+	return static_cast<bool>(vector_);
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -8,7 +8,6 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include <memory>
 #include <stdexcept>
 
 #include "NacaProfileGenerator.h"
@@ -62,12 +61,6 @@ ProfileGeneratorInterface::ProfileGeneratorInterface(const Stringmap& input)
 
 	interfaceObject_->generate();
 }
-
-
-// * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
-
-ProfileGeneratorInterface::~ProfileGeneratorInterface()
-{}
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //

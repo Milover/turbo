@@ -66,13 +66,7 @@ public:
 
 
 	//- Destructor
-	virtual ~Line();
-
-
-	// Member functions
-
-		//- Get Line length
-		virtual double getLength() const noexcept;
+	virtual ~Line() = default;
 
 
 	// Member operators

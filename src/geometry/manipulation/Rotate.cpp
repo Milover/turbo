@@ -8,11 +8,13 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include <optional>
 #include <stdexcept>
 
 #include "gmsh.h"
 
-#include "Translate.h"
+#include "Axis.h"
+#include "Rotate.h"
 #include "Utility.h"
 #include "Vector.h"
 
@@ -23,46 +25,69 @@ namespace turbo
 namespace geometry
 {
 
-// * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
+// * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * * * //
 
-Translate::Translate(const Vector& vector)
-:
-	parameter_ {std::make_unique<Vector>(vector)}
-{}
-
-
-// * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
-
-Translate::~Translate()
-{}
-
-
-// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
-
-void Translate::manipulate
+void Rotate::executeManipulation
 (
 	const Vectorpair<int>& dimTags
 ) const
 {
-	if (!parameter_)
+	if (!isSet())
 		throw std::runtime_error
 		(
-			"turbo::geometry::Translate::"
-			"manipulate(const turbo::Vectorpair&): "
-			"Manipulation parameter unset"
+			"turbo::geometry::Rotate::"
+			"manipulate(const turbo::Vectorpair<int>&): "
+			"Rotation parameters unset"
 		);
 
-	gmsh::model::geo::translate
+	PointCoordinates p {axis_->getPointCoordinates()};
+	Vector v {axis_->getVector()};
+
+	gmsh::model::geo::rotate
 	(
 		dimTags,
-		parameter_->x,
-		parameter_->y,
-		parameter_->z
+		p.at(Axis::X),
+		p.at(Axis::Y),
+		p.at(Axis::Z),
+		v.x,
+		v.y,
+		v.z,
+		angle_
 	);
 }
 
 
-// * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+void Rotate::setParameters
+(
+	const double& angle,
+	const std::optional<Axis>& axis
+) noexcept
+{
+	angle_ = angle;
+	
+	if
+	(
+		axis == std::nullopt &&
+		!isSet()
+	)
+		axis_.reset
+		(
+			new Axis {ZAxis {}}
+		);
+	else if (axis != std::nullopt)
+		axis_.reset
+		(
+			new Axis {axis.value()}
+		);
+}
+
+
+bool Rotate::isSet() const noexcept
+{
+	return static_cast<bool>(axis_);
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

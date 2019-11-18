@@ -8,12 +8,11 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include <cmath>
+#include <utility>
 
 #include "gmsh.h"
 
 #include "Axis.h"
-#include "Line.h"
 #include "Point.h"
 #include "Utility.h"
 
@@ -24,72 +23,57 @@ namespace turbo
 namespace geometry
 {
 
-// * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
-
-
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-int Line::construct
+int Point::construct
 (
-	const int startTag,
-	const int endTag
+	const double x,
+	const double y,
+	const double z
 ) const noexcept
 {
-	return gmsh::model::geo::addLine
-	(
-		startTag,
-		endTag
-	);
+	return gmsh::model::geo::addPoint(x, y, z);
 }
 
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-Line::Line
+Point::Point
 (
-	Point start,
-	Point end
+	const double x,
+	const double y,
+	const double z
 ) noexcept
 :
 	Shape
 	{
 		std::pair<int, int>
 		{
-			1,		// dimension
-			construct
-			(
-				start.getDimTag().second,
-				end.getDimTag().second
-			)
+			0,		// dimension
+			construct(x, y, z)
 		}
 	}
 {}
 
 
-Line::Line(const Line& line) noexcept
+Point::Point(const Point& point) noexcept
 :
-	Shape {line}
+	Shape {point}
 {}
 
 
-// * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * * //
 
-Line::~Line()
-{}
-
-
-// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
-
-double Line::getLength() const noexcept
+PointCoordinates Point::getCoordinates() const noexcept
 {
-	Vectorpair<double> minMax {getBoundingBox()};
+	Vectorpair<double> v {getBoundingBox()};
 
-	return std::hypot
-	(
-		minMax[toUnderlying(Axis::X)].first - minMax[toUnderlying(Axis::X)].second,
-		minMax[toUnderlying(Axis::Y)].first - minMax[toUnderlying(Axis::Y)].second,
-		minMax[toUnderlying(Axis::Z)].first - minMax[toUnderlying(Axis::Z)].second
-	);
+	return PointCoordinates
+	{
+		v[Axis::X].first,
+		v[Axis::Y].first,
+		v[Axis::Z].first
+	};
 }
 
 

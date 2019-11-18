@@ -14,7 +14,6 @@ Description
 #include <stdexcept>
 #include <vector>
 
-#include "Axis.h"
 #include "Utility.h"
 #include "Vector.h"
 
@@ -24,8 +23,11 @@ using namespace turbo;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int main() {
+int main(int argc, char* argv[])
+{
 
+	bool output {test::parseCommandLineArgs(argc, argv)};
+	test::initialize("test", false);
 	bool pass {true};
 
 	std::vector<geometry::Vector> v;
@@ -40,11 +42,8 @@ int main() {
 	// construct from components
 	v.push_back(geometry::Vector {1, 0});
 
-	// construct from axis
-	v.push_back(geometry::Vector {Axis::X});
-
 	// construct copy
-	v.push_back(geometry::Vector {v[2]});
+	v.push_back(geometry::Vector {v[1]});
 
 	// test
 	for (auto vec : v)
@@ -214,6 +213,29 @@ int main() {
 		!isEqual(v3.z, -0.5)
 	)
 		pass = false;
+	
+	// test comparisons
+	geometry::Vector v5 {1, 0 ,0};
+	geometry::Vector v6 {1, 0 ,0};
+	geometry::Vector v7 {0, 1 ,0};
+
+	// should be equal
+	test::compareTest
+	(
+		pass,
+		(v5 == v6),
+		output,
+		"Checking if equal"
+	);
+
+	// should not be equal
+	test::compareTest
+	(
+		pass,
+		(v5 != v7),
+		output,
+		"Checking if not equal"
+	);
 
 	// test pass or fail
 	if (pass)

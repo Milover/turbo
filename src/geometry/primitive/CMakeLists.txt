@@ -2,14 +2,11 @@
 #
 # See the LICENSE file for license information
 
-# add all subdirectories
-add_subdirectory(basic)
-add_subdirectory(manipulation)
-add_subdirectory(primitive)
-add_subdirectory(profile)
-
 # add sources
 set(SRC
+	Line.cpp
+	Point.cpp
+	Shape.cpp
 	)
 
 # append to sources

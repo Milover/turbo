@@ -12,9 +12,10 @@ License
 
 #include "gmsh.h"
 
-#include "Translate.h"
+#include "Axis.h"
+#include "Point.h"
+#include "Scale.h"
 #include "Utility.h"
-#include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -23,46 +24,81 @@ namespace turbo
 namespace geometry
 {
 
-// * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
+// * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * * * //
 
-Translate::Translate(const Vector& vector)
-:
-	parameter_ {std::make_unique<Vector>(vector)}
-{}
-
-
-// * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
-
-Translate::~Translate()
-{}
-
-
-// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
-
-void Translate::manipulate
+void Scale::executeManipulation
 (
 	const Vectorpair<int>& dimTags
 ) const
 {
-	if (!parameter_)
+	if (!isSet())
 		throw std::runtime_error
 		(
-			"turbo::geometry::Translate::"
-			"manipulate(const turbo::Vectorpair&): "
-			"Manipulation parameter unset"
+			"turbo::geometry::Scale::"
+			"manipulate(const turbo::Vectorpair<int>&): "
+			"Scale factors unset"
 		);
 
-	gmsh::model::geo::translate
+	gmsh::model::geo::dilate
 	(
 		dimTags,
-		parameter_->x,
-		parameter_->y,
-		parameter_->z
+		point_->at(Axis::X),
+		point_->at(Axis::Y),
+		point_->at(Axis::Z),
+		scaleFactors_->at(Axis::X),
+		scaleFactors_->at(Axis::Y),
+		scaleFactors_->at(Axis::Z)
 	);
 }
 
 
-// * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+void Scale::setParameters
+(
+	const Point& point,
+	const double& fx,
+	const double& fy,
+	const double& fz
+) noexcept
+{
+	point_.reset
+	(
+		new PointCoordinates {point.getCoordinates()}
+	);
+
+	scaleFactors_.reset
+	(
+		new PointCoordinates {fx, fy, fz}
+	);
+}
+
+
+void Scale::setParameters
+(
+	const Point& point,
+	const double factor
+) noexcept
+{
+	setParameters(point, factor, factor);
+}
+
+
+void Scale::setParameters(const double factor) noexcept
+{
+	setParameters
+	(
+		Point {0.0, 0.0},
+		factor
+	);
+}
+
+
+bool Scale::isSet() const noexcept
+{
+	return static_cast<bool>(point_)
+		&& static_cast<bool>(scaleFactors_);
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

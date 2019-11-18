@@ -109,7 +109,7 @@ void NacaProfileGenerator::parseSeries(const std::string& series)
 void NacaProfileGenerator::setSpacingIncrement
 (
 	const int numberOfPoints = 40
-)
+) noexcept
 {
 	if (spacingType_ == spacing_::LINEAR)
 		spacingIncrement_ = chord_ / static_cast<double>(numberOfPoints - 1);
@@ -119,13 +119,13 @@ void NacaProfileGenerator::setSpacingIncrement
 }
 
 
-void NacaProfileGenerator::computeA0()
+void NacaProfileGenerator::computeA0() noexcept
 {
 	a_[0] = 0.2969 * I_ / 6.0;
 }
 
 
-void NacaProfileGenerator::lookUpD1()
+void NacaProfileGenerator::lookUpD1() noexcept
 {
 	int m
 	{
@@ -136,7 +136,7 @@ void NacaProfileGenerator::lookUpD1()
 }
 
 
-void NacaProfileGenerator::computeD2()
+void NacaProfileGenerator::computeD2() noexcept
 {
 	double B {chord_ - M_};
 
@@ -144,7 +144,7 @@ void NacaProfileGenerator::computeD2()
 }
 
 
-void NacaProfileGenerator::computeD3()
+void NacaProfileGenerator::computeD3() noexcept
 {
 	double B {chord_ - M_};
 
@@ -152,7 +152,7 @@ void NacaProfileGenerator::computeD3()
 }
 
 
-void NacaProfileGenerator::scaleCoefficients()
+void NacaProfileGenerator::scaleCoefficients() noexcept
 {
 	for (int i {0}; i < 4; i++)
 	{
@@ -162,7 +162,7 @@ void NacaProfileGenerator::scaleCoefficients()
 }
 
 
-void NacaProfileGenerator::generateCamberLine()
+void NacaProfileGenerator::generateCamberLine() noexcept
 {
 	double x {0.0};
 	double y {0.0};
@@ -184,7 +184,7 @@ void NacaProfileGenerator::generateCamberLine()
 }
 
 
-double NacaProfileGenerator::computeCamberX(const double x) const
+double NacaProfileGenerator::computeCamberX(const double x) const noexcept
 {
 	if (spacingType_ == spacing_::LINEAR)
 	{
@@ -204,7 +204,7 @@ double NacaProfileGenerator::computeCamberX(const double x) const
 }
 
 
-double NacaProfileGenerator::computeCamberY(const double x) const
+double NacaProfileGenerator::computeCamberY(const double x) const noexcept
 {
 	if
 	(
@@ -225,7 +225,7 @@ double NacaProfileGenerator::computeCamberY(const double x) const
 }
 
 
-double NacaProfileGenerator::computeThickness(const double x) const
+double NacaProfileGenerator::computeThickness(const double x) const noexcept
 {
 	// leading edge to M
 	if (x < M_)
@@ -242,7 +242,7 @@ double NacaProfileGenerator::computeThickness(const double x) const
 }
 
 
-double NacaProfileGenerator::computeInclination(const double x) const
+double NacaProfileGenerator::computeInclination(const double x) const noexcept
 {
 	double dydx;
 
@@ -265,7 +265,7 @@ double NacaProfileGenerator::computeDX
 (
 	const double thickness,
 	const double inclination
-) const
+) const noexcept
 {
 	return - thickness * std::sin(inclination);
 }
@@ -275,7 +275,7 @@ double NacaProfileGenerator::computeDY
 (
 	const double thickness,
 	const double inclination
-) const
+) const noexcept
 {
 	return thickness * std::cos(inclination);
 }
@@ -365,15 +365,9 @@ NacaProfileGenerator::NacaProfileGenerator(const Stringmap& input)
 }
 
 
-// * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
-
-NacaProfileGenerator::~NacaProfileGenerator()
-{}
-
-
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-void NacaProfileGenerator::generate()
+void NacaProfileGenerator::generate() noexcept
 {
 	if (!isEmpty())
 		return;

@@ -11,7 +11,6 @@ License
 #include <cmath>
 #include <stdexcept>
 
-#include "Axis.h"
 #include "Utility.h"
 #include "Vector.h"
 
@@ -26,9 +25,9 @@ namespace geometry
 
 Vector::Vector() noexcept
 :
-	x {0.0},
-	y {0.0},
-	z {0.0}
+	x {NAN},
+	y {NAN},
+	z {NAN}
 {}
 
 
@@ -45,28 +44,6 @@ Vector::Vector
 {}
 
 
-Vector::Vector(const Axis& axis) noexcept
-:
-	x {0.0},
-	y {0.0},
-	z {0.0}
-{
-	switch(axis)
-	{
-		case Axis::X :
-			x = 1.0;
-			break;
-		case Axis::Y :
-			y = 1.0;
-			break;
-		case Axis::Z :
-			z = 1.0;
-			break;
-	}
-
-}
-
-
 Vector::Vector(const Vector& vector) noexcept
 :
 	x {vector.x},
@@ -75,13 +52,15 @@ Vector::Vector(const Vector& vector) noexcept
 {}
 
 
-// * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
-
-Vector::~Vector()
-{}
-
-
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+bool Vector::isEmpty() const noexcept
+{
+	return std::isnan(x)
+		&& std::isnan(y)
+		&& std::isnan(z);
+}
+
 
 double Vector::getMagnitude() const noexcept
 {
@@ -240,6 +219,20 @@ Vector& Vector::operator/=(const double d)
 	z /= d;
 
 	return *this;
+}
+
+
+bool Vector::operator==(const Vector& vector) const noexcept
+{
+	return x == vector.x
+		&& y == vector.y
+		&& z == vector.z;
+}
+
+
+bool Vector::operator!=(const Vector& vector) const noexcept
+{
+	return !(*this == vector);
 }
 
 

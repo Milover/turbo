@@ -4,9 +4,9 @@
 
 # add sources
 set(SRC
-	TranslateAlongVector.cpp
-	TranslateBase.cpp
-	TranslateToPoint.cpp
+	Scale.cpp
+	Rotate.cpp
+	Translate.cpp
 	)
 
 # append to sources

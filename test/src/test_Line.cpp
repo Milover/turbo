@@ -26,10 +26,8 @@ using namespace turbo;
 
 int main(int argc, char* argv[]) {
 	
-	bool gui {test::parseCommandLineArgs(argc, argv)};
-
-	test::initialize("test", gui);
-
+	bool output {test::parseCommandLineArgs(argc, argv)};
+	test::initialize("test", output);
 	bool pass {true};
 
 	// Test Point construction
@@ -37,31 +35,27 @@ int main(int argc, char* argv[]) {
 	geometry::Point p2 {1,0};
 	geometry::Point p3 {2,0};		// construct from Point
 
-	test::updateAndWait(1, gui);
+	test::updateAndWait(1, output);
 
 	// Test Line construction
 	geometry::Line l1 {p1, p2};		// construct from Points
 	geometry::Line l2 {p2, p3};
 	geometry::Line l3 {l1};			// construct from Line
 
-	test::updateAndWait(1, gui);
+	test::updateAndWait(1, output);
 
 	// Test Line member functions
-	if
+	test::compareTest
 	(
-		l1.getDimTag().first != 1 ||
-		l2.getDimTag().first != 1 ||
-		l3.getDimTag().first != 1
-	)
-		pass = false;
-
-	if
-	(
-		!isEqual(l1.getLength(), 1.0) ||
-		!isEqual(l2.getLength(), 1.0) ||
-		!isEqual(l3.getLength(), 1.0)
-	)
-		pass = false;
+		pass,
+		(
+			l1.getDimTag().first == 1 &&
+			l2.getDimTag().first == 1 &&
+			l3.getDimTag().first == 1
+		),
+		output,
+		"Checking dimension"
+	);
 
 	int numberOfEntities {test::getNumberOfEntities()};
 
@@ -74,11 +68,16 @@ int main(int argc, char* argv[]) {
 		0
 	);
 
-	test::updateAndWait(1, gui);
+	test::updateAndWait(1, output);
 
 	// should have the same entities as before translation
-	if (numberOfEntities != test::getNumberOfEntities())
-		pass = false;
+	test::compareTest
+	(
+		pass,
+		(numberOfEntities == test::getNumberOfEntities()),
+		output,
+		"Checking entitites"
+	);
 
 	// test pass or fail
 	if (pass)
@@ -86,7 +85,7 @@ int main(int argc, char* argv[]) {
 	else
 		test::echo(0);
 
-	test::finalize(gui);
+	test::finalize(output);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

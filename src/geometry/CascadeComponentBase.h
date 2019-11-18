@@ -56,9 +56,6 @@ protected:
 		//- Generate points from input map
 		virtual void generatePoints(const Stringmap& input) = 0;
 
-		//- Get vector of dimTags of underlying geometry
-		virtual Vectorpair<int> getDimTags() const noexcept;
-
 
 public:
 	
@@ -77,27 +74,17 @@ public:
 		//- Build geometry
 		virtual void build() = 0;
 
+		//- Get dimTags
+		virtual Vectorpair<int> getDimTags() const noexcept;
+
 		//- Get geometric center
 		Point getCenter() const noexcept;
-
-		//- Translate along vector
-		void translate(const Vector& vector) const noexcept;
-
-		//- Align geometric center with a point
-		void centerOnPoint(const Point& point) const noexcept;
-
-		//- Rotate around geometric center by 'angle' radians
-		void rotate(const double angle) const noexcept;
-
-		//- Scale uniformly about geometric center
-		void scale(const double factor) const noexcept;
 
 
 	// Member operators
 	
 		//- Disallow assignment
 		CascadeComponentBase& operator=(const CascadeComponentBase&) = delete;
-
 
 };
 

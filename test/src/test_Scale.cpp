@@ -7,15 +7,13 @@ License
 	See the LICENSE file for license information.
 
 Description
-	Testing TranslateToPoint class basic functionality.
+	Testing Rotate class basic functionality.
 
 \*---------------------------------------------------------------------------*/
 
-#include <vector>
-
 #include "Axis.h"
 #include "Point.h"
-#include "TranslateToPoint.h"
+#include "Scale.h"
 #include "Utility.h"
 
 #include "Test.h"
@@ -30,99 +28,95 @@ int main(int argc, char* argv[])
 	test::initialize("test", output);
 	bool pass {true};
 
-	geometry::TranslateToPoint translator;
+	geometry::Scale scaler;
 
 	// test parameter setting
-	
+
 	// should be unset
 	test::compareTest
 	(
 		pass,
-		!translator.isSet(),
+		!scaler.isSet(),
 		output,
 		"Checking if unset"
 	);
 
-	// set parameter
-	geometry::Point pFrom {0, 0};
-	geometry::Point pTo {1, 0};
-	test::updateAndWait(1, output);
-
-	translator.setParameters(pFrom, pTo);
+	// set parameters
+	geometry::Point origin {0.0, 0.0};
+	scaler.setParameters(origin, 2, 2, 2);
 
 	// should be set
 	test::compareTest
 	(
 		pass,
-		translator.isSet(),
+		scaler.isSet(),
 		output,
 		"Checking if set"
 	);
 
 	// test manipulation
-	geometry::Point p1 {0, 0};
+	geometry::Point p {1, 1, 1};
 	test::updateAndWait(1, output);
 
-	translator.manipulate
-	(
-		Vectorpair<int> {p1.getDimTag()}
-	);
+	scaler.manipulate(p);
 	test::updateAndWait(1, output);
 
-	// p1 should have been translated
-	std::vector<double> coordinates {p1.getCoordinates()};
-
+	PointCoordinates coordinates {p.getCoordinates()};
 	test::compareTest
 	(
 		pass,
 		(
-			isEqual(coordinates[toUnderlying(Axis::X)], 1.0) &&
-			isEqual(coordinates[toUnderlying(Axis::Y)], 0.0) &&
-			isEqual(coordinates[toUnderlying(Axis::Z)], 0.0)
+			isEqual(coordinates[geometry::Axis::X], 2.0) &&
+			isEqual(coordinates[geometry::Axis::Y], 2.0) &&
+			isEqual(coordinates[geometry::Axis::Z], 2.0)
 		),
 		output,
 		"Checking point coordinates"
 	);
 
-	// we should only have 1 point
-	test::compareTest
-	(
-		pass,
-		(test::getNumberOfEntities() == 3),
-		output,
-		"Checking number of entities"
-	);
+	// set parameters for 2d uniform scale
+	scaler.setParameters(origin, 0.5);
 
-	// vector should still be set
-	geometry::Point p2 {1, 0};
+	scaler.manipulate(p);
 	test::updateAndWait(1, output);
 
-	translator.manipulate
-	(
-		Vectorpair<int> {p2.getDimTag()}
-	);
-	test::updateAndWait(1, output);
-
-	// p2 should have been translated
-	coordinates = p2.getCoordinates();
-
+	coordinates = p.getCoordinates();
 	test::compareTest
 	(
 		pass,
 		(
-			isEqual(coordinates[toUnderlying(Axis::X)], 2.0) &&
-			isEqual(coordinates[toUnderlying(Axis::Y)], 0.0) &&
-			isEqual(coordinates[toUnderlying(Axis::Z)], 0.0)
+			isEqual(coordinates[geometry::Axis::X], 1.0) &&
+			isEqual(coordinates[geometry::Axis::Y], 1.0) &&
+			isEqual(coordinates[geometry::Axis::Z], 2.0)
 		),
 		output,
 		"Checking point coordinates"
 	);
 
-	// we should only have 2 points
+	// set parameters for 2d uniform scale about origin
+	scaler.setParameters(2);
+
+	scaler.manipulate(p);
+	test::updateAndWait(1, output);
+
+	coordinates = p.getCoordinates();
 	test::compareTest
 	(
 		pass,
-		(test::getNumberOfEntities() == 4),
+		(
+			isEqual(coordinates[geometry::Axis::X], 2.0) &&
+			isEqual(coordinates[geometry::Axis::Y], 2.0) &&
+			isEqual(coordinates[geometry::Axis::Z], 2.0)
+		),
+		output,
+		"Checking point coordinates"
+	);
+
+	// we should only have 2 points (origin and p)
+	test::compareTest
+	(
+		pass,
+		(test::getNumberOfEntities() == 2),
 		output,
 		"Checking number of entities"
 	);

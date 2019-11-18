@@ -28,7 +28,7 @@ namespace turbo
 					Class GenericInterface Declaration
 \*---------------------------------------------------------------------------*/
 
-template<class U, class V>
+template<typename U, typename... V>
 class GenericInterface
 {
 protected:
@@ -47,7 +47,7 @@ protected:
 	// Member functions
 		
 		//- Create underlying object to interface
-		virtual void createInterfaceObject(const V&) = 0;
+		virtual void createInterfaceObject(const V&...) = 0;
 
 
 public:

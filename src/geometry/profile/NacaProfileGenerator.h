@@ -115,51 +115,51 @@ private:
 		void parseSeries(const std::string& series);
 
 		//- Set spacing increment
-		void setSpacingIncrement(const int numberOfPoints);
+		void setSpacingIncrement(const int numberOfPoints) noexcept;
 
 		//- Compute $a_0$ coefficient
-		void computeA0();
+		void computeA0() noexcept;
 
 		//- Look up $d_1$ coefficient
-		void lookUpD1();
+		void lookUpD1() noexcept;
 
 		//- Compute $d_2$ coefficient
-		void computeD2();
+		void computeD2() noexcept;
 
 		//- Compute $d_3$ coefficient
-		void computeD3();
+		void computeD3() noexcept;
 
 		//- Scale coefficients
-		void scaleCoefficients();
+		void scaleCoefficients() noexcept;
 
 		//- Generate camber line coordinates
-		void generateCamberLine();
+		void generateCamberLine() noexcept;
 
 		//- Compute camber abscissa at a given point
-		double computeCamberX(const double x) const;
+		double computeCamberX(const double x) const noexcept;
 
 		//- Compute camber ordinate at a given point
-		double computeCamberY(const double x) const;
+		double computeCamberY(const double x) const noexcept;
 
 		//- Compute profile thickness at ``x''
-		double computeThickness(const double x) const;
+		double computeThickness(const double x) const noexcept;
 
 		//- Compute camber inclination at ``x''
-		double computeInclination(const double x) const;
+		double computeInclination(const double x) const noexcept;
 
 		//- Compute surface x-coordinate offset
 		double computeDX
 		(
 			const double thickness,
 			const double inclination
-		) const;
+		) const noexcept;
 
 		//- Compute surface y-coordinate offset
 		double computeDY
 		(
 			const double thickness,
 			const double inclination
-		) const;
+		) const noexcept;
 
 
 protected:
@@ -182,19 +182,13 @@ public:
 
 
 	//- Destructor
-	virtual ~NacaProfileGenerator();
+	~NacaProfileGenerator() = default;
 
 
 	// Member functions
 
 		//- Generate profile coordinates
-		void generate() override;
-
-
-	// Member operators
-
-		//- Disallow assignment
-		NacaProfileGenerator& operator=(const NacaProfileGenerator&) = delete;
+		void generate() noexcept override;
 
 };
 
