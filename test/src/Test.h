@@ -54,8 +54,26 @@ void initialize
 	{
 		gmsh::initialize(0, 0, false);
 	}
+	gmsh::option::setNumber("General.NumThreads", 0);
 	gmsh::option::setNumber("Geometry.AutoCoherence", 0);
 	gmsh::model::add(s);
+}
+
+
+void initializeNoModel(const bool gui = true)
+{
+	if (gui)
+	{
+		gmsh::initialize();
+		gmsh::fltk::initialize();
+		gmsh::option::setNumber("General.Terminal", 1);
+		gmsh::option::setNumber("General.Verbosity", 1000);
+	}
+	else
+	{
+		gmsh::initialize(0, 0, false);
+	}
+	gmsh::option::setNumber("Geometry.AutoCoherence", 0);
 }
 
 
@@ -186,7 +204,7 @@ void compareTest
 	const std::string& testString
 )
 {
-	auto totalWidth {30};
+	auto totalWidth {50};
 	auto outputWidth {totalWidth - testString.size() - 3};
 
 	if (output)

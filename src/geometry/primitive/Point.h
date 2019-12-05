@@ -52,16 +52,19 @@ protected:
 
 
 public:
-	
+
 	// Constructors
 		
-		//- Construct from coordinates
+		//- Construct from raw coordinates
 		Point
 		(
 			const double x,
 			const double y,
 			const double z = 0.0
 		) noexcept;
+
+		//- Construct from point coordinates
+		Point(const PointCoordinates& coordinates) noexcept;
 
 		//- Construct from a Point
 		Point(const Point&) noexcept;
@@ -75,6 +78,11 @@ public:
 
 		//- Get coordinates
 		PointCoordinates getCoordinates() const noexcept;
+
+
+		//- Return origin
+		static Point origin();
+
 
 	// Member operators
 	

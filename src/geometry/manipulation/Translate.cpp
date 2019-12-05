@@ -13,6 +13,7 @@ License
 #include "gmsh.h"
 
 #include "Axis.h"
+#include "Error.h"
 #include "Point.h"
 #include "Translate.h"
 #include "Utility.h"
@@ -30,12 +31,7 @@ namespace geometry
 void Translate::executeManipulation(const Vectorpair<int>& dimTags) const
 {
 	if (!isSet())
-		throw std::runtime_error
-		(
-			"turbo::geometry::Translate::"
-			"manipulate(const turbo::Vectorpair<int>&): "
-			"Translation vector unset"
-		);
+		THROW_RUNTIME_ERROR("translation vector not set");
 
 	gmsh::model::geo::translate
 	(

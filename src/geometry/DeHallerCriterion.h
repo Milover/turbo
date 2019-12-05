@@ -7,25 +7,18 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::Translate
+	turbo::geometry::DeHallerCriterion
 
 Description
-	Translate class for translation of geometry
+	Class DeHallerCriterion
 
 SourceFiles
-	Translate.cpp
+	DeHallerCriterion.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef TRANSLATE_BASE_H
-#define TRANSLATE_BASE_H
-
-#include <memory>
-
-#include "ManipulatorBase.h"
-#include "Point.h"
-#include "Utility.h"
-#include "Vector.h"
+#ifndef DEHALLER_CRITERION_H
+#define DEHALLER_CRITERION_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -35,58 +28,46 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-						Class Translate Declaration
+						Class DeHallerCriterion Declaration
 \*---------------------------------------------------------------------------*/
 
-class Translate final
-:
-	public ManipulatorBase<Vector>
+class DeHallerCriterion
 {
-private:
-
-	// Private data
-
-		std::unique_ptr<Vector> vector_;
-
-
-protected:
-
-	// Member functions
-
-		//- Manipulate geometry
-		void executeManipulation
-		(
-			const Vectorpair<int>& dimTags
-		) const override;
-
-
 public:
+
+	// Public data
+
+		inline static constexpr double constant {0.72};
+
 
 	// Constructors
 
 		//- Default constructor
-		Translate() = default;
+		DeHallerCriterion() = default;
+
+		//- Copy constructor
+		DeHallerCriterion(const DeHallerCriterion&) = default;
+
+		//- Move constructor
+		DeHallerCriterion(DeHallerCriterion&&) = default;
 
 
 	//- Destructor
-	~Translate() = default;
+	~DeHallerCriterion() = default;
 
 
-	// Member functions
+	// Member operators
 
-		//- Set translation vector
-		void setParameters(const Vector& vector) noexcept override;
+		//- Assignment operator
+		DeHallerCriterion& operator=(const DeHallerCriterion&) = default;
 
-		//- Set translation vector from points,
-		//  'pTo' defaults to origin
-		void setParameters
+		//- Function call operator
+		//  returns modified fluid outlet angle in degrees
+		double operator()
 		(
-			const Point& pFrom,
-			const Point& pTo = Point::origin()
-		) noexcept;
-
-		//- Check if translation vector is set
-		bool isSet() const noexcept override;
+			const double fluidInletAngle,
+			const double fluidOutletAngle
+		) const;
 
 };
 

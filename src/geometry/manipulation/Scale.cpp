@@ -13,6 +13,7 @@ License
 #include "gmsh.h"
 
 #include "Axis.h"
+#include "Error.h"
 #include "Point.h"
 #include "Scale.h"
 #include "Utility.h"
@@ -32,12 +33,7 @@ void Scale::executeManipulation
 ) const
 {
 	if (!isSet())
-		throw std::runtime_error
-		(
-			"turbo::geometry::Scale::"
-			"manipulate(const turbo::Vectorpair<int>&): "
-			"Scale factors unset"
-		);
+		THROW_RUNTIME_ERROR("scale parameters not set");
 
 	gmsh::model::geo::dilate
 	(
@@ -88,7 +84,7 @@ void Scale::setParameters(const double factor) noexcept
 {
 	setParameters
 	(
-		Point {0.0, 0.0},
+		Point::origin(),
 		factor
 	);
 }

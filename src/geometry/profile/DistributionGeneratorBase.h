@@ -7,22 +7,19 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::ProfileGeneratorInterface
+	turbo::geometry::DistributionGeneratorBase
 
 Description
-	Interface class for other ProfileGenerator classes
-
-SourceFiles
-	ProfileGeneratorInterface.cpp
+	Abstract base class for distribution generator classes
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef PROFILE_GENERATOR_INTERFACE_H
-#define PROFILE_GENERATOR_INTERFACE_H
+#ifndef DISTRIBUTION_GENERATOR_BASE_H
+#define DISTRIBUTION_GENERATOR_BASE_H
 
-#include "GenericInterface.h"
-#include "Point.h"
-#include "ProfileGeneratorBase.h"
+#include <string>
+
+#include "InputObjectBase.h"
 #include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -33,46 +30,49 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-				Class ProfileGeneratorInterface Declaration
+					Class DistributionGeneratorBase Declaration
 \*---------------------------------------------------------------------------*/
 
-class ProfileGeneratorInterface final
+class DistributionGeneratorBase
 :
-	public GenericInterface<ProfileGeneratorBase, Stringmap>
+	public InputObjectBase<double>
 {
 protected:
 
+	// Constructors
+
+		//- Default constructor
+		DistributionGeneratorBase() = default;
+
+
 	// Member functions
-		
-		//- Create the underlying object to interface
-		void createInterfaceObject(const Stringmap& input) override;
+
+		//- Check input
+		virtual void check() const = 0;
+
+		//- Convert value to double
+		double convert(const std::string& value) const final;
 
 
 public:
-	
+
 	// Constructors
-		
-		//- Construct from input data
-		ProfileGeneratorInterface(const Stringmap& input);
-	
+
+		//- Move constructor
+		DistributionGeneratorBase(DistributionGeneratorBase&&) = default;
+
 
 	//- Destructor
-	~ProfileGeneratorInterface() = default;
+	virtual ~DistributionGeneratorBase() = default;
 
 
 	// Member functions
-		
-		//- Get number of (camber line) points
-		int getSize() const noexcept;
 
-		//- Check if coordinates have beed generated
-		bool isEmpty() const noexcept;
+		//- Get thickness at ``x'' (half of total thickness)
+		virtual double getThicknessAt(const double x) const noexcept = 0;
 
-		//- Get a point on the upper surface at ``pos''
-		Point getUpperPointAt(const int pos) const;
-
-		//- Get a point on the lower surface at ``pos''
-		Point getLowerPointAt(const int pos) const;
+		//- Check if value is initialized
+		bool hasValue(const std::string& key) const noexcept final;
 
 };
 

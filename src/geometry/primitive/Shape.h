@@ -79,6 +79,9 @@ public:
 		//- Return Shape dimTag
 		std::pair<int, int> getDimTag() const noexcept;
 
+		//- Get boundary dimTags
+		Vectorpair<int> getBoundary() const noexcept;
+
 		//- Get bounding box
 		Vectorpair<double> getBoundingBox() const noexcept;
 

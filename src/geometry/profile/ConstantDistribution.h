@@ -7,23 +7,22 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::CascadeComponentBase
+	turbo::geometry::ConstantDistribution
 
 Description
-	Abstract base class for cascade components.
+	Class ConstantDistribution
 
 SourceFiles
-	CascadeComponentBase.cpp
+	ConstantDistribution.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef CASCADE_COMPONENT_BASE_H
-#define CASCADE_COMPONENT_BASE_H
+#ifndef CONSTANT_DISTRIBUTION_H
+#define CONSTANT_DISTRIBUTION_H
 
-#include <memory>
-
-#include "Point.h"
-#include "Vector.h"
+#include "DistributionGeneratorBase.h"
+#include "InputObjectBase.h"
+#include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -33,58 +32,43 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-					Class CascadeComponentBase  Declaration
+				Class ConstantDistribution Declaration
 \*---------------------------------------------------------------------------*/
 
-class CascadeComponentBase
+class ConstantDistribution final
+:
+	public DistributionGeneratorBase
 {
 protected:
 
-	// Protected data
-	
-		Ptrvector<Point> points_;
-
-
-	// Constructors
-		
-		//- Default constructor
-		CascadeComponentBase() = default;
-	
-
 	// Member functions
 
-		//- Generate points from input map
-		virtual void generatePoints(const Stringmap& input) = 0;
+		//- Build input map
+		void buildInputMap() noexcept override;
+
+		//- Check input
+		void check() const override;
 
 
 public:
-	
+
 	// Constructors
 
-		//- Copy constructor
-		CascadeComponentBase(const CascadeComponentBase&);
+		//- Default constructor
+		ConstantDistribution(const Stringmap<>& input);
+
+		//- Move constructor
+		ConstantDistribution(ConstantDistribution&&) = default;
 
 
 	//- Destructor
-	virtual ~CascadeComponentBase() = default;
+	~ConstantDistribution() = default;
 
 
 	// Member functions
 
-		//- Build geometry
-		virtual void build() = 0;
-
-		//- Get dimTags
-		virtual Vectorpair<int> getDimTags() const noexcept;
-
-		//- Get geometric center
-		Point getCenter() const noexcept;
-
-
-	// Member operators
-	
-		//- Disallow assignment
-		CascadeComponentBase& operator=(const CascadeComponentBase&) = delete;
+		//- Get thickness at ``x'' (half of total thickness)
+		double getThicknessAt(const double) const noexcept override;
 
 };
 

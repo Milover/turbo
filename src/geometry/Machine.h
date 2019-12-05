@@ -7,25 +7,26 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::Translate
+	turbo::geometry::Machine
 
 Description
-	Translate class for translation of geometry
+	Machine class
 
 SourceFiles
-	Translate.cpp
+	Machine.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef TRANSLATE_BASE_H
-#define TRANSLATE_BASE_H
+#ifndef MACHINE_H
+#define MACHINE_H
 
 #include <memory>
+#include <string>
 
-#include "ManipulatorBase.h"
-#include "Point.h"
+#include "BladeRow.h"
+#include "ComponentBase.h"
+#include "InputObjectBase.h"
 #include "Utility.h"
-#include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -35,29 +36,33 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-						Class Translate Declaration
+						Class Machine Declaration
 \*---------------------------------------------------------------------------*/
 
-class Translate final
+class Machine final
 :
-	public ManipulatorBase<Vector>
+	public ComponentBase
 {
 private:
 
 	// Private data
 
-		std::unique_ptr<Vector> vector_;
+		std::unique_ptr<BladeRow> rotor_;	// <- implement multiples later
+		std::string name_ {"machine"};
 
 
 protected:
 
 	// Member functions
 
-		//- Manipulate geometry
-		void executeManipulation
-		(
-			const Vectorpair<int>& dimTags
-		) const override;
+		//- Build input map
+		void buildInputMap() noexcept override;
+
+		//- Check values
+		void check() const override;
+
+		//- Empty overload
+		void computeAndStore() noexcept;
 
 
 public:
@@ -65,28 +70,31 @@ public:
 	// Constructors
 
 		//- Default constructor
-		Translate() = default;
+		Machine(const Stringmap<>& input);
+
+		//- Move constructor
+		Machine(Machine&&) = default;
 
 
 	//- Destructor
-	~Translate() = default;
+	virtual ~Machine() = default;
 
 
 	// Member functions
 
-		//- Set translation vector
-		void setParameters(const Vector& vector) noexcept override;
+		// General
 
-		//- Set translation vector from points,
-		//  'pTo' defaults to origin
-		void setParameters
-		(
-			const Point& pFrom,
-			const Point& pTo = Point::origin()
-		) noexcept;
+		//- Build geometry
+		void build();
 
-		//- Check if translation vector is set
-		bool isSet() const noexcept override;
+		//- Write geometry to file
+		// void write() const noexcept;		// <- implement later
+
+		//- Get dimTags
+		Vectorpair<int> getDimTags() const noexcept override;		// <- provisional
+
+		//- Get const pointer to rotor
+		const BladeRow* getRotor() const noexcept;
 
 };
 

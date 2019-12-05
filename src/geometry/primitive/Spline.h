@@ -7,25 +7,24 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::Translate
+	turbo::geometry::Spline
 
 Description
-	Translate class for translation of geometry
+	Spline class
 
 SourceFiles
-	Translate.cpp
+	Spline.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef TRANSLATE_BASE_H
-#define TRANSLATE_BASE_H
+#ifndef SPLINE_H
+#define SPLINE_H
 
-#include <memory>
+#include <vector>
+#include <initializer_list>
 
-#include "ManipulatorBase.h"
+#include "Shape.h"
 #include "Point.h"
-#include "Utility.h"
-#include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -35,58 +34,48 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-						Class Translate Declaration
+						Class Spline Declaration
 \*---------------------------------------------------------------------------*/
 
-class Translate final
+class Spline
 :
-	public ManipulatorBase<Vector>
+	public Shape
 {
-private:
-
-	// Private data
-
-		std::unique_ptr<Vector> vector_;
-
-
 protected:
+
+	typedef std::vector<Point> Pointvector;
+
 
 	// Member functions
 
-		//- Manipulate geometry
-		void executeManipulation
-		(
-			const Vectorpair<int>& dimTags
-		) const override;
+		//- Construct spline geometry
+		virtual int construct(const Pointvector& points) const noexcept;
 
 
 public:
 
 	// Constructors
 
-		//- Default constructor
-		Translate() = default;
+		//- Construct from points
+		//  (we take a copy to avoid dependency issues)
+		Spline(std::initializer_list<Point> points) noexcept;
+
+		//- Construct from a (copy of a) vector of points
+		//  (we take a copy to avoid dependency issues)
+		Spline(const Pointvector points) noexcept;
+
+		//- Construct from a spline
+		Spline(const Spline&) noexcept;
 
 
 	//- Destructor
-	~Translate() = default;
+	virtual ~Spline() = default;
 
 
-	// Member functions
+	// Member operators
 
-		//- Set translation vector
-		void setParameters(const Vector& vector) noexcept override;
-
-		//- Set translation vector from points,
-		//  'pTo' defaults to origin
-		void setParameters
-		(
-			const Point& pFrom,
-			const Point& pTo = Point::origin()
-		) noexcept;
-
-		//- Check if translation vector is set
-		bool isSet() const noexcept override;
+		//- Disallow assignment
+		Spline& operator=(const Spline&) = delete;
 
 };
 

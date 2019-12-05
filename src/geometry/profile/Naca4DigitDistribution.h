@@ -7,25 +7,25 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::Translate
+	turbo::geometry::Naca4DigitDistribution
 
 Description
-	Translate class for translation of geometry
+	Class Naca4DigitDistribution
+	For more information on the generation procedure see \cite{}.
 
 SourceFiles
-	Translate.cpp
+	Naca4DigitDistribution.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef TRANSLATE_BASE_H
-#define TRANSLATE_BASE_H
+#ifndef NACA_4_DIGIT_DISTRIBUTION_H
+#define NACA_4_DIGIT_DISTRIBUTION_H
 
-#include <memory>
+#include <array>
 
-#include "ManipulatorBase.h"
-#include "Point.h"
+#include "DistributionGeneratorBase.h"
+#include "InputObjectBase.h"
 #include "Utility.h"
-#include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -35,29 +35,37 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-						Class Translate Declaration
+				Class Naca4DigitDistribution Declaration
 \*---------------------------------------------------------------------------*/
 
-class Translate final
+class Naca4DigitDistribution final
 :
-	public ManipulatorBase<Vector>
+	public DistributionGeneratorBase
 {
 private:
 
 	// Private data
 
-		std::unique_ptr<Vector> vector_;
+		std::array<double, 5> a_;
+
+		const double scale_ {5.0};
+
+
+	// Member functions
+
+		//- Scale coefficients
+		void scaleCoefficients();
 
 
 protected:
 
 	// Member functions
 
-		//- Manipulate geometry
-		void executeManipulation
-		(
-			const Vectorpair<int>& dimTags
-		) const override;
+		//- Build input map
+		void buildInputMap() noexcept override;
+
+		//- Check input
+		void check() const override;
 
 
 public:
@@ -65,28 +73,23 @@ public:
 	// Constructors
 
 		//- Default constructor
-		Translate() = default;
+		Naca4DigitDistribution(const Stringmap<>& input);
+
+		//- Move constructor
+		Naca4DigitDistribution
+		(
+			Naca4DigitDistribution&&
+		) = default;
 
 
 	//- Destructor
-	~Translate() = default;
+	~Naca4DigitDistribution() = default;
 
 
 	// Member functions
 
-		//- Set translation vector
-		void setParameters(const Vector& vector) noexcept override;
-
-		//- Set translation vector from points,
-		//  'pTo' defaults to origin
-		void setParameters
-		(
-			const Point& pFrom,
-			const Point& pTo = Point::origin()
-		) noexcept;
-
-		//- Check if translation vector is set
-		bool isSet() const noexcept override;
+		//- Get thickness at ``x'' (half of total thickness)
+		double getThicknessAt(const double x) const noexcept override;
 
 };
 

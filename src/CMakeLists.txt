@@ -3,11 +3,11 @@
 # See the LICENSE file for license information
 
 # add all subdirectories
+add_subdirectory(general)
 add_subdirectory(geometry)
 
 # add sources
 set(SRC
-	turbo.cpp
 	)
 
 # append to sources

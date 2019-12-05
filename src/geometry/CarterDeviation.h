@@ -7,25 +7,40 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::Translate
+	turbo::geometry::CarterDeviation
 
 Description
-	Translate class for translation of geometry
+	Class CarterDeviation.
+
+	An empirical expression for computing the deviation angle, for more
+	information see \cite{}.
+
+	The deviation $\delta$ is computed from the following expression:
+
+	\[
+		\delta = \frac{m \theta}{\sqrt{\sigma}}
+	\]
+
+	where $\theta$ is the camber angle in \si{\degree}, $\sigma$ is the
+	solidity and $m$ is defined as:
+
+	\[
+		m = 0.23 \left(2 \cdot \frac{a}{c} \right)^2 + 0.002 * \beta_2
+	\]
+
+	where $\frac{a}{c}$ is the position of maximum camber given as percent of
+	chord and $\beta_2$ is the fluid outlet angle.
 
 SourceFiles
-	Translate.cpp
+	CarterDeviation.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef TRANSLATE_BASE_H
-#define TRANSLATE_BASE_H
+#ifndef CARTER_DEVIATION_H
+#define CARTER_DEVIATION_H
 
-#include <memory>
-
-#include "ManipulatorBase.h"
-#include "Point.h"
-#include "Utility.h"
-#include "Vector.h"
+#include "ComponentBase.h"
+#include "DeviationMethodBase.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -35,58 +50,29 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-						Class Translate Declaration
+					Class CarterDeviation Declaration
 \*---------------------------------------------------------------------------*/
 
-class Translate final
+class CarterDeviation
 :
-	public ManipulatorBase<Vector>
+	public DeviationMethodBase
 {
-private:
-
-	// Private data
-
-		std::unique_ptr<Vector> vector_;
-
-
-protected:
-
-	// Member functions
-
-		//- Manipulate geometry
-		void executeManipulation
-		(
-			const Vectorpair<int>& dimTags
-		) const override;
-
-
 public:
 
 	// Constructors
 
 		//- Default constructor
-		Translate() = default;
+		CarterDeviation() = default;
 
 
 	//- Destructor
-	~Translate() = default;
+	~CarterDeviation() = default;
 
 
 	// Member functions
 
-		//- Set translation vector
-		void setParameters(const Vector& vector) noexcept override;
-
-		//- Set translation vector from points,
-		//  'pTo' defaults to origin
-		void setParameters
-		(
-			const Point& pFrom,
-			const Point& pTo = Point::origin()
-		) noexcept;
-
-		//- Check if translation vector is set
-		bool isSet() const noexcept override;
+		//- Compute deviation in degrees
+		double compute(const ComponentBase& component) const override;
 
 };
 

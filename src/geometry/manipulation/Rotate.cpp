@@ -14,6 +14,7 @@ License
 #include "gmsh.h"
 
 #include "Axis.h"
+#include "Error.h"
 #include "Rotate.h"
 #include "Utility.h"
 #include "Vector.h"
@@ -33,12 +34,7 @@ void Rotate::executeManipulation
 ) const
 {
 	if (!isSet())
-		throw std::runtime_error
-		(
-			"turbo::geometry::Rotate::"
-			"manipulate(const turbo::Vectorpair<int>&): "
-			"Rotation parameters unset"
-		);
+		THROW_RUNTIME_ERROR("rotation parameters not set");
 
 	PointCoordinates p {axis_->getPointCoordinates()};
 	Vector v {axis_->getVector()};

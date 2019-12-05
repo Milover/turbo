@@ -10,6 +10,15 @@ add_subdirectory(profile)
 
 # add sources
 set(SRC
+	ComponentBase.cpp
+	Machine.cpp
+	BladeRow.cpp
+	Blade.cpp
+	Airfoil.cpp
+	DeHallerCriterion.cpp
+	Deviation.cpp
+	CarterDeviation.cpp
+	McKenzieDeviation.cpp
 	)
 
 # append to sources

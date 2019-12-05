@@ -8,13 +8,15 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include <initializer_list>
 #include <utility>
+#include <vector>
 
 #include "gmsh.h"
 
-#include "Axis.h"
 #include "Point.h"
-#include "Utility.h"
+#include "Shape.h"
+#include "Spline.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -25,73 +27,55 @@ namespace geometry
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-int Point::construct
-(
-	const double x,
-	const double y,
-	const double z
-) const noexcept
+int Spline::construct(const Spline::Pointvector& points) const noexcept
 {
-	return gmsh::model::geo::addPoint(x, y, z);
+	std::vector<int> tags;
+
+	for (const auto& p : points)
+		tags.push_back
+		(
+			p.getDimTag().second
+		);
+
+	return gmsh::model::geo::addSpline(tags);
 }
 
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-Point::Point
-(
-	const double x,
-	const double y,
-	const double z
-) noexcept
+Spline::Spline(std::initializer_list<Point> points) noexcept
 :
 	Shape
 	{
 		std::pair<int, int>
 		{
-			0,		// dimension
-			construct(x, y, z)
+			1,		// dimension
+			construct
+			(
+				Spline::Pointvector {points}
+			)
 		}
 	}
 {}
 
 
-Point::Point(const PointCoordinates& coordinates) noexcept
+Spline::Spline(const Spline::Pointvector points) noexcept
 :
-	Point
+	Shape
 	{
-		coordinates[Axis::X],
-		coordinates[Axis::Y],
-		coordinates[Axis::Z]
+		std::pair<int, int>
+		{
+			1,		// dimension
+			construct(points)
+		}
 	}
 {}
 
 
-Point::Point(const Point& point) noexcept
+Spline::Spline(const Spline& spline) noexcept
 :
-	Shape {point}
+	Shape {spline}
 {}
-
-
-// * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * * //
-
-PointCoordinates Point::getCoordinates() const noexcept
-{
-	Vectorpair<double> v {getBoundingBox()};
-
-	return PointCoordinates
-	{
-		v[Axis::X].first,
-		v[Axis::Y].first,
-		v[Axis::Z].first
-	};
-}
-
-
-Point Point::origin()
-{
-	return Point {0, 0};
-}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

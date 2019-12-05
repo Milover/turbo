@@ -7,25 +7,17 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::Translate
+	turbo::geometry::DeviationMethodBase
 
 Description
-	Translate class for translation of geometry
-
-SourceFiles
-	Translate.cpp
+	Abstract base class for other deviation method classes
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef TRANSLATE_BASE_H
-#define TRANSLATE_BASE_H
+#ifndef DEVIATION_METHOD_BASE_H
+#define DEVIATION_METHOD_BASE_H
 
-#include <memory>
-
-#include "ManipulatorBase.h"
-#include "Point.h"
-#include "Utility.h"
-#include "Vector.h"
+#include "ComponentBase.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -35,58 +27,44 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-						Class Translate Declaration
+					Class DeviationMethodBase Declaration
 \*---------------------------------------------------------------------------*/
 
-class Translate final
-:
-	public ManipulatorBase<Vector>
+class DeviationMethodBase
 {
-private:
-
-	// Private data
-
-		std::unique_ptr<Vector> vector_;
-
-
 protected:
 
-	// Member functions
+	// Constructors
 
-		//- Manipulate geometry
-		void executeManipulation
-		(
-			const Vectorpair<int>& dimTags
-		) const override;
+		//- Default constructor
+		DeviationMethodBase() = default;
 
 
 public:
 
 	// Constructors
 
-		//- Default constructor
-		Translate() = default;
+		//- Copy constructor
+		DeviationMethodBase(const DeviationMethodBase&) = default;
+
+		//- Move constructor
+		DeviationMethodBase(DeviationMethodBase&&) = default;
 
 
 	//- Destructor
-	~Translate() = default;
+	virtual ~DeviationMethodBase() = default;
 
 
 	// Member functions
 
-		//- Set translation vector
-		void setParameters(const Vector& vector) noexcept override;
+		//- Compute deviation in degrees
+		virtual double compute(const ComponentBase& component) const = 0;
 
-		//- Set translation vector from points,
-		//  'pTo' defaults to origin
-		void setParameters
-		(
-			const Point& pFrom,
-			const Point& pTo = Point::origin()
-		) noexcept;
 
-		//- Check if translation vector is set
-		bool isSet() const noexcept override;
+	// Member operators
+
+		//- Assignment operator
+		DeviationMethodBase& operator=(const DeviationMethodBase&) = default;
 
 };
 

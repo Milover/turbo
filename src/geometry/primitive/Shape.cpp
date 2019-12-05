@@ -53,10 +53,9 @@ int Shape::copy() const noexcept
 }
 
 
-void Shape::sync() noexcept
+bool Shape::isSync() noexcept
 {
-	if (!sync_)
-		gmsh::model::geo::synchronize();
+	return sync_;
 }
 
 
@@ -78,6 +77,13 @@ Shape::Shape(const Shape& shape) noexcept
 }
 
 
+void Shape::sync() noexcept
+{
+	if (!sync_)
+		gmsh::model::geo::synchronize();
+}
+
+
 // * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
 
 Shape::~Shape() noexcept
@@ -93,6 +99,22 @@ Shape::~Shape() noexcept
 std::pair<int, int> Shape::getDimTag() const noexcept
 {
 	return dimTag_;
+}
+
+
+Vectorpair<int> Shape::getBoundary() const noexcept
+{
+	sync();
+	
+	Vectorpair<int> outDimTags;
+
+	gmsh::model::getBoundary
+	(
+		Vectorpair<int> {getDimTag()},
+		outDimTags
+	);
+
+	return std::move(outDimTags);
 }
 
 
@@ -126,12 +148,6 @@ Vectorpair<double> Shape::getBoundingBox() const noexcept
 void Shape::setSync(const bool sync) noexcept
 {
 	sync_ = sync;
-}
-
-
-bool Shape::isSync() noexcept
-{
-	return sync_;
 }
 
 

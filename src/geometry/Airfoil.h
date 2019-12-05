@@ -20,10 +20,16 @@ SourceFiles
 #ifndef AIRFOIL_H
 #define AIRFOIL_H
 
-#include "CascadeComponentBase.h"
+#include <string>
+#include <memory>
+
+#include "ComponentBase.h"
+#include "Deviation.h"
+#include "Line.h"
 #include "Point.h"
+#include "ProfileGenerator.h"
+#include "Spline.h"
 #include "Utility.h"
-#include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -38,59 +44,123 @@ namespace geometry
 
 class Airfoil final
 :
-	public CascadeComponentBase
+	public ComponentBase
 {
 private:
-	
+
 	// Private data
 
-		bool evolved;
+		Ptrvector<Point> points_;
+
+		std::unique_ptr<Spline> surface_;
+		std::unique_ptr<Line> trailing_;
+
+		std::unique_ptr<ProfileGenerator> generator_;
+		std::unique_ptr<Deviation> deviation_;
+
+		bool wrapped_;
+
+
+	// Member functions
+
+		//- Compute blade inlet angle
+		double computeBladeInletAngle() const;
+
+		//- Compute total-to-static pressure difference
+		double computeDeltaP() const;
+
+		//- Compute fluid inlet angle
+		double computeFluidInletAngle() const;
+
+		//- Compute fluid outlet angle
+		double computeFluidOutletAngle() const;
+
+		//- Compute profile angles
+		void computeProfile();
+
+		//- Compute fluid outlet angle from Euler's work equation
+		double eulerEquation() const;
+
+		//- Initialize pointers
+		void initializePointers(const Stringmap<>& input);
+
+		//- Generate points
+		void generatePoints() noexcept;	
+
+		//- Generate points
+		void generateLines() noexcept;	
+
+		//- Limit fluid angle value [0,90]
+		double limitAngle(const double angle) const noexcept;
+
+		//- Position geometry (scale, stack, rotate)
+		void positionProfile() const;
+
+		//- Compute fluid outlet angle from vortex law equation
+		double vortexEquation() const;
+
 
 protected:
 
 	// Member functions
 
-		//- Build geometry
-		void generatePoints(const Stringmap& input) override;
+		//- Build input map
+		void buildInputMap() noexcept override;
 
-		//- Get vector of dimTags of underlying geometry
-		 Vectorpair<int> getDimTags() const noexcept override;
+		//- Check values
+		void check() const override;
+
+		//- Compute and store values to input map
+		void computeAndStore();
 
 
 public:
 	
 	// Constructors
 
-		//- Construct from input map
-		Airfoil(const Stringmap& input);
+		//- Construct from input
+		Airfoil
+		(
+			const Stringmap<>& input,
+			const ComponentBase& owner
+		);
 
-		//- Copy constructor
-		Airfoil(const Airfoil&);
+		//- Move constructor
+		Airfoil(Airfoil&&) = delete;
 
 
 	//- Destructor
-	~Airfoil();
+	~Airfoil() = default;
 
 
 	// Member functions
 
 		//- Build geometry
-		void build();
+		void build() override;
 
-		//- Create cylindrical section and evolve,
-		//  cylinder radius is determined from current
-		//  geometric center
-		void evolveSection();							// not implemented
+		//- Compute swirl constant
+		double computeSwirl() const;
 
-		//- Return evolved state
-		bool isEvolved() const noexcept;
+		//- Get dimTags
+		Vectorpair<int> getDimTags() const noexcept override;	// <- provisional
 
+		//- Get geometric center
+		Point getCenter() const noexcept;
 
-	// Member operators
-	
-		//- Disallow assignment
-		Airfoil& operator=(const Airfoil&) = delete;
+		//- Get leading edge
+		Point getLeadingEdge() const;
 
+		//- Get lower trailing edge
+		Point getLowerTrailingEdge() const;
+
+		//- Get upper trailing edge
+		Point getUpperTrailingEdge() const;
+
+		//- Return wrapped state
+		bool isWrapped() const noexcept;
+
+		//- Project to cylinder
+		//void wrapToCylinder() const;		// <- implement later
 
 };
 

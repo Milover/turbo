@@ -2,11 +2,11 @@
 #
 # See the LICENSE file for license information
 
+# add all subdirectories
+
 # add sources
 set(SRC
-	Rotate.cpp
-	Scale.cpp
-	Translate.cpp
+	turbo.cpp
 	)
 
 # append to sources

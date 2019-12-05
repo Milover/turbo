@@ -7,6 +7,7 @@ set(SRC
 	Line.cpp
 	Point.cpp
 	Shape.cpp
+	Spline.cpp
 	)
 
 # append to sources

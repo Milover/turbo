@@ -7,72 +7,71 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::GenericInterface
+	turbo::geometry::Deviation
 
 Description
-	Abstract base class template for interface classes
+	Class Deviation
+
+SourceFiles
+	Deviation.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef GENERIC_INTERFACE_H
-#define GENERIC_INTERFACE_H
+#ifndef DEVIATION_H
+#define DEVIATION_H
 
 #include <memory>
+
+#include "ComponentBase.h"
+#include "DeviationMethodBase.h"
+#include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace turbo
 {
+namespace geometry
+{
 
 /*---------------------------------------------------------------------------*\
-					Class GenericInterface Declaration
+						Class Deviation Declaration
 \*---------------------------------------------------------------------------*/
 
-template<typename U, typename... V>
-class GenericInterface
+class Deviation
 {
-protected:
+private:
 
-	// Protected data
-		
-		std::unique_ptr<U> interfaceObject_;
+	// Private data
 
-
-	// Constructors
-		
-		//- Default constructor
-		GenericInterface() = default;
-
-
-	// Member functions
-		
-		//- Create underlying object to interface
-		virtual void createInterfaceObject(const V&...) = 0;
+		std::unique_ptr<DeviationMethodBase> method_;
 
 
 public:
-	
+
 	// Constructors
-		
-		//- Disallow copy construction
-		GenericInterface(const GenericInterface&) = delete;
+
+		//- Default constructor
+		Deviation(const Stringmap<>& input);
+
+		//- Move constructor
+		Deviation(Deviation&&) = default;
 
 
 	//- Destructor
-	virtual ~GenericInterface() = default;
+	~Deviation() = default;
 
 
-	// Member operators
+	// Member functions
 
-		//- Disallow assignment
-		GenericInterface& operator=(const GenericInterface&) = delete;
-
+		//- Compute deviation in degrees
+		double compute(const ComponentBase& component) const;
 
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace geometry
 } // End namespace turbo
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -17,7 +17,7 @@ Description
 #ifndef MANIPULATOR_BASE_H
 #define MANIPULATOR_BASE_H
 
-#include "CascadeComponentBase.h"
+#include "ComponentBase.h"
 #include "Shape.h"
 #include "Utility.h"
 
@@ -84,7 +84,7 @@ public:
 		//- Manipulate cascade geometry
 		inline void manipulate
 		(
-			const CascadeComponentBase& component
+			const ComponentBase& component
 		) const
 		{
 			executeManipulation(component.getDimTags());

@@ -13,11 +13,6 @@ License
 #include "Main.h"
 #include "turbo.h"
 
-#include "Point.h"
-#include "Line.h"
-#include "Airfoil.h"
-#include "ProfileGeneratorInterface.h"
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 int main(int argc, char* argv[])

@@ -7,25 +7,24 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::Translate
+	turbo::geometry::ComponentBase
 
 Description
-	Translate class for translation of geometry
+	Abstract base class template for generic turbomachinery components.
 
 SourceFiles
-	Translate.cpp
+	ComponentBase.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef TRANSLATE_BASE_H
-#define TRANSLATE_BASE_H
+#ifndef COMPONENT_BASE_H
+#define COMPONENT_BASE_H
 
 #include <memory>
+#include <string>
 
-#include "ManipulatorBase.h"
-#include "Point.h"
+#include "InputObjectBase.h"
 #include "Utility.h"
-#include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -35,58 +34,64 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-						Class Translate Declaration
+					Class ComponentBase Declaration
 \*---------------------------------------------------------------------------*/
 
-class Translate final
+class ComponentBase
 :
-	public ManipulatorBase<Vector>
+	public InputObjectBase<double>
 {
-private:
-
-	// Private data
-
-		std::unique_ptr<Vector> vector_;
-
-
 protected:
+
+	// Protected data
+
+
+		const ComponentBase* owner_ {nullptr};
+
+
+	// Constructors
+
+		//- Default constructor
+		ComponentBase() = default;
+
 
 	// Member functions
 
-		//- Manipulate geometry
-		void executeManipulation
-		(
-			const Vectorpair<int>& dimTags
-		) const override;
+		//- Check input
+		virtual void check() const = 0;
+
+		//- Compute and store values to input map
+		virtual void computeAndStore() = 0;
+
+		//- Convert value
+		double convert(const std::string& value) const final;
 
 
 public:
 
 	// Constructors
 
-		//- Default constructor
-		Translate() = default;
+		//- Move constructor
+		ComponentBase(ComponentBase&&) = delete;
 
 
 	//- Destructor
-	~Translate() = default;
+	virtual ~ComponentBase() = default;
 
 
 	// Member functions
 
-		//- Set translation vector
-		void setParameters(const Vector& vector) noexcept override;
+		//- Build geometry
+		virtual void build() = 0;
 
-		//- Set translation vector from points,
-		//  'pTo' defaults to origin
-		void setParameters
-		(
-			const Point& pFrom,
-			const Point& pTo = Point::origin()
-		) noexcept;
+		//- Ask owner for value
+		double get(const std::string& key) const final;
 
-		//- Check if translation vector is set
-		bool isSet() const noexcept override;
+		//- Check if value is initialized
+		bool hasValue(const std::string& key) const noexcept final;
+
+		//- Get dimTags
+		virtual Vectorpair<int> getDimTags() const noexcept = 0;
 
 };
 

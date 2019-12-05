@@ -4,8 +4,13 @@
 
 # add sources
 set(SRC
-	NacaProfileGenerator.cpp
-	ProfileGeneratorInterface.cpp
+	CamberGeneratorBase.cpp
+	ConstantDistribution.cpp
+	DistributionGeneratorBase.cpp
+	Naca2DigitCamber.cpp
+	Naca4DigitDistribution.cpp
+	Naca4DigitModifiedDistribution.cpp
+	ProfileGenerator.cpp
 	)
 
 # append to sources
