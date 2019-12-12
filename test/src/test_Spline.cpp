@@ -14,8 +14,8 @@ Description
 
 #include "gmsh.h"
 
-#include "Spline.h"
 #include "Point.h"
+#include "Spline.h"
 #include "Utility.h"
 
 #include "Test.h"
@@ -24,24 +24,15 @@ using namespace turbo;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-geometry::Spline fromList()
-{
-	geometry::Point p1 {0,0};
-	geometry::Point p2 {1,1};
-	geometry::Point p3 {2,1};
-	geometry::Point p4 {3,0};
-
-	return geometry::Spline {p1, p2, p3, p4};
-}
-
-
 geometry::Spline fromVector()
 {
-	geometry::Point p1 {0,0};
-	geometry::Point p2 {1,1};
-	geometry::Point p3 {2,1};
-	geometry::Point p4 {3,0};
-	std::vector<geometry::Point> points {p1, p2, p3, p4};
+	std::vector<geometry::Point> points
+	{
+		geometry::Point {0,0},
+		geometry::Point {1,1},
+		geometry::Point {2,1},
+		geometry::Point {3,0}
+	};
 
 	return geometry::Spline {points};
 }
@@ -55,26 +46,35 @@ int main(int argc, char* argv[]) {
 	test::initialize("test", output);
 	bool pass {true};
 
+	std::vector<geometry::Point> points
+	{
+		geometry::Point {0,0},
+		geometry::Point {1,1},
+		geometry::Point {2,1},
+		geometry::Point {3,0}
+	};
 
 	// Test Line construction
-	geometry::Spline s1 {fromList()};		// construct from points
-	geometry::Spline s2 {fromVector()};				// construct from spline
-	geometry::Spline s3
-	{
-		geometry::Point {0, 0},
-		geometry::Point {1, 1},
-		geometry::Point {2, 1},
-		geometry::Point {3, 0}
-	};
-	geometry::Spline s4 {s3};
+	geometry::Spline s1 {points};		// construct from spline
+	geometry::Spline s2 {fromVector()};		// construct from spline
 
 	test::updateAndWait(1, output);
 
-	// Test Line member functions
 	int numberOfEntities {test::getNumberOfEntities()};
 
+	// 4 raw points,
+	// 2 points per spline (4),
+	// 2 splines
+	test::compareTest
+	(
+		pass,
+		(numberOfEntities == 10),
+		output,
+		"Checking entitites (10)"
+	);
+
 	// Test dependency manipulation
-	gmsh::model::geo::translate
+	gmsh::model::occ::translate
 	(
 		Vectorpair<int> {s1.getDimTag()},
 		0,
@@ -92,21 +92,6 @@ int main(int argc, char* argv[]) {
 		output,
 		"Checking entitites"
 	);
-
-	test::listEntities();
-
-	gmsh::model::geo::remove
-	(
-		Vectorpair<int>
-		{
-			s1.getDimTag(),
-			s2.getDimTag(),
-			s3.getDimTag(),
-			s4.getDimTag()
-		},
-		true
-	);
-	test::updateAndWait(1, output);
 
 	// test pass or fail
 	if (pass)

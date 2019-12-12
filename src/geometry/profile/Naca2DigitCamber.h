@@ -19,7 +19,7 @@ Description
 	camber angle is satisfied.
 
 SourceFiles
-	Naca4DigitDistribution.cpp
+	Naca2DigitCamber.cpp
 
 \*---------------------------------------------------------------------------*/
 

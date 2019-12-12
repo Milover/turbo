@@ -31,7 +31,7 @@ bool Shape::sync_ {false};
 
 void Shape::remove() const noexcept
 {
-	gmsh::model::geo::remove
+	gmsh::model::occ::remove
 	(
 		Vectorpair<int> {dimTag_},
 		true	// recursive
@@ -43,7 +43,7 @@ int Shape::copy() const noexcept
 {
 	Vectorpair<int> outDimTags;
 
-	gmsh::model::geo::copy
+	gmsh::model::occ::copy
 	(
 		Vectorpair<int> {dimTag_},
 		outDimTags
@@ -53,17 +53,12 @@ int Shape::copy() const noexcept
 }
 
 
-bool Shape::isSync() noexcept
-{
-	return sync_;
-}
-
-
 // * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
 
 Shape::Shape(const std::pair<int, int> dimTag) noexcept
 :
-	dimTag_ {dimTag}
+	dimTag_ {dimTag},
+	empty_ {false}
 {
 	sync_ = false;
 }
@@ -71,16 +66,34 @@ Shape::Shape(const std::pair<int, int> dimTag) noexcept
 
 Shape::Shape(const Shape& shape) noexcept
 :
-	dimTag_ {shape.dimTag_.first, shape.copy()}
+	dimTag_ {shape.dimTag_.first, shape.copy()},
+	empty_ {false}
 {
 	sync_ = false;
 }
 
 
+Shape::Shape(Shape&& shape) noexcept
+:
+	dimTag_
+	{
+		std::move(shape.dimTag_)
+	},
+	empty_ {false}
+{
+	shape.release();
+}
+
+
+// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
+
 void Shape::sync() noexcept
 {
-	if (!sync_)
-		gmsh::model::geo::synchronize();
+	if (sync_)
+		return;
+
+	gmsh::model::occ::synchronize();
+	sync_ = true;
 }
 
 
@@ -88,13 +101,21 @@ void Shape::sync() noexcept
 
 Shape::~Shape() noexcept
 {
-	remove();
-
-	sync_ = false;
+	if (!empty_)
+	{
+		remove();
+		sync_ = false;
+	}
 }
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+void Shape::release() noexcept
+{
+	empty_ = true;
+}
+
 
 std::pair<int, int> Shape::getDimTag() const noexcept
 {
@@ -104,7 +125,7 @@ std::pair<int, int> Shape::getDimTag() const noexcept
 
 Vectorpair<int> Shape::getBoundary() const noexcept
 {
-	sync();
+	Shape::sync();
 	
 	Vectorpair<int> outDimTags;
 
@@ -120,7 +141,7 @@ Vectorpair<int> Shape::getBoundary() const noexcept
 
 Vectorpair<double> Shape::getBoundingBox() const noexcept
 {
-	sync();
+	Shape::sync();
 
 	double xmin, ymin, zmin, xmax, ymax, zmax;
 
@@ -142,6 +163,18 @@ Vectorpair<double> Shape::getBoundingBox() const noexcept
 		std::make_pair(ymin, ymax),
 		std::make_pair(zmin, zmax)
 	};
+}
+
+
+bool Shape::isEmpty() const noexcept
+{
+	return empty_;
+}
+
+
+bool Shape::isSync() noexcept
+{
+	return sync_;
 }
 
 

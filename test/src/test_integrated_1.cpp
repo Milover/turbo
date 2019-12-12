@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 		{"shroudRadius",		"0.075"},	// [m]		
 		// blade
 		{"hubOffset",			"0.0"},		// [m]		- default
-		{"numberOfStations",	"10"},		//
+		{"numberOfStations",	"50"},		//
 		{"tipOffset",			"0.0"},		// [m]		- default
 		{"vortexLawExponent",	"0.6"},		// [-]		- default
 		// airfoil
@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
 		{"deviation",			"carter"},
 		// distribution generator
 		{"distribution",		"naca4Digit"},
-		{"maxThickness",		"0.2"},		// [-] - % of chord
+		{"maxThickness",		"0.1"},		// [-] - % of chord
 		// camber generator
 		{"camberPoints",		"100"},		//			- default
 		{"spacing",				"cosine"},	//			- default
@@ -71,6 +71,8 @@ int main(int argc, char* argv[])
 	// test
 	machine.build();
 	test::updateAndWait(1, output);
+
+	//gmsh::write("/home/philipp/workspace/test.step");
 
 	// test pass or fail
 	if (pass)

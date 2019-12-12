@@ -32,7 +32,7 @@ int Point::construct
 	const double z
 ) const noexcept
 {
-	return gmsh::model::geo::addPoint(x, y, z);
+	return gmsh::model::occ::addPoint(x, y, z);
 }
 
 
@@ -64,12 +64,6 @@ Point::Point(const PointCoordinates& coordinates) noexcept
 		coordinates[Axis::Y],
 		coordinates[Axis::Z]
 	}
-{}
-
-
-Point::Point(const Point& point) noexcept
-:
-	Shape {point}
 {}
 
 

@@ -7,23 +7,24 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::ComponentBase
+	turbo::geometry::CircularArcCamber
 
 Description
-	Abstract base class template for generic turbomachinery components.
+	Class CircularArcCamber declaration.
+
+	Generates a circular arc camber line. The circular arc is centered with
+	respect to the chord i.e. the position of max camber is always at
+	50% of the chord.
 
 SourceFiles
-	ComponentBase.cpp
+	CircularArcCamber.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef COMPONENT_BASE_H
-#define COMPONENT_BASE_H
+#ifndef CIRCULAR_ARC_CAMBER_H
+#define CIRCULAR_ARC_CAMBER_H
 
-#include <memory>
-#include <string>
-
-#include "InputObjectBase.h"
+#include "CamberGeneratorBase.h"
 #include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -34,61 +35,54 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-					Class ComponentBase Declaration
+					Class CircularArcCamber Declaration
 \*---------------------------------------------------------------------------*/
 
-class ComponentBase
+class CircularArcCamber final
 :
-	public InputObjectBase<double>
+	public CamberGeneratorBase
 {
+private:
+
+	// Private data
+
+		double offset_;
+
+
 protected:
-
-	// Protected data
-
-
-		const ComponentBase* owner_ {nullptr};
-
-
-	// Constructors
-
-		//- Default constructor
-		ComponentBase() = default;
-
 
 	// Member functions
 
-		//- Check input
-		virtual void check() const = 0;
+		//- Build input map
+		void buildInputMap() noexcept override;
 
-		//- Compute and store values to input map
-		virtual void computeAndStore() = 0;
+		//- Compute camber parameters to satisfy
+		//  a given camber angle
+		void computeParameters(const double camberAngle) noexcept override;
 
-		//- Convert value
-		double convert(const std::string& value) const final;
+		//- Compute camber ordinate at a ``x''
+		double computeY(const double x) const override;
 
 
 public:
 
 	// Constructors
 
+		//- Default constructor
+		CircularArcCamber(const Stringmap<>& input);
+
 		//- Move constructor
-		ComponentBase(ComponentBase&&) = delete;
+		CircularArcCamber(CircularArcCamber&&) = default;
 
 
 	//- Destructor
-	virtual ~ComponentBase() = default;
+	~CircularArcCamber() = default;
 
 
 	// Member functions
 
-		//- Build geometry
-		virtual void build() = 0;
-
-		//- Ask owner for value
-		double get(const std::string& key) const final;
-
-		//- Check if value is initialized
-		bool hasValue(const std::string& key) const noexcept final;
+		//- Get inlination angle at ``x'' in degrees
+		double getInclinationAt(const double x) const override;
 
 };
 

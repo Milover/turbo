@@ -7,24 +7,24 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::ComponentBase
+	turbo::geometry::Surface
 
 Description
-	Abstract base class template for generic turbomachinery components.
+	A dummy base class to help differentiate surface classes
 
 SourceFiles
-	ComponentBase.cpp
+	Surface.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef COMPONENT_BASE_H
-#define COMPONENT_BASE_H
+#ifndef SURFACE_H
+#define SURFACE_H
 
-#include <memory>
-#include <string>
+#include <vector>
 
-#include "InputObjectBase.h"
-#include "Utility.h"
+#include "Point.h"
+#include "Shape.h"
+#include "Wire.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -34,61 +34,44 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-					Class ComponentBase Declaration
+						Class Surface Declaration
 \*---------------------------------------------------------------------------*/
 
-class ComponentBase
+class Surface
 :
-	public InputObjectBase<double>
+	public Shape
 {
 protected:
 
-	// Protected data
-
-
-		const ComponentBase* owner_ {nullptr};
+	typedef std::vector<Wire> Wirevector;
+	typedef std::vector<Point> Pointvector;
 
 
 	// Constructors
 
-		//- Default constructor
-		ComponentBase() = default;
-
-
-	// Member functions
-
-		//- Check input
-		virtual void check() const = 0;
-
-		//- Compute and store values to input map
-		virtual void computeAndStore() = 0;
-
-		//- Convert value
-		double convert(const std::string& value) const final;
+		//- Construct from tag
+		Surface(const int tag) noexcept;
 
 
 public:
 
 	// Constructors
 
+		//- Copy constructor
+		Surface(const Surface&) = default;
+
 		//- Move constructor
-		ComponentBase(ComponentBase&&) = delete;
+		Surface(Surface&&) = default;
 
 
 	//- Destructor
-	virtual ~ComponentBase() = default;
+	virtual ~Surface() = default;
 
 
-	// Member functions
+	// Member operators
 
-		//- Build geometry
-		virtual void build() = 0;
-
-		//- Ask owner for value
-		double get(const std::string& key) const final;
-
-		//- Check if value is initialized
-		bool hasValue(const std::string& key) const noexcept final;
+		//- Disallow assignment
+		Surface& operator=(const Surface&) = delete;
 
 };
 

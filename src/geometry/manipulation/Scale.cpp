@@ -35,7 +35,7 @@ void Scale::executeManipulation
 	if (!isSet())
 		THROW_RUNTIME_ERROR("scale parameters not set");
 
-	gmsh::model::geo::dilate
+	gmsh::model::occ::dilate
 	(
 		dimTags,
 		point_->at(Axis::X),

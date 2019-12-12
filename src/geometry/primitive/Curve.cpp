@@ -10,11 +10,8 @@ License
 
 #include <utility>
 
-#include "gmsh.h"
-
+#include "Shape.h"
 #include "Curve.h"
-#include "Line.h"
-#include "Point.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -23,37 +20,17 @@ namespace turbo
 namespace geometry
 {
 
-// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
+// * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * * //
 
-int Line::construct
-(
-	const int startTag,
-	const int endTag
-) const noexcept
-{
-	return gmsh::model::occ::addLine
-	(
-		startTag,
-		endTag
-	);
-}
-
-
-// * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
-
-Line::Line
-(
-	Point start,
-	Point end
-) noexcept
+Curve::Curve(const int tag) noexcept
 :
-	Curve
+	Shape
 	{
-		construct
-		(
-			start.getDimTag().second,
-			end.getDimTag().second
-		)
+		std::pair<int, int>
+		{
+			1,		// dimension
+			tag
+		}
 	}
 {}
 

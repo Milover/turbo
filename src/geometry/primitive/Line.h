@@ -20,7 +20,7 @@ SourceFiles
 #ifndef LINE_H
 #define LINE_H
 
-#include "Shape.h"
+#include "Curve.h"
 #include "Point.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -34,16 +34,16 @@ namespace geometry
 						Class Line Declaration
 \*---------------------------------------------------------------------------*/
 
-class Line
+class Line final
 :
-	public Shape
+	public Curve
 {
 protected:
 
 	// Member functions
 
 		//- Construct Line geometry
-		virtual int construct
+		int construct
 		(
 			const int startTag,
 			const int endTag
@@ -61,12 +61,15 @@ public:
 			Point end
 		) noexcept;
 
+		//- Copy constructor
+		Line(const Line&) = default;
+
 		//- Construct from a Line
-		Line(const Line&) noexcept;
+		Line(Line&&) = default;
 
 
 	//- Destructor
-	virtual ~Line() = default;
+	~Line() = default;
 
 
 	// Member operators

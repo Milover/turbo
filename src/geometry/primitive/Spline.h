@@ -20,10 +20,7 @@ SourceFiles
 #ifndef SPLINE_H
 #define SPLINE_H
 
-#include <vector>
-#include <initializer_list>
-
-#include "Shape.h"
+#include "Curve.h"
 #include "Point.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -37,39 +34,41 @@ namespace geometry
 						Class Spline Declaration
 \*---------------------------------------------------------------------------*/
 
-class Spline
+class Spline final
 :
-	public Shape
+	public Curve
 {
 protected:
-
-	typedef std::vector<Point> Pointvector;
-
 
 	// Member functions
 
 		//- Construct spline geometry
-		virtual int construct(const Pointvector& points) const noexcept;
+		int construct
+		(
+			Point start,
+			Point end,
+			const Pointvector& points
+		) const noexcept;
 
 
 public:
 
 	// Constructors
 
-		//- Construct from points
-		//  (we take a copy to avoid dependency issues)
-		Spline(std::initializer_list<Point> points) noexcept;
+		//- Construct from a vector of points
+		//  (the start-end points are copied to
+		//  avoid dependency issues)
+		Spline(const Pointvector& points) noexcept;
 
-		//- Construct from a (copy of a) vector of points
-		//  (we take a copy to avoid dependency issues)
-		Spline(const Pointvector points) noexcept;
+		//- Copy constructor
+		Spline(const Spline&) = default;
 
-		//- Construct from a spline
-		Spline(const Spline&) noexcept;
+		//- Copy constructor
+		Spline(Spline&&) = default;
 
 
 	//- Destructor
-	virtual ~Spline() = default;
+	~Spline() = default;
 
 
 	// Member operators

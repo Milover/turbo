@@ -43,8 +43,8 @@ class CamberGeneratorBase
 {
 private:
 
-	typedef std::vector<PointCoordinates>::iterator iterator;
-	typedef std::vector<PointCoordinates>::const_iterator const_iterator;
+	typedef std::vector<PointCoordinates>::iterator Iterator;
+	typedef std::vector<PointCoordinates>::const_iterator Constiterator;
 
 
 	// Private data
@@ -124,19 +124,19 @@ public:
 	// Member functions
 
 		//- Get iterator to beginning
-		iterator begin();
+		Iterator begin();
 
 		//- Get const iterator to beginning
-		const_iterator begin() const;
+		Constiterator begin() const;
 
 		//- Check if empty
 		bool empty() const noexcept;
 
 		//- Get iterator to end
-		iterator end();
+		Iterator end();
 
 		//- Get const iterator to end
-		const_iterator end() const;
+		Constiterator end() const;
 
 		//- Generate camber line
 		void generate(const double camberAngle) noexcept;

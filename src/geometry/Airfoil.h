@@ -22,13 +22,12 @@ SourceFiles
 
 #include <string>
 #include <memory>
+#include <vector>
 
 #include "ComponentBase.h"
 #include "Deviation.h"
-#include "Line.h"
-#include "Point.h"
+#include "Profile.h"
 #include "ProfileGenerator.h"
-#include "Spline.h"
 #include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -50,15 +49,8 @@ private:
 
 	// Private data
 
-		Ptrvector<Point> points_;
-
-		std::unique_ptr<Spline> surface_;
-		std::unique_ptr<Line> trailing_;
-
 		std::unique_ptr<ProfileGenerator> generator_;
 		std::unique_ptr<Deviation> deviation_;
-
-		bool wrapped_;
 
 
 	// Member functions
@@ -84,17 +76,8 @@ private:
 		//- Initialize pointers
 		void initializePointers(const Stringmap<>& input);
 
-		//- Generate points
-		void generatePoints() noexcept;	
-
-		//- Generate points
-		void generateLines() noexcept;	
-
 		//- Limit fluid angle value [0,90]
 		double limitAngle(const double angle) const noexcept;
-
-		//- Position geometry (scale, stack, rotate)
-		void positionProfile() const;
 
 		//- Compute fluid outlet angle from vortex law equation
 		double vortexEquation() const;
@@ -115,7 +98,12 @@ protected:
 
 
 public:
-	
+
+	// Public data
+
+		Profile profile;
+
+
 	// Constructors
 
 		//- Construct from input
@@ -140,27 +128,6 @@ public:
 
 		//- Compute swirl constant
 		double computeSwirl() const;
-
-		//- Get dimTags
-		Vectorpair<int> getDimTags() const noexcept override;	// <- provisional
-
-		//- Get geometric center
-		Point getCenter() const noexcept;
-
-		//- Get leading edge
-		Point getLeadingEdge() const;
-
-		//- Get lower trailing edge
-		Point getLowerTrailingEdge() const;
-
-		//- Get upper trailing edge
-		Point getUpperTrailingEdge() const;
-
-		//- Return wrapped state
-		bool isWrapped() const noexcept;
-
-		//- Project to cylinder
-		//void wrapToCylinder() const;		// <- implement later
 
 };
 

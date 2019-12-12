@@ -5,6 +5,7 @@
 # add sources
 set(SRC
 	CamberGeneratorBase.cpp
+	CircularArcCamber.cpp
 	ConstantDistribution.cpp
 	DistributionGeneratorBase.cpp
 	Naca2DigitCamber.cpp

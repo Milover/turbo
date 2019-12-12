@@ -90,9 +90,6 @@ public:
 		//- Write geometry to file
 		// void write() const noexcept;		// <- implement later
 
-		//- Get dimTags
-		Vectorpair<int> getDimTags() const noexcept override;		// <- provisional
-
 		//- Get const pointer to rotor
 		const BladeRow* getRotor() const noexcept;
 

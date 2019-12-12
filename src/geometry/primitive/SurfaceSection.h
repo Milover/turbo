@@ -7,21 +7,20 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::Point
+	turbo::geometry::SurfaceSection
 
 Description
-	Point class
+	SurfaceSection class
 
 SourceFiles
-	Point.cpp
+	SurfaceSection.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef POINT_H
-#define POINT_H
+#ifndef SURFACE_SECTION_H
+#define SURFACE_SECTION_H
 
-#include "Shape.h"
-#include "Utility.h"
+#include "Surface.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -31,65 +30,43 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-						Class Line Declaration
+						Class SurfaceSection Declaration
 \*---------------------------------------------------------------------------*/
 
-class Point final
+class SurfaceSection final
 :
-	public Shape
+	public Surface
 {
-protected:
+private:
 
 	// Member functions
 
-		//- Construct Point geometry
-		int construct
-		(
-			const double x,
-			const double y,
-			const double z
-		) const noexcept;
+		//- Construct surface geometry
+		int construct(Surface::Wirevector&& wires) const noexcept;
 
 
 public:
 
 	// Constructors
-		
-		//- Construct from raw coordinates
-		Point
-		(
-			const double x,
-			const double y,
-			const double z = 0.0
-		) noexcept;
 
-		//- Construct from point coordinates
-		Point(const PointCoordinates& coordinates) noexcept;
+		//- Construct from a vector of wires
+		SurfaceSection(Surface::Wirevector&& wires) noexcept;
 
 		//- Copy constructor
-		Point(const Point&) = default;
+		SurfaceSection(const SurfaceSection&) = default;
 
 		//- Copy constructor
-		Point(Point&&) = default;
+		SurfaceSection(SurfaceSection&&) = default;
 
 
 	//- Destructor
-	~Point() = default;
-
-
-	// Member functions
-
-		//- Get coordinates
-		PointCoordinates getCoordinates() const noexcept;
-
-		//- Return origin
-		static Point origin();
+	~SurfaceSection() = default;
 
 
 	// Member operators
-	
+
 		//- Disallow assignment
-		Point& operator=(const Point&) = delete;
+		SurfaceSection& operator=(const SurfaceSection&) = delete;
 
 };
 

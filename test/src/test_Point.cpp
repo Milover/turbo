@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
 	test::updateAndWait(1, output);
 
 	// try to modify
-	gmsh::model::geo::translate
+	gmsh::model::occ::translate
 	(
 		Vectorpair<int> {p2.getDimTag()},
 		2,

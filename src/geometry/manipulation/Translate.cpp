@@ -33,7 +33,7 @@ void Translate::executeManipulation(const Vectorpair<int>& dimTags) const
 	if (!isSet())
 		THROW_RUNTIME_ERROR("translation vector not set");
 
-	gmsh::model::geo::translate
+	gmsh::model::occ::translate
 	(
 		dimTags,
 		vector_->x,

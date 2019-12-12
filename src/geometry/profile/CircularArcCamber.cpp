@@ -8,15 +8,12 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include <string>
-#include <utility>
-#include <memory>
+#include <cmath>
 
-#include "gmsh.h"
-
-#include "Machine.h"
+#include "CamberGeneratorBase.h"
 #include "Error.h"
 #include "InputObjectBase.h"
+#include "CircularArcCamber.h"
 #include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -28,55 +25,67 @@ namespace geometry
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-void Machine::buildInputMap() noexcept
+void CircularArcCamber::buildInputMap() noexcept
 {
-	store("deltaP",			NAN);	// [Pa]
-	store("density",		NAN);	// [kg m-3]
-	store("rpm",			NAN);	// [min-1]
-	store("volumeFlowRate",	NAN);	// [m3 h-1]
+	store("maxCamberPosition", 0.5);	// [-] - % of chord
 }
 
 
-void Machine::check() const
+void CircularArcCamber::computeParameters(const double camberAngle) noexcept
 {
-	for (const auto& [key, value] : this->inputMap_)
-		if (isLessOrEqual(value, 0.0))
-			THROW_RUNTIME_ERROR("value of keyword '" + key + "' <= 0");
+	double theta {degToRad(camberAngle)};
+
+	offset_ = -0.5 * chord_ / std::tan(0.5 * theta);
+
+	store
+	(
+		"maxCamber",
+		computeY(get("maxCamberPosition"))
+	);
 }
 
 
-void Machine::computeAndStore() noexcept
-{}
+double CircularArcCamber::computeY(const double x) const
+{
+	double root
+	{
+		std::pow(offset_, 2) + x * chord_ - std::pow(x, 2)
+	};
+
+	return std::sqrt(root) + offset_;
+}
 
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-Machine::Machine(const Stringmap<>& input)
+CircularArcCamber::CircularArcCamber(const Stringmap<>& input)
+:
+	CamberGeneratorBase {input}
 {
 	buildInputMap();
-	parse(input);
-	check();
-
-	gmsh::model::add(name_);
-
-	rotor_.reset					// <- should be a loop at some point
-	(
-		new BladeRow {input, *this}
-	);
 }
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-void Machine::build()
+double CircularArcCamber::getInclinationAt(const double x) const
 {
-	rotor_->build();
-}
+	if
+	(
+		!isInRange(x, 0.0, chord_)
+	)
+		THROW_DOMAIN_ERROR("x out of range [0, chord]");
 
+	double root
+	{
+		std::pow(offset_, 2) + x * chord_ - std::pow(x, 2)
+	};
+	double dydx
+	{
+		0.5 * (chord_ - 2.0 * x) / std::sqrt(root)
+	};
 
-const BladeRow* Machine::getRotor() const noexcept
-{
-	return &(*rotor_);
+	return radToDeg(std::atan(dydx));
 }
 
 

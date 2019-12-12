@@ -12,13 +12,20 @@ License
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
+
+#include <iostream>
+#include "gmsh.h"
 
 #include "Airfoil.h"
 #include "Blade.h"
 #include "ComponentBase.h"
 #include "Error.h"
 #include "InputObjectBase.h"
+#include "SurfaceFilling.h"
+#include "SurfaceSection.h"
 #include "Utility.h"
+#include "Wire.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -28,6 +35,96 @@ namespace geometry
 {
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
+
+void Blade::buildAirfoils()
+{
+	for (auto& a : airfoils_)
+	{
+		computeAndStore();
+
+		a->build();
+
+		// we store the swirl constant only once
+		if (station_ == 0)
+			store
+			(
+				"swirl",
+				a->computeSwirl()
+			);
+
+		station_++;
+	}
+}
+
+
+void Blade::buildSurfaces() noexcept
+{
+	std::vector<Wire> contour;
+	std::vector<Wire> trailing;
+
+	for (const auto& a : airfoils_)
+	{
+		contour.emplace_back
+		(
+			std::move(a->profile.getContour())
+		);
+		trailing.emplace_back
+		(
+			std::move(a->profile.getTrailingEdge())
+		);
+
+		if (&a == &airfoils_.front())
+		{
+			bottom_.reset
+			(
+				new SurfaceFilling
+				{
+					std::move
+					(
+						Wire
+						{
+							a->profile.getContour(),
+							a->profile.getTrailingEdge()
+						}
+					)
+				}
+			);
+		}
+		else if (&a == &airfoils_.back())
+		{
+			top_.reset
+			(
+				new SurfaceFilling
+				{
+					std::move
+					(
+						Wire
+						{
+							a->profile.getContour(),
+							a->profile.getTrailingEdge()
+						}
+					)
+				}
+			);
+		}
+	}
+
+	contour_.reset
+	(
+		new SurfaceSection
+		{
+			std::move(contour)
+		}
+	);
+	trailing_.reset
+	(
+		new SurfaceSection
+		{
+			std::move(trailing)
+		}
+	);
+}
+
 
 void Blade::checkNumberOfStations() const
 {
@@ -189,13 +286,13 @@ Blade::Blade
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-Blade::iterator Blade::begin()
+Blade::Iterator Blade::begin()
 {
 	return airfoils_.begin();
 }
 
 
-Blade::const_iterator Blade::begin() const
+Blade::Constiterator Blade::begin() const
 {
 	return airfoils_.begin();
 }
@@ -205,22 +302,14 @@ void Blade::build()
 {
 	checkOffsets();
 
+	buildAirfoils();
+
+	// optimize airfoil geometries
+
 	for (const auto& a : airfoils_)
-	{
-		computeAndStore();
+		a->profile.wrap();
 
-		a->build();
-
-		// we store the swirl constant only once
-		if (station_ == 0)
-			store
-			(
-				"swirl",
-				a->computeSwirl()
-			);
-
-		station_++;
-	}
+	buildSurfaces();
 }
 
 
@@ -230,13 +319,13 @@ bool Blade::empty() const noexcept
 }
 
 
-Blade::iterator Blade::end()
+Blade::Iterator Blade::end()
 {
 	return airfoils_.end();
 }
 
 
-Blade::const_iterator Blade::end() const
+Blade::Constiterator Blade::end() const
 {
 	return airfoils_.end();
 }
@@ -245,23 +334,6 @@ Blade::const_iterator Blade::end() const
 const Airfoil* Blade::getAirfoilAt(const int station) const
 {
 	return &(*airfoils_.at(station));
-}
-
-
-Vectorpair<int> Blade::getDimTags() const noexcept
-{
-	Vectorpair<int> dimTags;
-	Vectorpair<int> temp;
-
-	for (const auto& a : airfoils_)
-	{
-		temp = a->getDimTags();
-
-		for (const auto& p : temp)
-			dimTags.push_back(p);
-	}
-
-	return std::move(dimTags);
 }
 
 

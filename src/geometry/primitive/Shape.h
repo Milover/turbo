@@ -42,6 +42,7 @@ private:
 	// Private data
 
 		const std::pair<int, int> dimTag_;
+		bool empty_;
 		static bool sync_;
 
 
@@ -53,9 +54,6 @@ private:
 		//- Copy Shape geometry and return tag
 		int copy() const noexcept;
 
-		//- Synchronize geometry
-		static void sync() noexcept;
-
 
 protected:
 
@@ -64,8 +62,17 @@ protected:
 		//- Construct from tag
 		Shape(const std::pair<int, int> dimTag) noexcept;
 
-		//- Construct from a Shape
+		//- Copy constructor
 		Shape(const Shape&) noexcept;
+
+		//- Move constructor
+		Shape(Shape&&) noexcept;
+
+
+	// Member functions
+
+		//- Synchronize geometry
+		static void sync() noexcept;
 
 
 public:
@@ -76,6 +83,9 @@ public:
 
 	// Member functions
 
+		//- Release ownership of underlying geometry
+		void release() noexcept;
+
 		//- Return Shape dimTag
 		std::pair<int, int> getDimTag() const noexcept;
 
@@ -85,11 +95,14 @@ public:
 		//- Get bounding box
 		Vectorpair<double> getBoundingBox() const noexcept;
 
-		//- Set synchronization
-		static void setSync(const bool sync) noexcept;
+		//- Check if empty
+		bool isEmpty() const noexcept;
 
 		//- Check if synchronized
 		static bool isSync() noexcept;
+
+		//- Set synchronization
+		static void setSync(const bool sync) noexcept;
 
 
 	// Member operators

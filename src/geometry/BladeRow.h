@@ -106,9 +106,6 @@ public:
 		//- Build geometry
 		void build() override;
 
-		//- Get dimTags
-		Vectorpair<int> getDimTags() const noexcept override;		// <- provitional
-
 		//- Get const pointer to blade
 		const Blade* getBlade() const noexcept;
 

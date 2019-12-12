@@ -69,6 +69,14 @@ add_executable (turbo "${PROJECT_SOURCE_DIR}/src/Main.cpp" ${TURBO_SRC})
 target_include_directories(turbo PRIVATE ${TURBO_INCLUDE_DIRS})
 target_link_libraries(turbo ${TURBO_LIBRARIES})
 
+# < new
+# main library target (for tests)
+add_library (libturbo SHARED ${TURBO_SRC})
+set_target_properties (libturbo PROPERTIES PREFIX "")
+target_include_directories(libturbo PUBLIC ${TURBO_INCLUDE_DIRS})
+target_link_libraries(libturbo ${TURBO_LIBRARIES})
+# < new
+
 # install targets
 install(TARGETS turbo DESTINATION "${PROJECT_SOURCE_DIR}/bin")
 

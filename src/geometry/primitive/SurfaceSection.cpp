@@ -13,9 +13,9 @@ License
 
 #include "gmsh.h"
 
-#include "Curve.h"
-#include "Point.h"
-#include "Spline.h"
+#include "Surface.h"
+#include "SurfaceSection.h"
+#include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -26,49 +26,39 @@ namespace geometry
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-int Spline::construct
-(
-	Point start,
-	Point end,
-	const Spline::Pointvector& points
-) const noexcept
+int SurfaceSection::construct(Surface::Wirevector&& wires) const noexcept
 {
 	std::vector<int> tags;
+	Vectorpair<int> outDimTags;
 
-	for (const auto& p : points)
-	{
-		if (&p == &points.front())
-			tags.push_back
-			(
-				start.getDimTag().second
-			);
-		else if (&p == &points.back())
-			tags.push_back
-			(
-				end.getDimTag().second
-			);
-		else
-			tags.push_back
-			(
-				p.getDimTag().second
-			);
-	}
+	for (auto& w : wires)
+		tags.push_back
+		(
+			w.getDimTag().second
+		);
 
-	return gmsh::model::occ::addSpline(tags);
+	gmsh::model::occ::addThruSections
+	(
+		tags,
+		outDimTags,
+		-1,			// don't assign tag
+		false,		// don't make solid
+		false		// don't make ruled
+	);
+
+	return outDimTags.front().second;
 }
 
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-Spline::Spline(const Spline::Pointvector& points) noexcept
+SurfaceSection::SurfaceSection(Surface::Wirevector&& wires) noexcept
 :
-	Curve
+	Surface
 	{
 		construct
 		(
-			points.front(),
-			points.back(),
-			points
+			std::move(wires)
 		)
 	}
 {}

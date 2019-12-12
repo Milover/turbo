@@ -164,12 +164,6 @@ void BladeRow::build()
 }
 
 
-Vectorpair<int> BladeRow::getDimTags() const noexcept
-{
-	return std::move(blade_->getDimTags());
-}
-
-
 const Blade* BladeRow::getBlade() const noexcept
 {
 	return &(*blade_);

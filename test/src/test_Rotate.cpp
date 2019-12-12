@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 	// lambda for comparisons
 	auto compare = [](auto x, auto y)
 	{
-		return std::abs(x - y) < 1e-16;
+		return std::abs(x - y) < 2e-16;
 	};
 
 	// test manipulation

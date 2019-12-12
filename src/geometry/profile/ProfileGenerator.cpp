@@ -15,6 +15,7 @@ License
 
 #include "Axis.h"
 #include "ConstantDistribution.h"
+#include "CircularArcCamber.h"
 #include "Error.h"
 #include "Naca2DigitCamber.h"
 #include "Naca4DigitDistribution.h"
@@ -44,6 +45,11 @@ void ProfileGenerator::initializeCamberGenerator(const Stringmap<>& input)
 		camberGenerator_.reset
 		(
 			new Naca2DigitCamber {input}
+		);
+	else if (type == "circularArc")
+		camberGenerator_.reset
+		(
+			new CircularArcCamber {input}
 		);
 	else
 		THROW_RUNTIME_ERROR("unknown value '" + type + "' for keyword 'camber'");
@@ -157,13 +163,13 @@ ProfileGenerator::ProfileGenerator(const Stringmap<>& input)
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-ProfileGenerator::iterator ProfileGenerator::begin()
+ProfileGenerator::Iterator ProfileGenerator::begin()
 {
 	return profile_.begin();
 }
 
 
-ProfileGenerator::const_iterator ProfileGenerator::begin() const
+ProfileGenerator::Constiterator ProfileGenerator::begin() const
 {
 	return profile_.begin();
 }
@@ -175,13 +181,13 @@ bool ProfileGenerator::empty() const noexcept
 }
 
 
-ProfileGenerator::iterator ProfileGenerator::end()
+ProfileGenerator::Iterator ProfileGenerator::end()
 {
 	return profile_.end();
 }
 
 
-ProfileGenerator::const_iterator ProfileGenerator::end() const
+ProfileGenerator::Constiterator ProfileGenerator::end() const
 {
 	return profile_.end();
 }

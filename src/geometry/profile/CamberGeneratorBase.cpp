@@ -137,13 +137,13 @@ void CamberGeneratorBase::parse(const Stringmap<>& input)
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-CamberGeneratorBase::iterator CamberGeneratorBase::begin()
+CamberGeneratorBase::Iterator CamberGeneratorBase::begin()
 {
 	return camber_.begin();
 }
 
 
-CamberGeneratorBase::const_iterator CamberGeneratorBase::begin() const
+CamberGeneratorBase::Constiterator CamberGeneratorBase::begin() const
 {
 	return camber_.begin();
 }
@@ -155,13 +155,13 @@ bool CamberGeneratorBase::empty() const noexcept
 }
 
 
-CamberGeneratorBase::iterator CamberGeneratorBase::end()
+CamberGeneratorBase::Iterator CamberGeneratorBase::end()
 {
 	return camber_.end();
 }
 
 
-CamberGeneratorBase::const_iterator CamberGeneratorBase::end() const
+CamberGeneratorBase::Constiterator CamberGeneratorBase::end() const
 {
 	return camber_.end();
 }
@@ -169,6 +169,13 @@ CamberGeneratorBase::const_iterator CamberGeneratorBase::end() const
 
 void CamberGeneratorBase::generate(const double camberAngle) noexcept
 {
+	if
+	(
+		camberAngle < 0.0 &&
+		camberAngle > 90.0
+	)
+		THROW_DOMAIN_ERROR("camber angle out of range [0, 90]");
+
 	camber_.clear();
 
 	computeParameters(camberAngle);

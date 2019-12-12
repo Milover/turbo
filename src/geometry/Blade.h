@@ -24,6 +24,7 @@ SourceFiles
 
 #include "Airfoil.h"
 #include "ComponentBase.h"
+#include "Surface.h"
 #include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -43,15 +44,16 @@ class Blade final
 {
 private:
 
-	typedef Ptrvector<Airfoil>::iterator iterator;
-	typedef Ptrvector<Airfoil>::const_iterator const_iterator;
+	typedef Ptrvector<Airfoil>::iterator Iterator;
+	typedef Ptrvector<Airfoil>::const_iterator Constiterator;
 
 
 	// Private data
 
-		//std::unique_ptr<Face> lower_;		// <- implement later
-		//std::unique_ptr<Face> top_;		// <- implement later
-		//std::unique_ptr<Face> upper_;		// <- implement later
+		std::unique_ptr<Surface> contour_;		// TODO: implement in geometry class
+		std::unique_ptr<Surface> top_;			// TODO: implement in geometry class
+		std::unique_ptr<Surface> bottom_;		// TODO: implement in geometry class
+		std::unique_ptr<Surface> trailing_;		// TODO: implement in geometry class
 
 		Ptrvector<Airfoil> airfoils_;
 
@@ -60,6 +62,12 @@ private:
 
 
 	// Member functions
+
+		//- Build airfoil geometries
+		void buildAirfoils();
+
+		//- Build surfaces
+		void buildSurfaces() noexcept;			// TODO: move to geometry class
 
 		//- Check number of stations
 		void checkNumberOfStations() const;
@@ -116,28 +124,25 @@ public:
 	// Member functions
 
 		//- Get iterator to beginning
-		iterator begin();
+		Iterator begin();
 
 		//- Get const iterator to beginning
-		const_iterator begin() const;
+		Constiterator begin() const;
 
 		//- Build geometry
-		void build() override;
+		void build() override;					// TODO: optimization missing
 
 		//- Check if empty
 		bool empty() const noexcept;
 
 		//- Get iterator to end
-		iterator end();
+		Iterator end();
 
 		//- Get const iterator to end
-		const_iterator end() const;
+		Constiterator end() const;
 
 		//- Get const pointer to airfoil at station
 		const Airfoil* getAirfoilAt(const int station) const;
-
-		//- Get dimTags
-		Vectorpair<int> getDimTags() const noexcept override;	// <- provisional
 
 		//- Get number of stations
 		int size() const noexcept;

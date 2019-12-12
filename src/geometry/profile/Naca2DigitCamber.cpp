@@ -155,6 +155,12 @@ Naca2DigitCamber::Naca2DigitCamber(const Stringmap<>& input)
 
 double Naca2DigitCamber::getInclinationAt(const double x) const
 {
+	if
+	(
+		!isInRange(x, 0.0, chord_)
+	)
+		THROW_DOMAIN_ERROR("x out of range [0, chord]");
+
 	double max {get("maxCamber")};
 	double pos {get("maxCamberPosition")};
 	double dydx;

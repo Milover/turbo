@@ -39,7 +39,7 @@ void Rotate::executeManipulation
 	PointCoordinates p {axis_->getPointCoordinates()};
 	Vector v {axis_->getVector()};
 
-	gmsh::model::geo::rotate
+	gmsh::model::occ::rotate
 	(
 		dimTags,
 		p.at(Axis::X),

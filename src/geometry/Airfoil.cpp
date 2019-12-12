@@ -11,6 +11,7 @@ License
 #include <cmath>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "Airfoil.h"
 #include "Axis.h"
@@ -19,13 +20,8 @@ License
 #include "Deviation.h"
 #include "Error.h"
 #include "InputObjectBase.h"
-#include "Line.h"
-#include "Point.h"
+#include "Profile.h"
 #include "ProfileGenerator.h"
-#include "Rotate.h"
-#include "Scale.h"
-#include "Spline.h"
-#include "Translate.h"
 #include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -134,13 +130,9 @@ double Airfoil::computeFluidInletAngle() const
 
 double Airfoil::computeFluidOutletAngle() const
 {
-	// if we're the first or the only airfoil
+	// if we're the first airfoil
 	// we don't have the swirl constant
-	if
-	(
-		isEqual(get("radius"), get("hubRadius")) ||
-		isEqual(get("numberOfStations"), 1.0)
-	)
+	if (!owner_->hasValue("swirl"))
 		return eulerEquation();
 
 	return vortexEquation();
@@ -182,39 +174,6 @@ void Airfoil::initializePointers(const Stringmap<>& input)
 }
 
 
-void Airfoil::generatePoints() noexcept
-{
-	points_.clear();
-
-	for (const auto& p : *generator_)
-		points_.push_back
-		(
-			std::make_unique<Point>(p)
-		);
-}
-
-
-void Airfoil::generateLines() noexcept
-{
-	std::vector<Point> points;
-	for (const auto& p : points_)
-		points.push_back(*p);
-
-	surface_.reset
-	(
-		new Spline {points}
-	);
-	trailing_.reset
-	(
-		new Line
-		{
-			getLowerTrailingEdge(),
-			getUpperTrailingEdge()
-		}
-	);
-}
-
-
 double Airfoil::limitAngle(const double angle) const noexcept
 {
 	double angleNew {angle};
@@ -225,37 +184,6 @@ double Airfoil::limitAngle(const double angle) const noexcept
 		angleNew = 90.0;
 	
 	return angleNew;
-}
-
-
-void Airfoil::positionProfile() const
-{
-	Rotate rotate {};
-	Scale scale {};
-	Translate translate {};
-
-	// scale to chord
-	scale.setParameters
-	(
-		getCenter(),
-		get("chord")
-	);
-	scale.manipulate(*this);
-
-	// stack
-	translate.setParameters
-	(
-		getCenter(),
-		Point {0, 0, get("radius")}
-	);
-	translate.manipulate(*this);
-
-	// rotate
-	rotate.setParameters
-	(
-		degToRad(get("stagger"))
-	);
-	rotate.manipulate(*this);
 }
 
 
@@ -348,8 +276,6 @@ Airfoil::Airfoil
 	const Stringmap<>& input,
 	const ComponentBase& owner
 )
-:
-	wrapped_ {false}
 {
 	owner_ = &owner;
 	buildInputMap();
@@ -393,10 +319,14 @@ void Airfoil::build()
 	);
 
 	computeProfile();
-	generatePoints();
-	positionProfile();
 
-	generateLines();
+	profile.build
+	(
+		*generator_,
+		get("chord"),
+		get("radius"),
+		get("stagger")
+	);
 }
 
 
@@ -408,95 +338,6 @@ double Airfoil::computeSwirl() const
 	};
 
 	return get("bladeVelocity") - get("axialVelocity") * tanBeta;
-}
-
-
-Vectorpair<int> Airfoil::getDimTags() const noexcept
-{
-	Vectorpair<int> dimTags;
-
-	for (const auto& p : points_)
-		dimTags.push_back
-		(
-			p->getDimTag()
-		);
-
-	return std::move(dimTags);
-}
-
-
-Point Airfoil::getCenter() const noexcept
-{
-	if (points_.empty())
-		return Point::origin();
-
-	PointCoordinates point {};
-	PointCoordinates sum {Point::origin().getCoordinates()};
-	int count {0};
-
-	for (const auto& p : points_)
-	{
-		point = p->getCoordinates();
-
-		sum[Axis::X] += point[Axis::X];
-		sum[Axis::Y] += point[Axis::Y];
-		sum[Axis::Z] += point[Axis::Z];
-		
-		count++;
-	}
-
-	for (auto& s : sum)
-		s /= static_cast<double>(count);
-
-	return Point
-	{
-		sum[Axis::X],
-		sum[Axis::Y],
-		sum[Axis::Z]
-	};
-}
-
-
-Point Airfoil::getLeadingEdge() const
-{
-	if (points_.empty())
-		THROW_RUNTIME_ERROR("airfoil not built");
-
-	// we always have an odd number of points
-	int size {static_cast<int>(points_.size())};
-	int pos
-	{
-		(size - 1) / 2
-	};
-
-	// LE is always in the middle
-	return *points_[pos + 1];
-}
-
-
-Point Airfoil::getLowerTrailingEdge() const
-{
-	if (points_.empty())
-		THROW_RUNTIME_ERROR("airfoil not built");
-
-	// lower TE is always at the end
-	return *points_.back();
-}
-
-
-Point Airfoil::getUpperTrailingEdge() const
-{
-	if (points_.empty())
-		THROW_RUNTIME_ERROR("airfoil not built");
-
-	// upper TE is always at the beginning
-	return *points_.front();
-}
-
-
-bool Airfoil::isWrapped() const noexcept
-{
-	return wrapped_;
 }
 
 

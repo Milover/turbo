@@ -7,21 +7,21 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::Point
+	turbo::geometry::SurfaceFilling
 
 Description
-	Point class
+	SurfaceFilling class
 
 SourceFiles
-	Point.cpp
+	SurfaceFilling.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef POINT_H
-#define POINT_H
+#ifndef SURFACE_FILLING_H
+#define SURFACE_FILLING_H
 
-#include "Shape.h"
-#include "Utility.h"
+#include "Surface.h"
+#include "Wire.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -31,65 +31,52 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-						Class Line Declaration
+						Class SurfaceFilling Declaration
 \*---------------------------------------------------------------------------*/
 
-class Point final
+class SurfaceFilling final
 :
-	public Shape
+	public Surface
 {
-protected:
+private:
 
 	// Member functions
 
-		//- Construct Point geometry
+		//- Construct surface geometry
 		int construct
 		(
-			const double x,
-			const double y,
-			const double z
+			Wire&& wire,
+			const Surface::Pointvector& points
 		) const noexcept;
 
 
 public:
 
 	// Constructors
-		
-		//- Construct from raw coordinates
-		Point
+
+		//- Construct from a closed wire (loop),
+		//  interpolate through points if provided
+		SurfaceFilling
 		(
-			const double x,
-			const double y,
-			const double z = 0.0
+			Wire&& wire,
+			const Surface::Pointvector& points = Pointvector {}
 		) noexcept;
 
-		//- Construct from point coordinates
-		Point(const PointCoordinates& coordinates) noexcept;
+		//- Copy constructor
+		SurfaceFilling(const SurfaceFilling&) = default;
 
 		//- Copy constructor
-		Point(const Point&) = default;
-
-		//- Copy constructor
-		Point(Point&&) = default;
+		SurfaceFilling(SurfaceFilling&&) = default;
 
 
 	//- Destructor
-	~Point() = default;
-
-
-	// Member functions
-
-		//- Get coordinates
-		PointCoordinates getCoordinates() const noexcept;
-
-		//- Return origin
-		static Point origin();
+	~SurfaceFilling() = default;
 
 
 	// Member operators
-	
+
 		//- Disallow assignment
-		Point& operator=(const Point&) = delete;
+		SurfaceFilling& operator=(const SurfaceFilling&) = delete;
 
 };
 

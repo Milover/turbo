@@ -44,30 +44,27 @@ int main(int argc, char* argv[]) {
 
 	test::updateAndWait(1, output);
 
-	// Test Line member functions
+	int numberOfEntities {test::getNumberOfEntities()};
+
+	// 3 raw points,
+	// 2 points per line (6),
+	// 3 lines
 	test::compareTest
 	(
 		pass,
-		(
-			l1.getDimTag().first == 1 &&
-			l2.getDimTag().first == 1 &&
-			l3.getDimTag().first == 1
-		),
+		(numberOfEntities == 12),
 		output,
-		"Checking dimension"
+		"Checking entitites (12)"
 	);
 
-	int numberOfEntities {test::getNumberOfEntities()};
-
 	// Test dependency manipulation
-	gmsh::model::geo::translate
+	gmsh::model::occ::translate
 	(
 		Vectorpair<int> {l3.getDimTag()},
 		0,
 		1,
 		0
 	);
-
 	test::updateAndWait(1, output);
 
 	// should have the same entities as before translation
@@ -78,8 +75,6 @@ int main(int argc, char* argv[]) {
 		output,
 		"Checking entitites"
 	);
-
-	test::listEntities();
 
 	// test pass or fail
 	if (pass)

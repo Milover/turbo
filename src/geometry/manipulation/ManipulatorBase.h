@@ -75,19 +75,11 @@ public:
 		//- Manipulate primitive geometry
 		inline void manipulate(const Shape& shape) const
 		{
-			executeManipulation
-			(
-				Vectorpair<int> {shape.getDimTag()}
-			);
-		}
-
-		//- Manipulate cascade geometry
-		inline void manipulate
-		(
-			const ComponentBase& component
-		) const
-		{
-			executeManipulation(component.getDimTags());
+			if(!shape.isEmpty())
+				executeManipulation
+				(
+					Vectorpair<int> {shape.getDimTag()}
+				);
 		}
 
 

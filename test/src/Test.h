@@ -45,10 +45,14 @@ void initialize
 {
 	if (gui)
 	{
-		gmsh::initialize();
+		gmsh::initialize(0, 0, false);
 		gmsh::fltk::initialize();
 		gmsh::option::setNumber("General.Terminal", 1);
-		gmsh::option::setNumber("General.Verbosity", 1000);
+		gmsh::option::setNumber("General.Verbosity", 100);
+		gmsh::option::setNumber("Geometry.Surfaces", 1);
+		gmsh::option::setNumber("Geometry.SurfaceNumbers", 1);
+		gmsh::option::setNumber("Geometry.SurfaceType", 2);
+		gmsh::option::setNumber("Geometry.NumSubEdges", 200);
 	}
 	else
 	{
@@ -56,6 +60,7 @@ void initialize
 	}
 	gmsh::option::setNumber("General.NumThreads", 0);
 	gmsh::option::setNumber("Geometry.AutoCoherence", 0);
+	gmsh::option::setNumber("Geometry.Tolerance", 1e-17);
 	gmsh::model::add(s);
 }
 
@@ -67,19 +72,25 @@ void initializeNoModel(const bool gui = true)
 		gmsh::initialize();
 		gmsh::fltk::initialize();
 		gmsh::option::setNumber("General.Terminal", 1);
-		gmsh::option::setNumber("General.Verbosity", 1000);
+		gmsh::option::setNumber("General.Verbosity", 100);
+		gmsh::option::setNumber("Geometry.Surfaces", 1);
+		gmsh::option::setNumber("Geometry.SurfaceNumbers", 1);
+		gmsh::option::setNumber("Geometry.SurfaceType", 2);
+		gmsh::option::setNumber("Geometry.NumSubEdges", 200);
 	}
 	else
 	{
 		gmsh::initialize(0, 0, false);
 	}
+	gmsh::option::setNumber("General.NumThreads", 0);
 	gmsh::option::setNumber("Geometry.AutoCoherence", 0);
+	gmsh::option::setNumber("Geometry.Tolerance", 1e-17);
 }
 
 
 void update(const bool gui)
 {
-	gmsh::model::geo::synchronize();
+	gmsh::model::occ::synchronize();
 
 	if (gui)
 	{
@@ -103,7 +114,7 @@ void finalize(const bool gui)
 
 void updateAndWait
 (
-	const int d,
+	[[maybe_unused]] const int d,
 	const bool gui
 )
 {

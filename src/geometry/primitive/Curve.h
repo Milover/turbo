@@ -7,24 +7,23 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::ComponentBase
+	turbo::geometry::Curve
 
 Description
-	Abstract base class template for generic turbomachinery components.
+	A dummy base class to help differentiate curve classes
 
 SourceFiles
-	ComponentBase.cpp
+	Curve.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef COMPONENT_BASE_H
-#define COMPONENT_BASE_H
+#ifndef CURVE_H
+#define CURVE_H
 
-#include <memory>
-#include <string>
+#include <vector>
 
-#include "InputObjectBase.h"
-#include "Utility.h"
+#include "Shape.h"
+#include "Point.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -34,61 +33,43 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-					Class ComponentBase Declaration
+						Class Curve Declaration
 \*---------------------------------------------------------------------------*/
 
-class ComponentBase
+class Curve
 :
-	public InputObjectBase<double>
+	public Shape
 {
 protected:
 
-	// Protected data
-
-
-		const ComponentBase* owner_ {nullptr};
+	typedef std::vector<Point> Pointvector;
 
 
 	// Constructors
 
-		//- Default constructor
-		ComponentBase() = default;
-
-
-	// Member functions
-
-		//- Check input
-		virtual void check() const = 0;
-
-		//- Compute and store values to input map
-		virtual void computeAndStore() = 0;
-
-		//- Convert value
-		double convert(const std::string& value) const final;
+		//- Construct from tag
+		Curve(const int tag) noexcept;
 
 
 public:
 
 	// Constructors
 
+		//- Copy constructor
+		Curve(const Curve&) = default;
+
 		//- Move constructor
-		ComponentBase(ComponentBase&&) = delete;
+		Curve(Curve&&) = default;
 
 
 	//- Destructor
-	virtual ~ComponentBase() = default;
+	virtual ~Curve() = default;
 
 
-	// Member functions
+	// Member operators
 
-		//- Build geometry
-		virtual void build() = 0;
-
-		//- Ask owner for value
-		double get(const std::string& key) const final;
-
-		//- Check if value is initialized
-		bool hasValue(const std::string& key) const noexcept final;
+		//- Disallow assignment
+		Curve& operator=(const Curve&) = delete;
 
 };
 
