@@ -13,12 +13,8 @@ set(SRC
 	Airfoil.cpp
 	Blade.cpp
 	BladeRow.cpp
-	CarterDeviation.cpp
 	ComponentBase.cpp
-	DeHallerCriterion.cpp
-	Deviation.cpp
 	Machine.cpp
-	McKenzieDeviation.cpp
 	Profile.cpp
 	)
 

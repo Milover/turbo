@@ -87,6 +87,8 @@ public:
 				}
 			}
 		{
+			// we cannot call the destructor regularly because gmsh's
+			// implementation of wires/loops is very odd
 			release();
 		}
 

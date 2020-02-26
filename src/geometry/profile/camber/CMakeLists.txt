@@ -2,13 +2,11 @@
 #
 # See the LICENSE file for license information
 
-# add all subdirectories
-add_subdirectory(general)
-add_subdirectory(geometry)
-add_subdirectory(compute)
-
 # add sources
 set(SRC
+	CamberGeneratorBase.cpp
+	CircularArcCamber.cpp
+	Naca2DigitCamber.cpp
 	)
 
 # append to sources

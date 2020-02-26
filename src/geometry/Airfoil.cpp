@@ -24,6 +24,8 @@ License
 #include "ProfileGenerator.h"
 #include "Utility.h"
 
+#include <iostream>
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace turbo
@@ -98,14 +100,14 @@ double Airfoil::computeDeltaP() const
 		k * (std::pow(phi, 2) - 1)
 	};
 
-	// set to realizable if we haven't got one
+	// if not set, set to required if realizable
 	if (!hasKey("deltaP"))
 	{
 		// check global deltaP
-		if (get("deltaP") < deltaP)
+		if (deltaP > get("deltaP"))
 			deltaP = get("deltaP");
 	}
-	// compute regularly otherwise
+	// compute from fluid angle otherwise
 	else
 	{
 		double tanBeta
@@ -156,6 +158,8 @@ double Airfoil::eulerEquation() const
 			std::pow(phi, 2) - get("deltaP") / k - 1.0
 		)
 	};
+	if (std::isnan(tanBeta))	// because of random floating point errors?
+		tanBeta = 0.0;
 
 	return radToDeg(std::atan(tanBeta));
 }

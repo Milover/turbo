@@ -73,7 +73,9 @@ private:
 		void checkNumberOfStations() const;
 
 		//- Check offsets
-		void checkOffsets() const;
+		void checkOffsets() const;				// NOTE: disabled until tip/root
+												//		 profile extrapolation
+												//		 is implemented
 
 		//- Compute blade velocity at radius
 		double computeBladeVelocity() const;
@@ -130,7 +132,7 @@ public:
 		Constiterator begin() const;
 
 		//- Build geometry
-		void build() override;					// TODO: optimization missing
+		void build() override;					// TODO: airfoil optimization missing
 
 		//- Check if empty
 		bool empty() const noexcept;

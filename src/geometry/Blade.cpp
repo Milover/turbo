@@ -57,7 +57,7 @@ void Blade::buildAirfoils()
 }
 
 
-void Blade::buildSurfaces() noexcept
+void Blade::buildSurfaces() noexcept	// TODO: implement properly
 {
 	std::vector<Wire> contour;
 	std::vector<Wire> trailing;
@@ -133,8 +133,10 @@ void Blade::checkNumberOfStations() const
 }
 
 
-void Blade::checkOffsets() const
+void Blade::checkOffsets() const		// NOTE: disabled until tip/root profile
+										//		 extrapolation is implemented
 {
+/*
 	double offsets
 	{
 		get("hubOffset") + get("tipOffset")
@@ -145,6 +147,13 @@ void Blade::checkOffsets() const
 		isLessOrEqual(get("span"), offsets)
 	)
 		THROW_RUNTIME_ERROR("offsets larger than span");
+*/
+	if
+	(
+		!isEqual(get("hubOffset"), 0.0) ||
+		!isEqual(get("tipOffset"), 0.0)
+	)
+		THROW_RUNTIME_ERROR("station offsetting not implemented, set offsets to 0");
 }
 
 
@@ -298,7 +307,7 @@ Blade::Constiterator Blade::begin() const
 }
 
 
-void Blade::build()
+void Blade::build()						// TODO: airfoil optimization missing
 {
 	checkOffsets();
 

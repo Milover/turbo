@@ -2,15 +2,12 @@
 #
 # See the LICENSE file for license information
 
+# add all subdirectories
+add_subdirectory(camber)
+add_subdirectory(distribution)
+
 # add sources
 set(SRC
-	CamberGeneratorBase.cpp
-	CircularArcCamber.cpp
-	ConstantDistribution.cpp
-	DistributionGeneratorBase.cpp
-	Naca2DigitCamber.cpp
-	Naca4DigitDistribution.cpp
-	Naca4DigitModifiedDistribution.cpp
 	ProfileGenerator.cpp
 	)
 

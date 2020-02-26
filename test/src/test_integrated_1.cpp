@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 		{"deltaP",				"400"},		// [Pa]
 		{"density",				"1.2"},		// [kg m-3]
 		{"rpm",					"7000"},	// [min-1]
-		{"volumeFlowRate",		"800"},		// [m3 h-1]
+		{"volumeFlowRate",		"0.2222"},	// [m3 h-1]
 		// blade row
 		{"hubShroudRatio",		"0.5"},		// [-]		- default
 		{"numberOfBlades",		"5"},		// [-]		

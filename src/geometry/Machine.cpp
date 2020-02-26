@@ -33,7 +33,7 @@ void Machine::buildInputMap() noexcept
 	store("deltaP",			NAN);	// [Pa]
 	store("density",		NAN);	// [kg m-3]
 	store("rpm",			NAN);	// [min-1]
-	store("volumeFlowRate",	NAN);	// [m3 h-1]
+	store("volumeFlowRate",	NAN);	// [m3 s-1]
 }
 
 

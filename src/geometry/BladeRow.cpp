@@ -55,7 +55,7 @@ double BladeRow::computeAxialVelocity() const
 {
 	double area {computeArea()};
 
-	return get("volumeFlowRate") / (3600.0 * area);
+	return get("volumeFlowRate") / area;
 }
 
 

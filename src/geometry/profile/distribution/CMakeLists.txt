@@ -2,13 +2,12 @@
 #
 # See the LICENSE file for license information
 
-# add all subdirectories
-add_subdirectory(general)
-add_subdirectory(geometry)
-add_subdirectory(compute)
-
 # add sources
 set(SRC
+	ConstantDistribution.cpp
+	DistributionGeneratorBase.cpp
+	Naca4DigitDistribution.cpp
+	Naca4DigitModifiedDistribution.cpp
 	)
 
 # append to sources
