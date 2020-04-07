@@ -96,6 +96,11 @@ throwError(const std::string& message)
 		(errorMessage(__PRETTY_FUNCTION__, __FILE__, __LINE__, (message)))
 
 
+#define THROW_RANGE_ERROR(message) \
+	throwError<std::out_of_range> \
+		(errorMessage(__PRETTY_FUNCTION__, __FILE__, __LINE__, (message)))
+
+
 #define THROW_RUNTIME_ERROR(message) \
 	throwError<std::runtime_error> \
 		(errorMessage(__PRETTY_FUNCTION__, __FILE__, __LINE__, (message)))

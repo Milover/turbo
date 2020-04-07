@@ -2,16 +2,17 @@
 #
 # See the LICENSE file for license information
 
+# add all subdirectories
+add_subdirectory(compute)
+add_subdirectory(profile)
+
 # add sources
 set(SRC
-	Curve.cpp
-	Line.cpp
-	Point.cpp
-	Shape.cpp
-	Spline.cpp
-	Surface.cpp
-	SurfaceFilling.cpp
-	SurfaceSection.cpp
+	Airfoil.cpp
+	Blade.cpp
+	BladeRow.cpp
+	ComponentBase.cpp
+	Machine.cpp
 	)
 
 # append to sources

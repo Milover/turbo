@@ -2,16 +2,10 @@
 #
 # See the LICENSE file for license information
 
+# add all subdirectories
+
 # add sources
 set(SRC
-	Curve.cpp
-	Line.cpp
-	Point.cpp
-	Shape.cpp
-	Spline.cpp
-	Surface.cpp
-	SurfaceFilling.cpp
-	SurfaceSection.cpp
 	)
 
 # append to sources

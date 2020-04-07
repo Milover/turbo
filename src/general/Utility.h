@@ -7,23 +7,18 @@ License
 	See the LICENSE file for license information.
 
 Description
-	Alias templates, typedefs and some other utilities
+	Some utilities.
 
 \*---------------------------------------------------------------------------*/
 
 #ifndef UTILITY_H
 #define UTILITY_H
 
-#include <array>
 #include <cmath>
-#include <functional>
 #include <limits>
-#include <map>
-#include <memory>
-#include <string>
 #include <type_traits>
-#include <utility>
-#include <vector>
+
+#include "General.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -32,48 +27,19 @@ namespace turbo
 
 // * * * * * * * * * * * * * * * * Constants * * * * * * * * * * * * * * * * //
 
-static constexpr double pi {M_PI};
-
-
-// * * * * * * * * * * * * * * * * * Enums * * * * * * * * * * * * * * * * * //
-
-enum class InputType
-{
-	CONST,
-	AUTO,
-	FROM_FILE
-};
-
-
-// * * * * * * * * * * * * * * * * Typedefs  * * * * * * * * * * * * * * * * //
-
-typedef std::array<double, 3> PointCoordinates;
-
-
-// * * * * * * * * * * * * * * Template Aliases  * * * * * * * * * * * * * * //
-
-template<typename T>
-using Vectorpair = std::vector<std::pair<T, T>>;
-
-
-template<typename T>
-using Ptrvector = std::vector<std::unique_ptr<T>>;
-
-
-template<typename T = std::string>
-using Stringmap = std::map<std::string, T>;
+static constexpr Float pi {M_PI};
 
 
 // * * * * * * * * * * * * * * Functions * * * * * * * * * * * * * * * * * * //
 
 //- Compare two numbers (up to ``about'' machine precision)
 template<typename T>
-std::enable_if_t<!std::numeric_limits<T>::is_integer, bool>
+std::enable_if_t<std::is_floating_point_v<T>, bool>
 isEqual
 (
 	T x,
 	T y,
-	int ulp = 2
+	Integer ulp = 2
 )
 {
 	// the machine epsilon has to be scaled to the magnitude
@@ -82,18 +48,18 @@ isEqual
 	return std::abs(x - y) <=
 		std::numeric_limits<T>::epsilon() * std::abs(x + y) * ulp
 		// unless the result is subnormal
-		|| std::abs(x - y) < std::numeric_limits<T>::min();
+	 || std::abs(x - y) < std::numeric_limits<T>::min();
 }
 
 
 //- Check if 'x' is less or equal to 'y'
 template<typename T>
-std::enable_if_t<!std::numeric_limits<T>::is_integer, bool>
+std::enable_if_t<std::is_floating_point_v<T>, bool>
 isLessOrEqual
 (
 	T x,
 	T y,
-	int ulp = 2
+	Integer ulp = 2
 )
 {
 	return x < y || isEqual(x, y, ulp);
@@ -102,12 +68,12 @@ isLessOrEqual
 
 //- Check if 'x' is greater or equal to 'y'
 template<typename T>
-std::enable_if_t<!std::numeric_limits<T>::is_integer, bool>
+std::enable_if_t<std::is_floating_point_v<T>, bool>
 isGreaterOrEqual
 (
 	T x,
 	T y,
-	int ulp = 2
+	Integer ulp = 2
 )
 {
 	return x > y || isEqual(x, y, ulp);
@@ -116,13 +82,13 @@ isGreaterOrEqual
 
 //- Check if 'x' is in range [min, max] (inclusive)
 template<typename T>
-std::enable_if_t<!std::numeric_limits<T>::is_integer, bool>
+std::enable_if_t<std::is_floating_point_v<T>, bool>
 isInRange
 (
 	T x,
 	T min,
 	T max,
-	int ulp = 2
+	Integer ulp = 2
 )
 {
 	return isGreaterOrEqual(x, min, ulp) ||
@@ -135,7 +101,9 @@ template<typename T>
 std::enable_if_t<std::is_floating_point_v<T>, T>
 radToDeg(const T t)
 {
-	return t * 180.0 / pi;
+	static constexpr Float radDeg {180.0 / pi};
+
+	return t * radDeg;
 }
 
 
@@ -144,7 +112,9 @@ template<typename T>
 std::enable_if_t<std::is_floating_point_v<T>, T>
 degToRad(const T t)
 {
-	return t * pi / 180.0;
+	static constexpr Float degRad {pi / 180.0};
+
+	return t * degRad;
 }
 
 
