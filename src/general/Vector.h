@@ -25,7 +25,6 @@ SourceFiles
 #include <numeric>
 #include <utility>
 
-#include "Error.h"
 #include "General.h"
 #include "Utility.h"
 
@@ -39,8 +38,6 @@ namespace turbo
 \*---------------------------------------------------------------------------*/
 
 class Vector
-:
-	public vector::tag
 {
 private:
 
@@ -58,14 +55,17 @@ private:
 public:
 
 	// Constructors
+
+		//- Default constructor
+		Vector() = default;
 		
 		//- Construct from components
 		template
 		<
 			typename T,
-			std::enable_if_t<std::is_same_v<Float, T>, int> = 0>
+			std::enable_if_t<std::is_same_v<Float, T>, int> = 0
 		>
-		Vector
+		constexpr Vector
 		(
 			T&& x,
 			T&& y,
@@ -107,12 +107,6 @@ public:
 			return data_.end();
 		}
 
-		//- Access X component by value
-		inline Float x() const noexcept
-		{
-			return data_[0];
-		}
-
 		//- Access X component by reference
 		inline Float& x() noexcept
 		{
@@ -125,12 +119,6 @@ public:
 			return data_[0];
 		}
 
-		//- Access Y component by value
-		inline Float y() const noexcept
-		{
-			return data_[1];
-		}
-
 		//- Access Y component by reference
 		inline Float& y() noexcept
 		{
@@ -141,12 +129,6 @@ public:
 		inline const Float& y() const noexcept
 		{
 			return data_[1];
-		}
-
-		//- Access Z component by value
-		inline Float z() const noexcept
-		{
-			return data_[2];
 		}
 
 		//- Access Z component by reference
@@ -182,6 +164,8 @@ public:
 			data_[0] += v.data_[0];
 			data_[1] += v.data_[1];
 			data_[2] += v.data_[2];
+
+			return *this;
 		}
 
 		//- Subtraction assignment operator
@@ -190,6 +174,8 @@ public:
 			data_[0] -= v.data_[0];
 			data_[1] -= v.data_[1];
 			data_[2] -= v.data_[2];
+
+			return *this;
 		}
 
 		//- Scalar multiplication assignment operator
@@ -198,17 +184,18 @@ public:
 			data_[0] *= f;
 			data_[1] *= f;
 			data_[2] *= f;
+
+			return *this;
 		}
 
 		//- Scalar division assignment operator
-		inline Vector& operator/=(const Float f);
+		inline Vector& operator/=(const Float f) noexcept
 		{
-			if (isEqual(f, 0.0))
-				THROW_ARGUMENT_ERROR("divide by 0");
-
 			data_[0] /= f;
 			data_[1] /= f;
 			data_[2] /= f;
+
+			return *this;
 		}
 
 		//- Equality operator
@@ -272,7 +259,7 @@ inline Vector operator/(Vector lhs, const Float& rhs)
 
 
 //- Inequality operator
-inline bool operator!=(const Vector& lhs, const Vector& rhs) const noexcept
+inline bool operator!=(const Vector& lhs, const Vector& rhs) noexcept
 {
 	return !(lhs == rhs);
 }
@@ -281,7 +268,7 @@ inline bool operator!=(const Vector& lhs, const Vector& rhs) const noexcept
 // * * * * * * * * * * * * * * Vector Operations * * * * * * * * * * * * * * //
 
 // Magnitude
-Float mag(const Vector& v) noexcept
+inline Float mag(const Vector& v) noexcept
 {
 	return std::hypot
 	(
@@ -291,7 +278,7 @@ Float mag(const Vector& v) noexcept
 
 
 // Normalize (to unit vector)
-Vector unit(Vector v)
+inline Vector unit(Vector v)
 {
 	v /= mag(v);
 	return v;
@@ -299,14 +286,14 @@ Vector unit(Vector v)
 
 
 // Dot product
-Float dot(const Vector& v1, const Vector& v2)
+inline Float dot(const Vector& v1, const Vector& v2)
 {
 	return std::inner_product(v1.begin(), v1.end(), v2.begin(), 0.0);
 }
 
 
 // Cross product
-Vector cross(const Vector& v1, const Vector& v2) noexcept
+inline Vector cross(const Vector& v1, const Vector& v2) noexcept
 {
 	return Vector
 	{

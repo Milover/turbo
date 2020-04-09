@@ -17,9 +17,10 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef SURFACE_FILLING_H
-#define SURFACE_FILLING_H
+#ifndef GEOMETRY_SURFACE_FILLING_H
+#define GEOMETRY_SURFACE_FILLING_H
 
+#include "General.h"
 #include "Surface.h"
 #include "Wire.h"
 
@@ -43,7 +44,7 @@ private:
 	// Member functions
 
 		//- Construct surface geometry
-		int construct
+		Integer construct
 		(
 			Wire&& wire,
 			const Surface::Pointvector& points
@@ -75,8 +76,11 @@ public:
 
 	// Member operators
 
-		//- Disallow assignment
+		//- Disallow copy assignment
 		SurfaceFilling& operator=(const SurfaceFilling&) = delete;
+
+		//- Disallow move assignment
+		SurfaceFilling& operator=(SurfaceFilling&&) = delete;
 
 };
 

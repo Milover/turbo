@@ -20,7 +20,12 @@ Description
 #include <type_traits>
 #include <utility>
 
+#include "BladeVelocity.h"
 #include "General.h"
+#include "IncidenceAngle.h"
+#include "InclinationAngle.h"
+#include "InitialDesign.h"
+#include "InletVelocity.h"
 #include "RegistryObject.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -57,6 +62,46 @@ public:
 		explicit StaggerAngle(T&& t)
 		:
 			RegBase {std::forward<T>(t)}
+		{}
+
+		//- Compute and construct
+		StaggerAngle
+		(
+			const InletVelocity& c_1,
+			const BladeVelocity& U,
+			const InclinationAngle& zeta,
+			const IncidenceAngle& i
+		)
+		:
+			StaggerAngle
+			{
+				compute::computeStaggerAngle
+				(
+					c_1.value(),
+					U.value(),
+					zeta.value(),
+					i.value()
+				)
+			}
+		{}
+
+		//- Compute assuming zero incidence and construct
+		StaggerAngle
+		(
+			const InletVelocity& c_1,
+			const BladeVelocity& U,
+			const InclinationAngle& zeta
+		)
+		:
+			StaggerAngle
+			{
+				compute::computeStaggerAngle
+				(
+					c_1.value(),
+					U.value(),
+					zeta.value()
+				)
+			}
 		{}
 
 };

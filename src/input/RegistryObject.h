@@ -92,7 +92,7 @@ public:
 	// Member functions
 
 		//- Get value
-		T get() const noexcept;
+		T value() const noexcept;
 
 		//- Set value
 		void set(T&& t);
@@ -112,7 +112,7 @@ public:
 // * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
 
 template<typename T>
-RegistryObject<T>::RegistryObject(T&& t) noexcept (std::is_integral_v<T>)
+RegistryObject<T>::RegistryObject(T&& t) noexcept(std::is_integral_v<T>)
 :
 	value_ {std::forward<T>(t)}
 {
@@ -139,7 +139,7 @@ void RegistryObject<T>::check() const noexcept(std::is_integral_v<T>)
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 template<typename T>
-T RegistryObject<T>::get() const noexcept
+T RegistryObject<T>::value() const noexcept
 {
 	return this->value_;
 }
@@ -164,18 +164,31 @@ typename T::type convert(const Word& value)
 }
 
 
-//- Create a RegistryObject by reading the InputRegistry
+//- Create a RegistryObject by reading the InputRegistry if possible
+//  otherwise default construct if possible
 template<typename T>
 std::enable_if_t<std::is_base_of_v<RegistryObjectBase, T>, T>
 read()
 {
-	return T
-	{
-		convert<T>
-		(
-			InputRegistry::get(T::name)
-		)
-	};
+	if constexpr (std::is_default_constructible_v<T>)
+		if (InputRegistry::has(T::name))
+			return T
+			{
+				input::convert<T>
+				(
+					InputRegistry::get(T::name)
+				)
+			};
+		else
+			return T {};
+	else
+		return T
+		{
+			input::convert<T>
+			(
+				InputRegistry::get(T::name)
+			)
+		};
 }
 
 

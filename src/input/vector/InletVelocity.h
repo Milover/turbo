@@ -21,8 +21,12 @@ Description
 #include <utility>
 
 #include "General.h"
+#include "HubRadius.h"
+#include "InitialDesign.h"
 #include "RegistryObject.h"
+#include "ShroudRadius.h"
 #include "Vector.h"
+#include "VolumeFlowRate.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -58,6 +62,25 @@ public:
 		explicit InletVelocity(T&& t)
 		:
 			RegBase {std::forward<T>(t)}
+		{}
+
+		//- Compute and construct
+		InletVelocity
+		(
+			const VolumeFlowRate& Q,
+			const HubRadius& r_h,
+			const ShroudRadius& r_s
+		)
+		:
+			InletVelocity
+			{
+				compute::computeInletVelocity
+				(
+					Q.value(),
+					r_h.value(),
+					r_s.value()
+				)
+			}
 		{}
 
 };

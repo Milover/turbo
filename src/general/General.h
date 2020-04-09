@@ -38,7 +38,8 @@ using Float = double;
 using Word = std::string;
 
 
-using PointCoordinates = std::array<Float, 3>;
+template<typename T, typename U = T>
+using Pair = std::pair<T, U>;
 
 
 template<typename T>
@@ -46,7 +47,7 @@ using Uptr = std::unique_ptr<T>;
 
 
 template<typename T>
-using Vectorpair = std::vector<std::pair<T, T>>;
+using Vectorpair = std::vector<Pair<T>>;
 
 
 template<typename T>

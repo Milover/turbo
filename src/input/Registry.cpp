@@ -11,6 +11,7 @@ License
 #include <memory>
 #include <utility>
 
+#include "Error.h"
 #include "General.h"
 #include "Registry.h"
 #include "RegistryObject.h"
@@ -27,28 +28,38 @@ namespace input
 
 Registry::Registry(const Registry& r) noexcept
 :
-	owner_ {&r}
+	owner_
+	{
+		&const_cast<Registry&>(r)
+	}
 {}
 
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
-template<typename T>
+template<typename T, enum Registry::Scope S>
 auto&& Registry::obtain() const
 {
 	auto search {data_.find(T::name)};
 
 	if (search == data_.end())
-		if (owner_)
-			return owner_->obtain<T>();
+	{
+		if constexpr(S = Registry::GLOBAL)
+		{
+			if (owner_)
+				return owner_->obtain<T>();
 
-		// construct if it doesn't exist
-		auto&& [iter, success] store
-		(
-			std::move(input::read<T>())
-		);
+			// construct if it doesn't exist
+			auto&& [iter, success] store
+			(
+				input::read<T>()
+			);
 
-		return *(static_cast<T*>(iter->second.get()));
+			return *(static_cast<T*>(iter->second.get()));
+		}
+		else
+			THROW_ARGUMENT_ERROR(T::name + " not found");
+	}
 	else
 		return *(static_cast<T*>(search->second.get()));
 }
@@ -64,7 +75,7 @@ Registry& Registry::create() noexcept
 			std::make_unique<Ptrvector<Registry>>()
 		);
 
-	slaves_->emplace_back
+	slaves_->push_back
 	(
 		std::make_unique<Registry>(*this)
 	);
@@ -79,10 +90,10 @@ const T& Registry::cref() const
 }
 
 
-template<typename T>
-T Registry::get()
+template<typename T, enum Registry::Scope S>
+T Registry::get() const
 {
-	return this->obtain<T>();
+	return this->obtain<T, S>();
 }
 
 
@@ -94,17 +105,19 @@ bool Registry::has() const noexcept
 
 
 template<enum Registry::Scope S>
-bool Registry::has(const word& key) const noexcept
+bool Registry::has(const Word& key) const noexcept
 {
 	auto search {data_.find(key)};
 
 	if (search == data_.end())
+	{
 		// recurse for if searching globally
 		if constexpr (S == Registry::GLOBAL)
 			if (owner_)
 				return owner_->has<S>(key);
 		else
 			return false;
+	}
 
 	return true;
 }

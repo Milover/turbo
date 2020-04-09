@@ -14,13 +14,10 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef DISTRIBUTION_GENERATOR_BASE_H
-#define DISTRIBUTION_GENERATOR_BASE_H
+#ifndef DESIGN_DISTRIBUTION_GENERATOR_BASE_H
+#define DESIGN_DISTRIBUTION_GENERATOR_BASE_H
 
-#include <string>
-
-#include "InputObjectBase.h"
-#include "Utility.h"
+#include "General.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -34,8 +31,6 @@ namespace design
 \*---------------------------------------------------------------------------*/
 
 class DistributionGeneratorBase
-:
-	public InputObjectBase<double>
 {
 protected:
 
@@ -45,18 +40,12 @@ protected:
 		DistributionGeneratorBase() = default;
 
 
-	// Member functions
-
-		//- Check input
-		virtual void check() const = 0;
-
-		//- Convert value to double
-		double convert(const std::string& value) const final;
-
-
 public:
 
 	// Constructors
+
+		//- Copy constructor
+		DistributionGeneratorBase(const DistributionGeneratorBase&&) = default;
 
 		//- Move constructor
 		DistributionGeneratorBase(DistributionGeneratorBase&&) = default;
@@ -68,11 +57,24 @@ public:
 
 	// Member functions
 
-		//- Get thickness at ``x'' (half of total thickness)
-		virtual double getThicknessAt(const double x) const noexcept = 0;
+		//- Get thickness at 'x' (half of total thickness)
+		virtual Float thickness(const Float x) const noexcept = 0;
+			// FIXME: we should probably check range here [0, 1]
 
-		//- Check if value is initialized
-		bool hasValue(const std::string& key) const noexcept final;
+
+	// Member operators
+
+		//- Copy assignment operator
+		DistributionGeneratorBase& operator=
+		(
+			const DistributionGeneratorBase&&
+		) = default;
+
+		//- Move assignment operator
+		DistributionGeneratorBase& operator=
+		(
+			DistributionGeneratorBase&&
+		) = default;
 
 };
 

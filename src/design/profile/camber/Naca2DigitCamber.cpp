@@ -12,7 +12,8 @@ License
 
 #include "CamberGeneratorBase.h"
 #include "Error.h"
-#include "InputObjectBase.h"
+#include "General.h"
+#include "InputRegistry.h"
 #include "Naca2DigitCamber.h"
 #include "Utility.h"
 
@@ -25,152 +26,82 @@ namespace design
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
-double Naca2DigitCamber::computeMaxCamber
-(
-	const double camberAngle,
-	const double maxCamberPosition
-) const noexcept
+void Naca2DigitCamber::computeMaxCamber() const noexcept
 {
-	double theta {degToRad(camberAngle)};
-	double root
+	Float root
 	{
-		0.25 / std::pow(std::tan(theta), 2) +
-		maxCamberPosition * (1.0 - maxCamberPosition)
-	};
-	double max
-	{
-		-0.25 / std::tan(theta) + 0.5 * std::sqrt(root)
+		0.25 / std::pow(std::tan(camber_), 2) +
+		maxCamberPosition_ * (1.0 - maxCamberPosition_)
 	};
 
-	return max;
-}
-
-
-double Naca2DigitCamber::computeMaxCamberPosition
-(
-	const double camberAngle,
-	const double maxCamber
-) const noexcept
-{
-	double theta {degToRad(camberAngle)};
-	double root
-	{
-		1.0 - 8.0 * maxCamber * (2.0 * maxCamber + 1.0 / std::tan(theta))
-	};
-	double pos
-	{
-		0.5 + 0.5 * std::sqrt(root)
-	};
-
-	return pos;
+	maxCamber_ = -0.25 / std::tan(camber_) + 0.5 * std::sqrt(root)
 }
 
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-void Naca2DigitCamber::buildInputMap() noexcept
+Float Naca2DigitCamber::computeY(const Float x) const
 {
-	store("maxCamberPosition", 0.5);	// [-] - % of chord
-}
-
-
-void Naca2DigitCamber::check() const
-{
-	if
-	(
-		!isInRange(get("maxCamberPosition"), 0.0, 0.9)
-	)
-		THROW_RUNTIME_ERROR("value of keyword 'maxCamberPosition' out of range [0, 0.9]");
-
-	if
-	(
-		hasValue("maxCamber") &&
-		!isInRange(get("maxCamber"), 0.0, 0.09)
-	)
-		THROW_RUNTIME_ERROR("value of keyword 'maxCamber' out of range [0, 0.09]");
-}
-
-
-void Naca2DigitCamber::computeParameters(const double camberAngle)
-{
-	double pos {get("maxCamberPosition")};
-	double max
-	{
-		computeMaxCamber(camberAngle, pos)
-	};
-
-/*	we do not respect the conventional limit
-	if (max > 0.09)
-	{
-		max = 0.09;
-		pos = computeMaxCamberPosition(camberAngle, max);
-	}
-*/
-
-	store("maxCamber", max);
-	store("maxCamberPosition", pos);
-
-	check();
-}
-
-
-double Naca2DigitCamber::computeY(const double x) const
-{
-	double max {get("maxCamber")};
-	double pos {get("maxCamberPosition")};
-
-	if (x < pos)
-		return max / std::pow(pos, 2) *
+	if (x < maxCamberPosition_)
+		return maxCamber_ / std::pow(maxCamberPosition_, 2) *
 			(
-				2.0 * pos * x - std::pow(x, 2)
+				2.0 * maxCamberPosition_ * x - std::pow(x, 2)
 			);
 	else
-		return max / std::pow((1.0 - pos), 2) *
+		return maxCamber_ / std::pow((1.0 - maxCamberPosition_), 2) *
 			(
-				1.0 - 2.0 * pos + 2.0 * pos * x - std::pow(x, 2)
+				1.0 - 2.0 * maxCamberPosition_ * (1.0 + x) - std::pow(x, 2)
 			);
-}
-
-
-void Naca2DigitCamber::parse(const Stringmap<>& input)
-{
-	InputObjectBase::parse(input);
 }
 
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-Naca2DigitCamber::Naca2DigitCamber(const Stringmap<>& input)
+// TODO: clean up a bit
+Naca2DigitCamber::Naca2DigitCamber(const Float camber)
 :
-	CamberGeneratorBase {input}
+	CamberGeneratorBase {camber}
 {
-	buildInputMap();
-	addOptional("maxCamberPosition");
-	parse(input);
-	check();
+	if (inputRegistry::has("maxCamberPosition"))
+	{
+		maxCamberPosition_ = StringConverter<Float> {}
+		(
+			InputRegistry::get("maxCamberPosition")
+		);
+
+		if
+		(
+			!isInRange(maxCamberPosition_, 0.0, 1.0)
+		)
+			THROW_RUNTIME_ERROR("maxCamberPosition out of range [0, 1]");
+	}
+
+	computeMaxCamber();
 }
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-double Naca2DigitCamber::getInclinationAt(const double x) const
+Float Naca2DigitCamber::inclination(const Float x) const
 {
 	if
 	(
-		!isInRange(x, 0.0, chord_)
+		!isInRange(x, 0.0, 1.0)
 	)
-		THROW_DOMAIN_ERROR("x out of range [0, chord]");
+		THROW_DOMAIN_ERROR("x out of range [0, 1.0]");
 
-	double max {get("maxCamber")};
-	double pos {get("maxCamberPosition")};
-	double dydx;
+	Float dydx;
 
-	if (x < pos)
-		dydx = 2.0 * max / std::pow(pos, 2) * (pos - x);
+	if (x < maxCamberPosition_)
+		dydx = 2.0 * maxCamber_
+			 / std::pow(maxCamberPosition_, 2)
+			 * (maxCamberPosition_ - x);
 	else
-		dydx = 2.0 * max / std::pow((1.0 - pos), 2) * (pos - x);
+		dydx = 2.0 * maxCamber_
+			 / std::pow((1.0 - maxCamberPosition_), 2)
+			 * (maxCamberPosition_ - x);
 
-	return radToDeg(std::atan(dydx));
+	return std::atan(dydx);
 }
 
 

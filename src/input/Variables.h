@@ -20,6 +20,7 @@ Description
 #include "Density.h"
 #include "HubRadius.h"
 #include "IncidenceAngle.h"
+#include "InclinationAngle.h"
 #include "NumberOfBlades.h"
 #include "Radius.h"
 #include "Rps.h"

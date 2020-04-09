@@ -17,11 +17,11 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef POINT_H
-#define POINT_H
+#ifndef GEOMETRY_POINT_H
+#define GEOMETRY_POINT_H
 
+#include "General.h"
 #include "Shape.h"
-#include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,9 +45,9 @@ protected:
 		//- Construct Point geometry
 		int construct
 		(
-			const double x,
-			const double y,
-			const double z
+			const Float x,
+			const Float y,
+			const Float z
 		) const noexcept;
 
 
@@ -58,13 +58,13 @@ public:
 		//- Construct from raw coordinates
 		Point
 		(
-			const double x,
-			const double y,
-			const double z = 0.0
+			const Float x,
+			const Float y,
+			const Float z = 0.0
 		) noexcept;
 
 		//- Construct from point coordinates
-		Point(const PointCoordinates& coordinates) noexcept;
+		Point(const Shape::Coordinates& c) noexcept;
 
 		//- Copy constructor
 		Point(const Point&) = default;
@@ -80,7 +80,7 @@ public:
 	// Member functions
 
 		//- Get coordinates
-		PointCoordinates getCoordinates() const noexcept;
+		Shape::Coordinates coordinates() const noexcept;
 
 		//- Return origin
 		static Point origin();
@@ -88,8 +88,11 @@ public:
 
 	// Member operators
 	
-		//- Disallow assignment
+		//- Disallow copy assignment
 		Point& operator=(const Point&) = delete;
+
+		//- Disallow move assignment
+		Point& operator=(Point&&) = delete;
 
 };
 

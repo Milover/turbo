@@ -17,11 +17,8 @@ Description
 #ifndef STRING_CONVERTER_H
 #define STRING_CONVERTER_H
 
-#include <stdexcept>
-#include <string>
-#include <type_traits>
-
 #include "Error.h"
+#include "General.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -39,37 +36,24 @@ private:
 
 	// Private data
 
-		std::string::size_type pos_;
+		Word::size_type pos_;
 
 
 public:
 
-	// Constructors
-
-		//- Default constructor
-		StringConverter() = default;
-
-		//- Disallow copy construction
-		StringConverter(const StringConverter&) = default;
-
-		//- Move constructor
-		StringConverter(StringConverter&&) = default;
+	using type = typename T;
 
 
-	//- Destructor
-	~StringConverter() = default;
+	// Member functions
+
+		//- Perform conversion
+		T static convert(const Word& s);
 
 
 	// Member operators
 
-		//- Assignment operator
-		StringConverter& operator=(const StringConverter&) = default;
-
-		//- Perform conversion
-		T static convert(const std::string& s);
-
 		//- Function call operator
-		T operator()(const std::string& s);
+		T operator()(const Word& s);
 
 };
 
@@ -77,13 +61,16 @@ public:
 // * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
 
 template<typename T>
-T StringConverter<T>::operator()(const std::string& s)
+T StringConverter<T>::operator()(const Word& s)
 {
-	T t {convert<T>(s)};
+	T t
+	{
+		StringConverter<T>::convert(s)
+	};
 
 	// we demand complete conversion,
 	// partial matches are not allowed
-	if (pos_ != s.size())
+	if (this->pos_ != s.size())
 		THROW_ARGUMENT_ERROR("Partial match on: " + s);
 	else
 		return t;
@@ -91,11 +78,11 @@ T StringConverter<T>::operator()(const std::string& s)
 
 
 template<>
-double StringConverter<double>::convert(const std::string& s)
+Float StringConverter<Float>::convert(const Word& s)
 {
 	try
 	{
-		return std::stod(s, &pos_);
+		return std::stod(s, &this->pos_);
 	}
 	catch(...)
 	{
@@ -105,11 +92,11 @@ double StringConverter<double>::convert(const std::string& s)
 
 
 template<>
-int StringConverter<int>::convert(const std::string& s)
+Integer StringConverter<Integer>::convert(const Word& s)
 {
 	try
 	{
-		return std::stoi(s, &pos_);
+		return std::stoi(s, &this->pos_);
 	}
 	catch(...)
 	{

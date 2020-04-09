@@ -8,15 +8,13 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include <string>
 #include <utility>
-#include <memory>
 
 #include "gmsh.h"				// TODO: this shouldn't be here
 
-#include "Machine.h"
 #include "Error.h"
-#include "InputObjectBase.h"
+#include "General.h"
+#include "Machine.h"
 #include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

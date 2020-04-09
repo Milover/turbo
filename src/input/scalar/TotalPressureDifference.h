@@ -20,8 +20,13 @@ Description
 #include <type_traits>
 #include <utility>
 
+#include "BladeVelocity.h"
+#include "Density.h"
 #include "General.h"
+#include "InitialDesign.h"
+#include "InletVelocity.h"
 #include "PositiveValue.h"
+#include "OutletVelocity.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -57,6 +62,27 @@ public:
 		explicit TotalPressureDifference(T&& t)
 		:
 			PVBase {std::forward<T>(t)}
+		{}
+
+		//- Compute and construct
+		TotalPressureDifference
+		(
+			const InletVelocity& c_1,
+			const OutletVelocity& c_2,
+			const BladeVelocity& U,
+			const Density& rho
+		)
+		:
+			TotalPressureDifference
+			{
+				compute::computeTotalPressureDifference
+				(
+					c_1.value(),
+					c_2.value(),
+					U.value(),
+					rho.value()
+				)
+			}
 		{}
 
 };

@@ -8,11 +8,11 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include <cmath>
-
 #include "ConstantDistribution.h"
-#include "InputObjectBase.h"
 #include "Error.h"
+#include "General.h"
+#include "InputRegistry.h"
+#include "StringConverter.h"
 #include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -22,39 +22,31 @@ namespace turbo
 namespace design
 {
 
-// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-void ConstantDistribution::buildInputMap() noexcept
-{
-	store("maxThickness", NAN);	// [-] - % of chord
-}
-
-
-void ConstantDistribution::check() const
+ConstantDistribution::ConstantDistribution()
+:
+	maxThickness_
+	{
+		StringConverter<Float> {}
+		(
+			InputRegistry::get("maxThickness")
+		)
+	}
 {
 	if
 	(
-		!isInRange(get("maxThickness"), 0.0, 1.0)
+		!isInRange(maxThickness_, 0.0, 1.0)
 	)
-		THROW_RUNTIME_ERROR("value of keyword 'maxThickness' out of range [0, 1]");
-}
-
-
-// * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
-
-ConstantDistribution::ConstantDistribution(const Stringmap<>& input)
-{
-	buildInputMap();
-	parse(input);
-	check();
+		THROW_RUNTIME_ERROR("maxThickness out of range [0, 1]");
 }
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-double ConstantDistribution::getThicknessAt(const double) const noexcept
+Float ConstantDistribution::thickness(const Float x) const noexcept
 {
-	return 0.5 * get("maxThickness");
+	return 0.5 * maxThickness_;
 }
 
 

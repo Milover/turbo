@@ -21,11 +21,11 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef CIRCULAR_ARC_CAMBER_H
-#define CIRCULAR_ARC_CAMBER_H
+#ifndef DESIGN_CIRCULAR_ARC_CAMBER_H
+#define DESIGN_CIRCULAR_ARC_CAMBER_H
 
 #include "CamberGeneratorBase.h"
-#include "Utility.h"
+#include "General.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -46,22 +46,15 @@ private:
 
 	// Private data
 
-		double offset_;
+		Float yOffset_;
 
 
 protected:
 
 	// Member functions
 
-		//- Build input map
-		void buildInputMap() noexcept override;
-
-		//- Compute camber parameters to satisfy
-		//  a given camber angle
-		void computeParameters(const double camberAngle) noexcept override;
-
-		//- Compute camber ordinate at a ``x''
-		double computeY(const double x) const override;
+		//- Compute camber ordinate at a 'x'
+		Float computeY(const Float x) const noexcept override;
 
 
 public:
@@ -69,20 +62,13 @@ public:
 	// Constructors
 
 		//- Default constructor
-		CircularArcCamber(const Stringmap<>& input);
-
-		//- Move constructor
-		CircularArcCamber(CircularArcCamber&&) = default;
-
-
-	//- Destructor
-	~CircularArcCamber() = default;
+		explicit CircularArcCamber(const Float camber);
 
 
 	// Member functions
 
-		//- Get inlination angle at ``x'' in degrees
-		double getInclinationAt(const double x) const override;
+		//- Get inlination angle at 'x' in radians
+		Float inclination(const Float x) const override;
 
 };
 

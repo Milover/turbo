@@ -17,12 +17,11 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef SHAPE_H
-#define SHAPE_H
+#ifndef GEOMETRY_SHAPE_H
+#define GEOMETRY_SHAPE_H
 
-#include <utility>
-
-#include "Utility.h"
+#include "General.h"
+#include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -41,7 +40,7 @@ private:
 
 	// Private data
 
-		const std::pair<int, int> dimTag_;
+		const Pair<Integer> dimTag_;
 		bool empty_;
 		static bool sync_;
 
@@ -52,27 +51,24 @@ private:
 		void remove() const noexcept;
 
 		//- Copy Shape geometry and return tag
-		int copy() const noexcept;
+		Integer copy() const noexcept;
 
 
 protected:
 
+	using Coordinates = Vector;
+
+
 	// Constructors
 
 		//- Construct from tag
-		Shape(const std::pair<int, int> dimTag) noexcept;
+		Shape(const Pair<Integer> dimTag) noexcept;
 
 		//- Copy constructor
 		Shape(const Shape&) noexcept;
 
 		//- Move constructor
 		Shape(Shape&&) noexcept;
-
-
-	// Member functions
-
-		//- Synchronize geometry
-		static void sync() noexcept;
 
 
 public:
@@ -87,28 +83,31 @@ public:
 		void release() noexcept;
 
 		//- Return Shape dimTag
-		std::pair<int, int> getDimTag() const noexcept;
+		Pair<Integer> getDimTag() const noexcept;
 
 		//- Get boundary dimTags
-		Vectorpair<int> getBoundary() const noexcept;
+		Vectorpair<Integer> getBoundary() const noexcept;
 
 		//- Get bounding box
-		Vectorpair<double> getBoundingBox() const noexcept;
+		Pair<Coordinates> getBoundingBox() const noexcept;
 
 		//- Check if empty
-		bool isEmpty() const noexcept;
+		bool empty() const noexcept;
 
 		//- Check if synchronized
-		static bool isSync() noexcept;
+		static bool sync() noexcept;
 
-		//- Set synchronization
-		static void setSync(const bool sync) noexcept;
+		//- Synchronize geometry
+		static void synchronize() noexcept;
 
 
 	// Member operators
 
-		//- Disallow assignment
+		//- Disallow copy assignment
 		Shape& operator=(const Shape&) = delete;
+
+		//- Disallow move assignment
+		Shape& operator=(Shape&&) = delete;
 
 };
 

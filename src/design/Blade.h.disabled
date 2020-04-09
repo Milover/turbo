@@ -17,8 +17,8 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef BLADE_H
-#define BLADE_H
+#ifndef DESIGN_BLADE_H
+#define DESIGN_BLADE_H
 
 #include <string>
 
@@ -52,7 +52,7 @@ private:
 
 		std::unique_ptr<geometry::Surface> contour_;		// TODO: move to geometry class
 		std::unique_ptr<geometry::Surface> top_;			// TODO: move to geometry class
-		std::unique_ptr<geometry::Surface> bottom_;		// TODO: move to geometry class
+		std::unique_ptr<geometry::Surface> bottom_;			// TODO: move to geometry class
 		std::unique_ptr<geometry::Surface> trailing_;		// TODO: move to geometry class
 
 		Ptrvector<Airfoil> airfoils_;

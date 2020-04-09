@@ -17,9 +17,10 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef SURFACE_SECTION_H
-#define SURFACE_SECTION_H
+#ifndef GEOMETRY_SURFACE_SECTION_H
+#define GEOMETRY_SURFACE_SECTION_H
 
+#include "General.h"
 #include "Surface.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -42,7 +43,7 @@ private:
 	// Member functions
 
 		//- Construct surface geometry
-		int construct(Surface::Wirevector&& wires) const noexcept;
+		Integer construct(Surface::Wirevector&& wires) const noexcept;
 
 
 public:
@@ -65,8 +66,11 @@ public:
 
 	// Member operators
 
-		//- Disallow assignment
+		//- Disallow copy assignment
 		SurfaceSection& operator=(const SurfaceSection&) = delete;
+
+		//- Disallow move assignment
+		SurfaceSection& operator=(SurfaceSection&&) = delete;
 
 };
 

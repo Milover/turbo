@@ -17,8 +17,8 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef SURFACE_H
-#define SURFACE_H
+#ifndef GEOMETRY_SURFACE_H
+#define GEOMETRY_SURFACE_H
 
 #include <vector>
 
@@ -43,14 +43,14 @@ class Surface
 {
 protected:
 
-	typedef std::vector<Wire> Wirevector;
-	typedef std::vector<Point> Pointvector;
+	using Wirevector = std::vector<Wire>;
+	using Pointvector = std::vector<Point;
 
 
 	// Constructors
 
 		//- Construct from tag
-		Surface(const int tag) noexcept;
+		Surface(const Integer tag) noexcept;
 
 
 public:

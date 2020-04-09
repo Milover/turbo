@@ -17,12 +17,11 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef CONSTANT_DISTRIBUTION_H
-#define CONSTANT_DISTRIBUTION_H
+#ifndef DESIGN_CONSTANT_DISTRIBUTION_H
+#define DESIGN_CONSTANT_DISTRIBUTION_H
 
 #include "DistributionGeneratorBase.h"
-#include "InputObjectBase.h"
-#include "Utility.h"
+#include "General.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -39,36 +38,25 @@ class ConstantDistribution final
 :
 	public DistributionGeneratorBase
 {
-protected:
+private:
 
-	// Member functions
+	// Private data
 
-		//- Build input map
-		void buildInputMap() noexcept override;
-
-		//- Check input
-		void check() const override;
+		Float maxThickness_;
 
 
 public:
 
 	// Constructors
 
-		//- Default constructor
-		ConstantDistribution(const Stringmap<>& input);
-
-		//- Move constructor
-		ConstantDistribution(ConstantDistribution&&) = default;
-
-
-	//- Destructor
-	~ConstantDistribution() = default;
+		//- Defaul constructor
+		ConstantDistribution();
 
 
 	// Member functions
 
-		//- Get thickness at ``x'' (half of total thickness)
-		double getThicknessAt(const double) const noexcept override;
+		//- Get thickness at 'x' (half of total thickness)
+		Float thickness(const Float x) const noexcept override;
 
 };
 

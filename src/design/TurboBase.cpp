@@ -8,11 +8,9 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include <cmath>
-
-#include "DeHaller.h"
+#include "TurboBase.h"
 #include "General.h"
-#include "Utility.h"
+#include "Registry.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -21,28 +19,31 @@ namespace turbo
 namespace design
 {
 
-// * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
 
-double DeHaller::operator()
-(
-	const double fluidInletAngle,
-	const double fluidOutletAngle
-) const noexcept
-{
-	double beta1 {degToRad(fluidInletAngle)};
-	double beta2 {degToRad(fluidOutletAngle)};
-	double beta2New
+TurboBase::TurboBase() noexcept
+:
+	owns_ {true},
+	data_ {new Registry()}	// we own and manage
+{}
+
+
+TurboBase::TurboBase(const Registry& r) noexcept
+:
+	owns_ {false},
+	data_					// we don't own or manage but have access
 	{
-		std::acos
-		(
-			std::cos(beta1) / DeHaller::constant
-		)
-	};
+		&const_cast<Registry&>(r).create()
+	}
+{}
 
-	if (beta2 > beta2New)
-		beta2 = beta2New;
 
-	return radToDeg(beta2);
+// * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
+
+TurboBase::~TurboBase() noexcept
+{
+	if (owns_)
+		delete data_;
 }
 
 

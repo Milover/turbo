@@ -18,14 +18,13 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef NACA_4_DIGIT_DISTRIBUTION_H
-#define NACA_4_DIGIT_DISTRIBUTION_H
+#ifndef DESIGN_NACA_4_DIGIT_DISTRIBUTION_H
+#define DESIGN_NACA_4_DIGIT_DISTRIBUTION_H
 
 #include <array>
 
 #include "DistributionGeneratorBase.h"
-#include "InputObjectBase.h"
-#include "Utility.h"
+#include "General.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -46,50 +45,30 @@ private:
 
 	// Private data
 
-		std::array<double, 5> a_;
+		static constexpr Float scale_ {5.0};
+		std::array<Float, 5> a_
+		{
+			0.2969,
+		   -0.1260,
+		   -0.3516,
+			0.2843,
+		   -0.1015
+		};
 
-		const double scale_ {5.0};
-
-
-	// Member functions
-
-		//- Scale coefficients
-		void scaleCoefficients();
-
-
-protected:
-
-	// Member functions
-
-		//- Build input map
-		void buildInputMap() noexcept override;
-
-		//- Check input
-		void check() const override;
-
+		Float maxThickness_;
 
 public:
 
 	// Constructors
 
 		//- Default constructor
-		Naca4DigitDistribution(const Stringmap<>& input);
-
-		//- Move constructor
-		Naca4DigitDistribution
-		(
-			Naca4DigitDistribution&&
-		) = default;
-
-
-	//- Destructor
-	~Naca4DigitDistribution() = default;
+		Naca4DigitDistribution();
 
 
 	// Member functions
 
-		//- Get thickness at ``x'' (half of total thickness)
-		double getThicknessAt(const double x) const noexcept override;
+		//- Get thickness at 'x' (half of total thickness)
+		Float thickness(const Float x) const noexcept override;
 
 };
 

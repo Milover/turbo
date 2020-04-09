@@ -22,10 +22,10 @@ SourceFiles
 
 #include <vector>
 
-#include "Geometry.h"
 #include "General.h"
+#include "Geometry.h"
 #include "ProfileGenerator.h"
-#include "Utility.h"
+#include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -42,49 +42,40 @@ class Profile
 {
 private:
 
-	typedef std::vector<PointCoordinates> Pcvector;
-	typedef Pcvector::iterator Iterator;
-	typedef Pcvector::const_iterator Constiterator;
+	using Point			= Vector;
+	using Iterator		= Vectorpair<Point>::iterator;
+	using Constiterator	= Vectorpair<Point>::const_iterator;
+	using Sizetype		= Vectorpair<Point>::size_type;
 
 
 	// Private data
 
-		Pcvector points_;
+		Vectorpair<Point> points_;
 
 		bool wrapped_ {false};
-		static constexpr PointCoordinates origin_ {0.0, 0.0, 0.0};
+		static constexpr Point origin_ {0.0, 0.0, 0.0};
 
 
 	// Member functions
 
-		//- 2d rotate around z-axis positioned at origin (in degrees)
-		void rotate(const double angle);
+		//- Center on point 'p'
+		void centerOn(const Point& p) noexcept;
 
-		//- 2d uniform scale about origin
-		void scale(const double factor);
+		//- 2d rotate around z-axis positioned (in radians)
+		void rotate2D(const Float angle) noexcept;
 
-		//- Translate from center to 'coordinates'
-		void translate(const PointCoordinates& coordinates) noexcept;
+		//- Uniform scale about centroid
+		void scale(const Float factor) noexcept;
+
+		//- Uniform scale about point
+		void scale(const Point& p, const Float factor) noexcept;
+
+		//- Translate by vector 'v'
+		void translate(const Vector& v) noexcept;
 
 
 public:
 	
-	// Constructors
-
-		//- Construct from input
-		Profile() = default;
-
-		//- Copy constructor
-		Profile(const Profile&) = default;
-
-		//- Move constructor
-		Profile(Profile&&) = default;
-
-
-	//- Destructor
-	~Profile() = default;
-
-
 	// Member functions
 
 		//- Get iterator to beginning
@@ -97,9 +88,9 @@ public:
 		void build
 		(
 			const ProfileGenerator& generator,
-			const double chord,
-			const double radius,
-			const double stagger
+			const Float chord,
+			const Float radius,
+			const Float stagger
 		);
 
 		//- Check if empty
@@ -112,31 +103,29 @@ public:
 		Constiterator end() const;
 
 		//- Get geometric center
-		PointCoordinates getCenter() const noexcept;
+		Point centroid() const noexcept;
 
 		//- Get contour
 		geometry::Spline getContour() const;	
 
-		//- Get points
-		std::vector<geometry::Point> getPoints() const noexcept;
+		//- Get points ordered from top (upper) TE to
+		//	bot (lower) TE
+		std::vector<geometry::Point> getPoints() const;
 
 		//- Get trailing edge
 		geometry::Line getTrailingEdge() const;
 
-		//- Return wrapped state
-		bool isWrapped() const noexcept;
+		//- Get data (raw points)
+		Vectorpair<Point> points() const noexcept;
 
 		//- Get size
-		Pcvector::size_type size() const noexcept;
+		Sizetype size() const noexcept;
 
 		//- Wrap to cylinder
 		void wrap() noexcept;
 
-
-	// Member operators
-
-		//- Disallow assignment
-		Profile& operator=(const Profile&) = delete;
+		//- Return wrapped state
+		bool wrapped() const noexcept;
 
 };
 

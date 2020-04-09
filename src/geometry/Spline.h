@@ -17,10 +17,11 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef SPLINE_H
-#define SPLINE_H
+#ifndef GEOMETRY_SPLINE_H
+#define GEOMETRY_SPLINE_H
 
 #include "Curve.h"
+#include "General.h"
 #include "Point.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -43,7 +44,7 @@ protected:
 	// Member functions
 
 		//- Construct spline geometry
-		int construct
+		Integer construct
 		(
 			Point start,
 			Point end,
@@ -73,8 +74,11 @@ public:
 
 	// Member operators
 
-		//- Disallow assignment
+		//- Disallow copy assignment
 		Spline& operator=(const Spline&) = delete;
+
+		//- Disallow move assignment
+		Spline& operator=(Spline&&) = delete;
 
 };
 

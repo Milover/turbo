@@ -7,56 +7,64 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::design::DeHaller
+	turbo::input::InclinationAngle
 
 Description
-	Class DeHaller
-
-SourceFiles
-	DeHaller.cpp
+	Class InclinationAngle.
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef DESIGN_DEHALLER_H
-#define DESIGN_DEHALLER_H
+#ifndef INPUT_INCLINATION_ANGLE_H
+#define INPUT_INCLINATION_ANGLE_H
+
+#include <type_traits>
+#include <utility>
 
 #include "General.h"
+#include "RegistryObject.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace turbo
 {
-namespace design
+namespace input
 {
 
 /*---------------------------------------------------------------------------*\
-						Class DeHaller Declaration
+						Class InclinationAngle Definition
 \*---------------------------------------------------------------------------*/
 
-class DeHaller
+class InclinationAngle final
+:
+	public RegistryObject<Float>
 {
 public:
 
-	// Public data
+	// Public static data
 
-		inline static constexpr double constant {0.72};
+		inline static const Word name {"InclinationAngle"};
 
-	// Member operators
 
-		//- Function call operator
-		//  returns modified fluid outlet angle in degrees
-		double operator()
-		(
-			const double fluidInletAngle,
-			const double fluidOutletAngle
-		) const noexcept;
+	// Constructors
+
+		//- Construct from a Float,
+		//  no aditional checking required
+		template
+		<
+			typename T,
+			std::enable_if_t<std::is_same_v<Float, T>, int> = 0>
+		>
+		explicit InclinationAngle(T&& t)
+		:
+			RegBase {std::forward<T>(t)}
+		{}
 
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace design
+} // End namespace input
 } // End namespace turbo
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

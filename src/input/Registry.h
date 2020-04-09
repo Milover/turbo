@@ -20,6 +20,8 @@ SourceFiles
 #ifndef INPUT_REGISTRY_H
 #define INPUT_REGISTRY_H
 
+#include <type_traits>
+
 #include "General.h"
 #include "RegistryObjectBase.h"
 
@@ -62,7 +64,7 @@ private:
 		//  i.e. search through global scope.
 		//  If a registry object doesn't exist
 		//  do a 'read()' (if possible) and store locally
-		template<typename T>
+		template<typename T, enum Registry::Scope S = Registry::GLOBAL>
 		auto&& obtain() const;
 
 
@@ -98,8 +100,8 @@ public:
 		const T& cref() const;
 
 		//- Recursively get a registry object
-		template<typename T>
-		T get();
+		template<typename T, enum Registry::Scope S = Registry::GLOBAL>
+		T get() const;
 
 		//- Check if a registry object exists (locally or globally)
 		template<typename T, enum Registry::Scope S = Registry::GLOBAL>
@@ -107,7 +109,7 @@ public:
 
 		//- Check if a registry object (key) exists (locally or globally)
 		template<enum Registry::Scope S = Registry::GLOBAL>
-		bool has(const word& key) const noexcept;
+		bool has(const Word& key) const noexcept;
 
 		//- Get owner
 		Registry* owner() const noexcept;
@@ -130,6 +132,26 @@ public:
 		Registry& operator=(Registry&&) = delete;
 
 };
+
+
+// * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * * //
+
+//- Store a set of values into a container
+template<typename Container, typename T, typename... Ts>
+void storeAll(Container&& c, T&& t, Ts&&... ts)
+{
+	if constexpr (sizeof...(Ts) == 0)
+		storeAll
+		(
+			std::forward<Container>(c),
+			std::forward<Ts>(ts)...
+		);
+
+	if constexpr (std::is_pointer_v<Container>)
+		c->store(std::forward<T>(t));
+	else
+		c.store(std::forward<T>(t));
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

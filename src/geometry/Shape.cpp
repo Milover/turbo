@@ -14,6 +14,7 @@ License
 
 #include "Shape.h"
 #include "Utility.h"
+#include "General.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -33,19 +34,19 @@ void Shape::remove() const noexcept
 {
 	gmsh::model::occ::remove
 	(
-		Vectorpair<int> {dimTag_},
+		Vectorpair<Integer> {dimTag_},
 		true	// recursive
 	);
 }
 
 
-int Shape::copy() const noexcept
+Integer Shape::copy() const noexcept
 {
-	Vectorpair<int> outDimTags;
+	Vectorpair<Integer> outDimTags;
 
 	gmsh::model::occ::copy
 	(
-		Vectorpair<int> {dimTag_},
+		Vectorpair<Integer> {dimTag_},
 		outDimTags
 	);
 
@@ -55,7 +56,7 @@ int Shape::copy() const noexcept
 
 // * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
 
-Shape::Shape(const std::pair<int, int> dimTag) noexcept
+Shape::Shape(const Pair<Integer> dimTag) noexcept
 :
 	dimTag_ {dimTag},
 	empty_ {false}
@@ -85,18 +86,6 @@ Shape::Shape(Shape&& shape) noexcept
 }
 
 
-// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
-
-void Shape::sync() noexcept
-{
-	if (sync_)
-		return;
-
-	gmsh::model::occ::synchronize();
-	sync_ = true;
-}
-
-
 // * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
 
 Shape::~Shape() noexcept
@@ -117,21 +106,21 @@ void Shape::release() noexcept
 }
 
 
-std::pair<int, int> Shape::getDimTag() const noexcept
+Pair<Integer> Shape::getDimTag() const noexcept
 {
 	return dimTag_;
 }
 
 
-Vectorpair<int> Shape::getBoundary() const noexcept
+Vectorpair<Integer> Shape::getBoundary() const noexcept
 {
-	Shape::sync();
+	Shape::synchronize();
 	
-	Vectorpair<int> outDimTags;
+	Vectorpair<Integer> outDimTags;
 
 	gmsh::model::getBoundary
 	(
-		Vectorpair<int> {getDimTag()},
+		Vectorpair<Integer> {getDimTag()},
 		outDimTags
 	);
 
@@ -139,9 +128,9 @@ Vectorpair<int> Shape::getBoundary() const noexcept
 }
 
 
-Vectorpair<double> Shape::getBoundingBox() const noexcept
+Pair<Shape::Coordinates> Shape::getBoundingBox() const noexcept
 {
-	Shape::sync();
+	Shape::synchronize();
 
 	double xmin, ymin, zmin, xmax, ymax, zmax;
 
@@ -157,30 +146,33 @@ Vectorpair<double> Shape::getBoundingBox() const noexcept
 		zmax
 	);
 
-	return Vectorpair<double>
+	return std::make_pair
 	{
-		std::make_pair(xmin, xmax),
-		std::make_pair(ymin, ymax),
-		std::make_pair(zmin, zmax)
+		Coordinates {xmin, ymin, zmin},
+		Coordinates {xmax, ymax, zmax}
 	};
 }
 
 
-bool Shape::isEmpty() const noexcept
+bool Shape::empty() const noexcept
 {
 	return empty_;
 }
 
 
-bool Shape::isSync() noexcept
+bool Shape::sync() noexcept
 {
 	return sync_;
 }
 
 
-void Shape::setSync(const bool sync) noexcept
+void Shape::synchronize() noexcept
 {
-	sync_ = sync;
+	if (!sync_)
+	{
+		gmsh::model::occ::synchronize();
+		sync_ = true;
+	}
 }
 
 

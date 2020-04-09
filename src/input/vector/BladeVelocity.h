@@ -21,8 +21,12 @@ Description
 #include <utility>
 
 #include "General.h"
+#include "InitialDesign.h"
 #include "RegistryObject.h"
+#include "Radius.h"
+#include "Rps.h"
 #include "Vector.h"
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -58,6 +62,23 @@ public:
 		explicit BladeVelocity(T&& t)
 		:
 			RegBase {std::forward<T>(t)}
+		{}
+
+		//- Compute and construct
+		BladeVelocity
+		{
+			const Rps& rps,
+			const Radius& r
+		}
+		:
+			BladeVelocity
+			{
+				compute::computeBladeVelocity
+				(
+					rps.value(),
+					r.value()
+				)
+			}
 		{}
 
 };

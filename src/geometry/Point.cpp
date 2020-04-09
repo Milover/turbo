@@ -12,9 +12,9 @@ License
 
 #include "gmsh.h"
 
-#include "Axis.h"
+#include "General.h"
 #include "Point.h"
-#include "Utility.h"
+#include "Shape.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -25,11 +25,11 @@ namespace geometry
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-int Point::construct
+Integer Point::construct
 (
-	const double x,
-	const double y,
-	const double z
+	const Float x,
+	const Float y,
+	const Float z
 ) const noexcept
 {
 	return gmsh::model::occ::addPoint(x, y, z);
@@ -40,45 +40,36 @@ int Point::construct
 
 Point::Point
 (
-	const double x,
-	const double y,
-	const double z
+	const Float x,
+	const Float y,
+	const Float z
 ) noexcept
 :
 	Shape
 	{
-		std::pair<int, int>
-		{
+		std::make_pair
+		(
 			0,		// dimension
 			construct(x, y, z)
-		}
+		)
 	}
 {}
 
 
-Point::Point(const PointCoordinates& coordinates) noexcept
+Point::Point(const Shape::Coordinates& c) noexcept
 :
 	Point
 	{
-		coordinates[Axis::X],
-		coordinates[Axis::Y],
-		coordinates[Axis::Z]
+		c.x(), c.y(), c.z()
 	}
 {}
 
 
 // * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * * //
 
-PointCoordinates Point::getCoordinates() const noexcept
+Shape::Coordinates Point::coordinates() const noexcept
 {
-	Vectorpair<double> v {getBoundingBox()};
-
-	return PointCoordinates
-	{
-		v[Axis::X].first,
-		v[Axis::Y].first,
-		v[Axis::Z].first
-	};
+	return getBoundingBox().first;
 }
 
 

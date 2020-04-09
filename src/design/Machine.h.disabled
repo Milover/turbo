@@ -17,12 +17,11 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef MACHINE_H
-#define MACHINE_H
+#ifndef DESIGN_MACHINE_H
+#define DESIGN_MACHINE_H
 
 #include "BladeRow.h"
-#include "ComponentBase.h"
-#include "InputObjectBase.h"
+#include "Registry.h"
 #include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -36,16 +35,16 @@ namespace design
 						Class Machine Declaration
 \*---------------------------------------------------------------------------*/
 
-class Machine final
-:
-	public ComponentBase
+class Machine
 {
 private:
 
 	// Private data
 
-		Uptr<BladeRow> rotor_;				// TODO: implement multiples at some point
 		Word name_ {"machine"};
+
+		Registry& data_;
+		Uptr<BladeRow> rotor_;				// TODO: implement multiples at some point
 
 
 protected:
@@ -69,6 +68,9 @@ public:
 		//- Default constructor
 		Machine(const Stringmap<>& input);
 
+		//- Disallow copy constructor
+		Machine(const Machine&) = delete;
+
 		//- Move constructor
 		Machine(Machine&&) = default;
 
@@ -79,16 +81,20 @@ public:
 
 	// Member functions
 
-		// General
-
 		//- Build geometry
 		void build();
 
 		//- Write geometry to file
 		// void write() const noexcept;		// <- implement later
 
-		//- Get const pointer to rotor
-		const BladeRow* getRotor() const noexcept;
+
+	// Member operators
+
+		//- Dissalow copy assignment operator
+		Machine& operator=(const Machine&) = delete;
+
+		//- Move assignment operator
+		Machine& operator=(Machine&&) = default;
 
 };
 

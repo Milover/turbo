@@ -9,15 +9,15 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include <cmath>
-#include <utility>
 #include <vector>
 
 #include "Error.h"
-#include "Geometry.h"
 #include "General.h"
+#include "Geometry.h"
 #include "Profile.h"
 #include "ProfileGenerator.h"
 #include "Utility.h"
+#include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -28,58 +28,60 @@ namespace design
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
-void Profile::rotate(const double angle)
+void Profile::centerOn(const Point& p) noexcept
 {
-	if (wrapped_)
-		THROW_RUNTIME_ERROR("profile is wrapped");
-		
-	double rad {degToRad(angle)};
-	double x;
-	double y;
+	translate
+	(
+		Vector {p - centroid()}
+	);
+}
 
-	for (auto& p : points_)
+
+void Profile::rotate2D(const Float angle) noexcept
+{
+	Float x_top;
+	Float y_top;
+	Float x_bot;
+	Float y_bot;
+
+	for (auto& [top, bot] : points_)
 	{
-		x = p[Axis::X];
-		y = p[Axis::Y];
+		x_top = top.x();
+		y_top = top.y();
+		x_bot = bot.x();
+		y_bot = bot.y();
 
-		p[Axis::X] = x * std::cos(rad) - y * std::sin(rad);
-		p[Axis::Y] = x * std::sin(rad) + y * std::cos(rad);
+		top.x() = x_top * std::cos(angle) - y_top * std::sin(angle);
+		top.y() = x_top * std::sin(angle) + y_top * std::cos(angle);
+		bot.x() = x_bot * std::cos(angle) - y_bot * std::sin(angle);
+		bot.y() = x_bot * std::sin(angle) + y_bot * std::cos(angle);
 	}
 }
 
 
-void Profile::scale(const double factor)
+void Profile::scale(const Float factor) noexcept
 {
-	if (wrapped_)
-		THROW_RUNTIME_ERROR("profile is wrapped");
+	scale(centroid(), factor);
+}
 
-	for (auto& p : points_)
+
+void Profile::scale(const Point& p, const Float factor) noexcept
+{
+	for (auto& [top, bot] : points_)
 	{
-		p[Axis::X] *= factor;
-		p[Axis::Y] *= factor;
-		p[Axis::Z] *= factor;
+		top = p + (top - p) * factor;
+		bot = p + (bot - p) * factor;
 	}
 }
 
 
-void Profile::translate(const PointCoordinates& coordinates) noexcept
+void Profile::translate(const Vector& v) noexcept
 {
-	PointCoordinates center {getCenter()};
-
-	PointCoordinates vector
+	for (auto& [top, bot] : points_)
 	{
-		coordinates[Axis::X] - center[Axis::X],
-		coordinates[Axis::Y] - center[Axis::Y],
-		coordinates[Axis::Z] - center[Axis::Z]
-	};
-
-	for (auto& p : points_)
-	{
-		p[Axis::X] += vector[Axis::X];
-		p[Axis::Y] += vector[Axis::Y];
-		p[Axis::Z] += vector[Axis::Z];
+		top += v;
+		bot += v;
 	}
-
 }
 
 
@@ -100,25 +102,27 @@ Profile::Constiterator Profile::begin() const
 void Profile::build
 (
 	const ProfileGenerator& generator,
-	const double chord,
-	const double radius,
-	const double stagger
+	const Float chord,
+	const Float radius,
+	const Float stagger
 )
 {
 	points_.clear();
+	wrapped_ = false;
 
-	for (const auto& p : generator)
-		points_.push_back(p);
-
-	// center on origin
-	translate(origin_);
+	points_.insert
+	(
+		points_.begin(),
+		generator.begin(),
+		generator.end()
+	);
 
 	scale(chord);
-	translate
+	centerOn
 	(
-		PointCoordinates {0.0, 0.0, radius}
+		Point {0.0, 0.0, radius}
 	);
-	rotate(stagger);
+	rotate2D(stagger);
 }
 
 
@@ -140,47 +144,49 @@ Profile::Constiterator Profile::end() const
 }
 
 
-PointCoordinates Profile::getCenter() const noexcept
+Profile::Point Profile::centroid() const noexcept
 {
-	if (points_.empty())
+	if (empty())
 		return origin_;
 
-	PointCoordinates center {origin_};
+	Point center {origin_};
 
-	for (const auto& p : points_)
-	{
-		center[Axis::X] += p[Axis::X];
-		center[Axis::Y] += p[Axis::Y];
-		center[Axis::Z] += p[Axis::Z];
-	}
+	for (const auto& [top, bot] : points_)
+		center += top + bot;
 
-	for (auto& p : center)
-		p /= static_cast<double>(size());
+	center /= static_cast<Float>(2 * size());
 
-	return std::move(center);
+	return center;
 }
 
 
 geometry::Spline Profile::getContour() const
 {
-	if (empty())
-		THROW_RUNTIME_ERROR("profile not built");
-	
-	return std::move
-	(
-		Spline {getPoints()}
-	);
+	return geometry::Spline {getPoints()};
 }
 
 
-std::vector<geometry::Point> Profile::getPoints() const noexcept
+std::vector<geometry::Point> Profile::getPoints() const
 {
+	if (empty())
+		THROW_RUNTIME_ERROR("profile not built");
+
+	// we have to map from a pair list --- top - bot
+	// ordered from LE to TE, to a uniquely single-valued list
+	// ordered from top-TE to bot-TE i.e. we have to
+	// skip one LE point (both top and bot lists have it)
+	// and unwrap (reorder) the list properly, eg:
+	// [[0, 0], [1, 1], [2, 2]] -> [2, 1, 0, 1, 2]
 	std::vector<geometry::Point> points;
+	points.reserve(2 * size() - 1);
 
-	for (const auto& p : points_)
-		points.push_back(p);
+	for (auto i {size() - 1}; i > 0; --i)
+		points.push_back(points_[i].first);
 
-	return std::move(points);
+	for (auto& p : points_)
+		points_.push_back(p.second);
+
+	return points;
 }
 
 
@@ -189,29 +195,22 @@ geometry::Line Profile::getTrailingEdge() const
 	if (empty())
 		THROW_RUNTIME_ERROR("profile not built");
 
-	geometry::Point lower
+	// from bot-TE to top-TE
+	return geometry::Line
 	{
-		points_.back()
+		geometry::Point {points_.back().first},
+		geometry::Point {points_.back().second}
 	};
-	geometry::Point upper
-	{
-		points_.front()
-	};
-
-	return std::move
-	(
-		geometry::Line {lower, upper}
-	);
 }
 
 
-bool Profile::isWrapped() const noexcept
+Vectorpair<Profile::Point> Profile::points() const noexcept
 {
-	return wrapped_;
+	return points_;
 }
 
 
-Profile::Pcvector::size_type Profile::size() const noexcept
+Profile::Sizetype Profile::size() const noexcept
 {
 	return points_.size();
 }
@@ -219,28 +218,33 @@ Profile::Pcvector::size_type Profile::size() const noexcept
 
 void Profile::wrap() noexcept
 {
-	if (points_.empty())
+	if (empty() || wrapped_)
 		return;
 
-	double radius;	// [m]
-	double angle;	// [rad]
-
-	PointCoordinates wp;
+	Float r;		// radius
+	Float a_top;	// angle
+	Float a_bot;
 
 	// compute wrapped coordinates
-	for (auto& p : points_)
+	for (auto& [top, bot] : points_)
 	{
-		radius = p[Axis::Z];
-		angle = p[Axis::Y] / radius;
+		r = top.z();		// z_top == z_bot
+		a_top = top.y() / r;
+		a_bot = bot.y() / r;
 
-		wp[Axis::X] = p[Axis::X];
-		wp[Axis::Y] = radius * std::sin(angle);
-		wp[Axis::Z] = radius * std::cos(angle);
-
-		std::swap(p, wp);
+		top.y() = r * std::sin(a_top);
+		top.z() = r * std::cos(a_top);
+		bot.y() = r * std::sin(a_bot);
+		bot.z() = r * std::cos(a_bot);
 	}
 
 	wrapped_ = true;
+}
+
+
+bool Profile::wrapped() const noexcept
+{
+	return wrapped_;
 }
 
 

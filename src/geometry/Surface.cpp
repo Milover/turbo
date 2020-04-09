@@ -10,6 +10,7 @@ License
 
 #include <utility>
 
+#include "General.h"
 #include "Shape.h"
 #include "Surface.h"
 
@@ -22,15 +23,15 @@ namespace geometry
 
 // * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * * //
 
-Surface::Surface(const int tag) noexcept
+Surface::Surface(const Integer tag) noexcept
 :
 	Shape
 	{
-		std::pair<int, int>
-		{
+		std::make_pair
+		(
 			2,		// dimension
 			tag
-		}
+		)
 	}
 {}
 

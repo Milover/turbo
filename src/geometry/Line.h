@@ -17,10 +17,11 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef LINE_H
-#define LINE_H
+#ifndef GEOMETRY_LINE_H
+#define GEOMETRY_LINE_H
 
 #include "Curve.h"
+#include "General.h"
 #include "Point.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -43,10 +44,10 @@ protected:
 	// Member functions
 
 		//- Construct Line geometry
-		int construct
+		Integer construct
 		(
-			const int startTag,
-			const int endTag
+			const Integer startTag,
+			const Integer endTag
 		) const noexcept;
 
 
@@ -74,8 +75,11 @@ public:
 
 	// Member operators
 	
-		//- Disallow assignment
+		//- Disallow copy assignment
 		Line& operator=(const Line&) = delete;
+
+		//- Disallow move assignment
+		Line& operator=(Line&&) = delete;
 
 };
 

@@ -5,9 +5,7 @@
 # add sources
 set(SRC
 	ConstantDistribution.cpp
-	DistributionGeneratorBase.cpp
 	Naca4DigitDistribution.cpp
-	Naca4DigitModifiedDistribution.cpp
 	)
 
 # append to sources

@@ -8,12 +8,12 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include <utility>
 #include <vector>
 
 #include "gmsh.h"
 
 #include "Curve.h"
+#include "General.h"
 #include "Point.h"
 #include "Spline.h"
 
@@ -26,14 +26,14 @@ namespace geometry
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-int Spline::construct
+Integer Spline::construct
 (
 	Point start,
 	Point end,
 	const Spline::Pointvector& points
 ) const noexcept
 {
-	std::vector<int> tags;
+	std::vector<Integer> tags;
 
 	for (const auto& p : points)
 	{

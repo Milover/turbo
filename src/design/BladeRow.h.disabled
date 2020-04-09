@@ -7,22 +7,24 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::design::ComponentBase
+	turbo::design::BladeRow
 
 Description
-	Abstract base class template for generic turbomachinery components.
+	BladeRow class
 
 SourceFiles
-	ComponentBase.cpp
+	BladeRow.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef COMPONENT_BASE_H
-#define COMPONENT_BASE_H
+#ifndef DESIGN_BLADE_ROW_H
+#define DESIGN_BLADE_ROW_H
 
-#include <memory>
 #include <string>
+#include <memory>
 
+#include "Blade.h"
+#include "ComponentBase.h"
 #include "InputObjectBase.h"
 #include "Utility.h"
 
@@ -34,61 +36,78 @@ namespace design
 {
 
 /*---------------------------------------------------------------------------*\
-					Class ComponentBase Declaration
+						Class BladeRow Declaration
 \*---------------------------------------------------------------------------*/
 
-class ComponentBase
+class BladeRow final
 :
-	public InputObjectBase<double>
+	public ComponentBase
 {
-protected:
+private:
 
-	// Protected data
+	// Private data
 
-
-		const ComponentBase* owner_ {nullptr};
-
-
-	// Constructors
-
-		//- Default constructor
-		ComponentBase() = default;
+		std::unique_ptr<Blade> blade_;
 
 
 	// Member functions
 
-		//- Check input
-		virtual void check() const = 0;
+		//- Check if hub tip ratio is valid
+		void checkHubTipRatio() const;
+
+		//- Compute area
+		double computeArea() const;
+
+		//- Compute axial velocity
+		double computeAxialVelocity() const;
+
+		//- Compute hub radius
+		double computeHubRadius() const;
+
+		//- Compute span
+		double computeSpan() const;
+
+
+protected:
+
+	// Member functions
+
+		//- Build input map
+		void buildInputMap() noexcept override;
+
+		//- Check values
+		void check() const override;
 
 		//- Compute and store values to input map
-		virtual void computeAndStore() = 0;
-
-		//- Convert value
-		double convert(const std::string& value) const final;
+		void computeAndStore();
 
 
 public:
 
 	// Constructors
 
+		//- Construct from input
+		BladeRow
+		(
+			const Stringmap<>& input,
+			const ComponentBase& owner
+		);
+
 		//- Move constructor
-		ComponentBase(ComponentBase&&) = delete;
+		BladeRow(BladeRow&&) = delete;
 
 
 	//- Destructor
-	virtual ~ComponentBase() = default;
+	~BladeRow() = default;
 
 
 	// Member functions
 
 		//- Build geometry
-		virtual void build() = 0;
+		void build() override;
 
-		//- Ask owner for value
-		double get(const std::string& key) const final;
-
-		//- Check if value is initialized
-		bool hasValue(const std::string& key) const noexcept final;
+		//- Get const pointer to blade
+		const Blade* getBlade() const noexcept;
 
 };
 

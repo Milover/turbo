@@ -11,10 +11,10 @@ License
 #include <cmath>
 #include <string>
 
-#include "Axis.h"
 #include "CamberGeneratorBase.h"
 #include "Error.h"
-#include "InputObjectBase.h"
+#include "General.h"
+#include "InputRegistry.h"
 #include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -26,190 +26,84 @@ namespace design
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-double CamberGeneratorBase::computeX(const double x) const noexcept
+Float CamberGeneratorBase::computeX(const Integer count) const noexcept
 {
-	if (spacing_ == SpacingType::LINEAR)
-	{
-		return x + increment_;
-	}
-	// spacing_::COSINE is default
+	if (spacing_ == Spacing::LINEAR)
+		return static_cast<Float>(count) * increment_;
+	// Spacing::COSINE is default
 	else
 	{
-		// using size because camber line is growing (push_back())
-		double angle
+		Float angle
 		{
-			pi + static_cast<double>(camber_.size()) * increment_
+			pi + static_cast<Float>(count) * increment_
 		};
 
 		// scale and shift the unit circle
-		return 0.5 * chord_ * (1.0 + std::cos(angle));
+		return 0.5 * (1.0 + std::cos(angle));
 	}
-}
-
-
-void CamberGeneratorBase::parseCamberPoints(const std::string& value)
-{
-	try
-	{
-		camberPoints_ = std::stoi(value);
-	}
-	catch (...)
-	{
-		THROW_ARGUMENT_ERROR("can't convert '" + value + "' to int");
-	}
-}
-
-
-void CamberGeneratorBase::parseSpacing(const std::string& value)
-{
-	if (value == "linear")
-		spacing_ = SpacingType::LINEAR;
-	else if (value == "cosine")
-		spacing_ = SpacingType::COSINE;
-	else
-		THROW_RUNTIME_ERROR("unknown value '" + value + "' for keyword 'spacing'");
-}
-
-
-void CamberGeneratorBase::setIncrement() noexcept
-{
-	if (spacing_ == SpacingType::LINEAR)
-		increment_ = chord_ / static_cast<double>(camberPoints_ - 1);
-	// SpacingType::COSINE is default
-	else
-		increment_ = pi / static_cast<double>(camberPoints_ - 1);
 }
 
 
 // * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
 
-CamberGeneratorBase::CamberGeneratorBase(const Stringmap<>& input)
+// TODO: clean up a bit
+CamberGeneratorBase::CamberGeneratorBase(const Float camber)
+:
+	camber_ {camber}
 {
-	parse(input);
-	check();
-
-	setIncrement();
-}
-
-
-// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
-
-void CamberGeneratorBase::check() const
-{
-	if (camberPoints_ <= 0)
-		THROW_RUNTIME_ERROR("value of keyword 'camberPoints' <= 0");
-}
-
-
-double CamberGeneratorBase::convert(const std::string& value) const
-{
-	try
+	if (inputRegistry::has("camberPoints"))
 	{
-		return std::stod(value);
-	}
-	catch (...)
-	{
-		THROW_ARGUMENT_ERROR("can't convert '" + value + "' to double");
-	}
-}
+		camberPoints_ = StringConverter<Integer> {}
+		(
+			InputRegistry::get("camberPoints")
+		);
 
-
-void CamberGeneratorBase::parse(const Stringmap<>& input)
-{
-	auto points {input.find("camberPoints")};
-	auto spacing {input.find("spacing")};
-
-	std::string value;
-
-	if (points != input.end())
-	{
-		value = points->second;
-		parseCamberPoints(value);
+		if (camberPoints_ < 0)
+			THROW_RUNTIME_ERROR("camberPoints < 0");
 	}
 
-	if (spacing != input.end())
+	if (inputRegistry::has("spacing"))
 	{
-		value = spacing->second;
-		parseSpacing(value);
+		auto type InputRegistry::get("camberPoints")
+
+		if (type == "linear")
+			spacing_ = Spacing::LINEAR;
+		else if (type == "cosine")
+			spacing_ = Spacing::COSINE;
+		else
+			THROW_RUNTIME_ERROR("unknown spacing: " + type);
 	}
+
+	if (spacing_ == Spacing::LINEAR)
+		increment_ = 1.0 / static_cast<Float>(camberPoints_ - 1);
+	else
+		increment_ = pi / static_cast<Float>(camberPoints_ - 1);
 }
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-CamberGeneratorBase::Iterator CamberGeneratorBase::begin()
+std::vector<CamberGeneratorBase::Point>
+CamberGeneratorBase::generate() const noexcept
 {
-	return camber_.begin();
-}
+	std::vector<Point> points;
+	points.reserve(camberPoints_);
 
+	Float x;
+	Float y;
 
-CamberGeneratorBase::Constiterator CamberGeneratorBase::begin() const
-{
-	return camber_.begin();
-}
-
-
-bool CamberGeneratorBase::empty() const noexcept
-{
-	return camber_.empty();
-}
-
-
-CamberGeneratorBase::Iterator CamberGeneratorBase::end()
-{
-	return camber_.end();
-}
-
-
-CamberGeneratorBase::Constiterator CamberGeneratorBase::end() const
-{
-	return camber_.end();
-}
-
-
-void CamberGeneratorBase::generate(const double camberAngle) noexcept
-{
-	if
-	(
-		camberAngle < 0.0 &&
-		camberAngle > 90.0
-	)
-		THROW_DOMAIN_ERROR("camber angle out of range [0, 90]");
-
-	camber_.clear();
-
-	computeParameters(camberAngle);
-
-	PointCoordinates p {0.0, 0.0, 0.0};
-	while
-	(
-		isLessOrEqual(p[Axis::X], chord_)
-	)
+	for (auto i {0}; i < points_.size(); ++i)
 	{
-		camber_.push_back(p);
+		x = computeX(i);	// increment x
+		y = computeY(x);	// compute new y
 
-		p[Axis::X] = computeX(p[Axis::X]);
-		p[Axis::Y] = computeY(p[Axis::X]);
-
-		// don't go in circles
-		if
+		points.push_back
 		(
-			camber_.back()[Axis::X] > p[Axis::X]
-		)
-			break;
+			Point {x, y}
+		);
 	}
-}
 
-
-bool CamberGeneratorBase::hasValue(const std::string& key) const noexcept
-{
-	return hasKey(key);
-}
-
-
-int CamberGeneratorBase::size() const noexcept
-{
-	return camber_.size();
+	return points;
 }
 
 

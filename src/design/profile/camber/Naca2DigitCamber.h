@@ -23,11 +23,11 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef NACA_2_DIGIT_CAMBER_H
-#define NACA_2_DIGIT_CAMBER_H
+#ifndef DESIGN_NACA_2_DIGIT_CAMBER_H
+#define DESIGN_NACA_2_DIGIT_CAMBER_H
 
 #include "CamberGeneratorBase.h"
-#include "Utility.h"
+#include "General.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -46,45 +46,25 @@ class Naca2DigitCamber final
 {
 private:
 
+	// Private data
+
+		maxCamber_;
+		maxCamberPosition_ {0.4};
+			// TODO: implement search for optimal maxCamberPosition_
+
 	// Member functions
 
 		//- Compute max camber for a given
 		//  camber angle and max camber position
-		double computeMaxCamber
-		(
-			const double camberAngle,
-			const double maxCamberPosition
-		) const noexcept;
-
-		//- Compute max camber position for a given
-		//  camber angle and max camber
-		//  NOTE: this is not actually used
-		double computeMaxCamberPosition
-		(
-			const double camberAngle,
-			const double maxCamber
-		) const noexcept;
+		void computeMaxCamber() const noexcept;
 
 
 protected:
 
 	// Member functions
 
-		//- Build input map
-		void buildInputMap() noexcept override;
-
-		//- Check values
-		void check() const override;
-
-		//- Compute camber parameters to satisfy
-		//  a given camber angle
-		void computeParameters(const double camberAngle) override;
-
-		//- Compute camber ordinate at a ``x''
-		double computeY(const double x) const override;
-
-		//- Parse input
-		void parse(const Stringmap<>& input) override;
+		//- Compute camber ordinate at a 'x'
+		Float computeY(const Float x) const override;
 
 
 public:
@@ -92,20 +72,14 @@ public:
 	// Constructors
 
 		//- Default constructor
-		Naca2DigitCamber(const Stringmap<>& input);
-
-		//- Move constructor
-		Naca2DigitCamber(Naca2DigitCamber&&) = default;
-
-
-	//- Destructor
-	~Naca2DigitCamber() = default;
+		explicit Naca2DigitCamber(const Float camber);
+			// TODO: clean up a bit
 
 
 	// Member functions
 
-		//- Get inlination angle at ``x'' in degrees
-		double getInclinationAt(const double x) const override;
+		//- Get inlination angle at 'x' in radians
+		Float inclination(const Float x) const override;
 
 };
 

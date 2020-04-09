@@ -24,8 +24,8 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef WIRE_H
-#define WIRE_H
+#ifndef GEOMETRY_WIRE_H
+#define GEOMETRY_WIRE_H
 
 #include <type_traits>
 #include <utility>
@@ -35,6 +35,7 @@ Description
 
 #include "Shape.h"
 #include "Curve.h"
+#include "General.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -57,10 +58,10 @@ private:
 
 		//- Construct spline geometry
 		template<typename... T>
-		std::enable_if_t<std::conjunction_v<std::is_base_of<Curve, T>...>, int>
+		std::enable_if_t<std::conjunction_v<std::is_base_of<Curve, T>...>, Integer>
 		construct(const T&... t) const noexcept
 		{
-			std::vector<int> tags
+			std::vector<Integer> tags
 			{
 				t.getDimTag().second...
 			};
@@ -80,7 +81,7 @@ public:
 		:
 			Shape
 			{
-				std::pair<int, int>
+				std::make_pair
 				{
 					1,		// dimension
 					construct(t...)
@@ -113,8 +114,11 @@ public:
 
 	// Member operators
 
-		//- Disallow assignment
+		//- Disallow copy assignment
 		Wire& operator=(const Wire&) = delete;
+
+		//- Disallow move assignment
+		Wire& operator=(Wire&&) = delete;
 
 };
 

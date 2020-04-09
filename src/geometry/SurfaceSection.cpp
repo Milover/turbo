@@ -13,9 +13,9 @@ License
 
 #include "gmsh.h"
 
+#include "General.h"
 #include "Surface.h"
 #include "SurfaceSection.h"
-#include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -26,10 +26,10 @@ namespace geometry
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-int SurfaceSection::construct(Surface::Wirevector&& wires) const noexcept
+Integer SurfaceSection::construct(Surface::Wirevector&& wires) const noexcept
 {
-	std::vector<int> tags;
-	Vectorpair<int> outDimTags;
+	std::vector<Integer> tags;
+	Vectorpair<Integer> outDimTags;
 
 	for (auto& w : wires)
 		tags.push_back

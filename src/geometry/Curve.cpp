@@ -10,8 +10,9 @@ License
 
 #include <utility>
 
-#include "Shape.h"
 #include "Curve.h"
+#include "General.h"
+#include "Shape.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -22,15 +23,15 @@ namespace geometry
 
 // * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * * //
 
-Curve::Curve(const int tag) noexcept
+Curve::Curve(const Integer tag) noexcept
 :
 	Shape
 	{
-		std::pair<int, int>
-		{
+		std::make_pair
+		(
 			1,		// dimension
 			tag
-		}
+		)
 	}
 {}
 

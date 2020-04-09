@@ -21,7 +21,11 @@ Description
 #include <utility>
 
 #include "General.h"
+#include "InitialDesign.h"
+#include "NumberOfBlades.h"
 #include "PositiveValue.h"
+#include "Radius.h"
+#include "Solidity.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -57,6 +61,25 @@ public:
 		explicit Chord(T&& t)
 		:
 			PVBase {std::forward<T>(t)}
+		{}
+
+		//- Compute and construct
+		Chord
+		(
+			const NumberOfBlades& N_b,
+			const Radius& r,
+			const Solidity& sigma
+		)
+		:
+			Chord
+			{
+				compute::computeChord
+				(
+					N_b.value(),
+					r.value(),
+					sigma.value()
+				)
+			}
 		{}
 
 };

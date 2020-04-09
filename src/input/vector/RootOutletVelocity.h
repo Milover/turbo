@@ -20,8 +20,14 @@ Description
 #include <type_traits>
 #include <utility>
 
+#include "Density.h"
 #include "General.h"
+#include "InitialDesign.h"
+#include "InletVelocity.h"
+#include "Radius.h"
 #include "RegistryObject.h"
+#include "Rps.h"
+#include "TotalPressureDifference.h"
 #include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -58,6 +64,29 @@ public:
 		explicit RootOutletVelocity(T&& t)
 		:
 			RegBase {std::forward<T>(t)}
+		{}
+
+		//- Compute and construct
+		RootOutletVelocity
+		(
+			const InletVelocity& c_1,
+			const TotalPressureDifference& dp,
+			const Rps& rps,
+			const Radius& r,
+			const Density& rho
+		)
+		:
+			RootOutletVelocity
+			{
+				compute::computeRootOutletVelocity
+				(
+					c_1.value(),
+					dp.value(),
+					rps.value(),
+					r.value(),
+					rho.value()
+				)
+			}
 		{}
 
 };

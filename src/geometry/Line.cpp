@@ -8,8 +8,6 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include <utility>
-
 #include "gmsh.h"
 
 #include "Curve.h"
@@ -25,10 +23,10 @@ namespace geometry
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-int Line::construct
+Integer Line::construct
 (
-	const int startTag,
-	const int endTag
+	const Integer startTag,
+	const Integer endTag
 ) const noexcept
 {
 	return gmsh::model::occ::addLine

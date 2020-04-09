@@ -9,10 +9,10 @@ add_subdirectory(profile)
 # add sources
 set(SRC
 	Airfoil.cpp
-	Blade.cpp
-	BladeRow.cpp
-	ComponentBase.cpp
-	Machine.cpp
+	#Blade.cpp
+	#BladeRow.cpp
+	#Machine.cpp
+	TurboBase.cpp
 	)
 
 # append to sources

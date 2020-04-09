@@ -9,19 +9,17 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include <cmath>
-#include <string>
 #include <utility>
-#include <vector>
+#include <memory>
 
 #include "ConstantDistribution.h"
 #include "CircularArcCamber.h"
 #include "Error.h"
 #include "General.h"
+#include "InputRegistry.h"
 #include "Naca2DigitCamber.h"
 #include "Naca4DigitDistribution.h"
-#include "Naca4DigitModifiedDistribution.h"
 #include "ProfileGenerator.h"
-#include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -32,244 +30,118 @@ namespace design
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void ProfileGenerator::initializeCamberGenerator(const Stringmap<>& input)
+void ProfileGenerator::createCamberGenerator(const Float camber)
 {
-	auto search {input.find("camber")};
-	
-	if (search == input.end())
-		THROW_RUNTIME_ERROR("keyword 'camber' undefined");
-	
-	std::string type {search->second};
+	Word type
+	{
+		InputRegistry::get("camber")
+	};
 
 	if (type == "naca2Digit")
-		camberGenerator_.reset
+		cGen_.reset
 		(
-			new Naca2DigitCamber {input}
+			std::make_unique<Naca2DigitCamber>(camber)
 		);
 	else if (type == "circularArc")
-		camberGenerator_.reset
+		cGen_.reset
 		(
-			new CircularArcCamber {input}
+			std::make_unique<CircularArcCamber>(camber)
 		);
 	else
-		THROW_RUNTIME_ERROR("unknown value '" + type + "' for keyword 'camber'");
+		THROW_RUNTIME_ERROR("unknown camber: " + type);
 }
 
 
-void ProfileGenerator::initializeDistributionGenerator(const Stringmap<>& input)
+void ProfileGenerator::createDistributionGenerator()
 {
-	auto search {input.find("distribution")};
-
-	if (search == input.end())
-		THROW_RUNTIME_ERROR("keyword 'distribution' undefined");
-
-	std::string type {search->second};
+	Word type
+	{
+		InputRegistry::get("distribution")
+	};
 
 	if (type == "constant")
-		distributionGenerator_.reset
+		dGen_.reset
 		(
-			new ConstantDistribution {input}
+			std::make_unique<ConstantDistribution>()
 		);
 	else if (type == "naca4Digit")
-		distributionGenerator_.reset
+		dGen_.reset
 		(
-			new Naca4DigitDistribution {input}
-		);
-	else if (type == "naca4DigitModified")
-		distributionGenerator_.reset
-		(
-			new Naca4DigitModifiedDistribution {input}
+			std::make_unique<Naca4DigitDistribution>()
 		);
 	else
-		THROW_RUNTIME_ERROR("unknown value '" + type + "' for keyword 'distribution'");
-}
-
-
-void ProfileGenerator::finalize
-(
-	const Vectorpair<PointCoordinates>& profile
-) noexcept
-{
-	// upper surface (we're skipping the LE point)
-	int size {static_cast<int>(profile.size())};
-	for (int i {size - 1}; i > 0; i--)
-		profile_.push_back
-		(
-			profile[i].first
-		);
-
-	// lower surface (we're including the LE point)
-	for (const auto& p : profile)
-		profile_.push_back
-		(
-			p.second
-		);
-}
-
-
-void ProfileGenerator::generateCamberLine(const double camberAngle) noexcept
-{
-	camberGenerator_->generate(camberAngle);
-
-	store
-	(
-		"maxCamber",
-		camberGenerator_->get("maxCamber")
-	);
-	store
-	(
-		"maxCamberPosition",
-		camberGenerator_->get("maxCamberPosition")
-	);
-	store
-	(
-		"leadingInclination",
-		camberGenerator_->getInclinationAt(0.0)
-	);
-	store
-	(
-		"trailingInclination",
-		camberGenerator_->getInclinationAt(1.0)
-	);
-}
-
-
-void ProfileGenerator::store
-(
-	const std::string& key,
-	const double value
-)
-{
-	data_[key] = value;
+		THROW_RUNTIME_ERROR("unknown distribution: " + type);
 }
 
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-ProfileGenerator::ProfileGenerator(const Stringmap<>& input)
-:
-	data_
-	{
-		{"leadingInclination",	NAN},	// [deg]
-		{"maxCamber",			NAN},	// [-] - % of chord
-		{"maxCamberPosition",	NAN},	// [-] - % of chord
-		{"trailingInclination",	NAN}	// [deg]
-	}
+ProfileGenerator::ProfileGenerator(const Float camber)
 {
-	initializeCamberGenerator(input);
-	initializeDistributionGenerator(input);
+	reset(camber);
 }
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-ProfileGenerator::Iterator ProfileGenerator::begin()
+Vectorpair<ProfileGenerator::Point> ProfileGenerator::generate() const
 {
-	return profile_.begin();
-}
-
-
-ProfileGenerator::Constiterator ProfileGenerator::begin() const
-{
-	return profile_.begin();
-}
-
-
-bool ProfileGenerator::empty() const noexcept
-{
-	return profile_.empty();
-}
-
-
-ProfileGenerator::Iterator ProfileGenerator::end()
-{
-	return profile_.end();
-}
-
-
-ProfileGenerator::Constiterator ProfileGenerator::end() const
-{
-	return profile_.end();
-}
-
-
-void ProfileGenerator::generate(const double camberAngle)
-{
-	profile_.clear();
-
-	generateCamberLine(camberAngle);
+	auto camberLine {cGen_->generate()};
 
 	// apply distribution to camber line
-	Vectorpair<PointCoordinates> profile;
-	double x;
-	double y;
-	double thickness;		// half of total thickness
-	double inclination;
-	double dx;
-	double dy;
+	Vectorpair<Point> points;
+	points.reserve(camberLine.size());
 
-	for (const auto& p : *camberGenerator_)
+	Float x;
+	Float y;
+	Float thickness;		// half of total thickness
+	Float inclination;
+	Float dx;
+	Float dy;
+
+	for (const auto& p : camberLine)
 	{
-		x = p[Axis::X];
-		y = p[Axis::Y];
+		x = p.x();
+		y = p.y();
 
-		thickness = distributionGenerator_->getThicknessAt(x);
-		inclination = degToRad(camberGenerator_->getInclinationAt(x));
+		thickness = dGen_->thickness(x);
+		inclination = cGen_->inclination(x);
 
-		dx = -thickness * std::sin(inclination);
+		dx = thickness * std::sin(inclination);
 		dy = thickness * std::cos(inclination);
 
-		profile.push_back
+		points.push_back
 		(
 			std::make_pair
 			(
-				PointCoordinates	// upper surface
-				{
-					x + dx,
-					y + dy,
-					0.0
-				},
-				PointCoordinates	// lower surface
+				Point	// upper surface
 				{
 					x - dx,
-					y - dy,
-					0.0
+					y + dy
+				},
+				Point	// lower surface
+				{
+					x + dx,
+					y - dy
 				}
 			)
 		);
 	}
 
-	finalize(profile);
+	return points;
 }
 
 
-double ProfileGenerator::get(const std::string& key) const
+Float ProfileGenerator::inclination(const Float x) const noexcept
 {
-	auto search {data_.find(key)};
-
-	if (search == data_.end())
-		THROW_ARGUMENT_ERROR("key '" + key + "' does not exist");
-
-	return search->second;
+	return cGen_->inclination(x);
 }
 
 
-bool ProfileGenerator::hasValue(const std::string& key) const noexcept
+void ProfileGenerator::reset(const Float camber) const
 {
-	auto search {data_.find(key)};
-
-	if (search == data_.end())
-		return false;
-	else if (std::isnan(search->second))
-		return false;
-	
-	return true;
-}
-
-
-int ProfileGenerator::size() const noexcept
-{
-	return profile_.size();
+	createCamberGenerator(camber);
+	createDistributionGenerator();
 }
 
 

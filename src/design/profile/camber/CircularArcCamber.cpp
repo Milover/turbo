@@ -25,67 +25,49 @@ namespace design
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-void CircularArcCamber::buildInputMap() noexcept
+Float CircularArcCamber::computeY(const Float x) const noexcept
 {
-	store("maxCamberPosition", 0.5);	// [-] - % of chord
-}
-
-
-void CircularArcCamber::computeParameters(const double camberAngle) noexcept
-{
-	double theta {degToRad(camberAngle)};
-
-	offset_ = -0.5 * chord_ / std::tan(0.5 * theta);
-
-	store
-	(
-		"maxCamber",
-		computeY(get("maxCamberPosition"))
-	);
-}
-
-
-double CircularArcCamber::computeY(const double x) const
-{
-	double root
+	Float root
 	{
-		std::pow(offset_, 2) + x * chord_ - std::pow(x, 2)
+		std::pow(yOffset_, 2) + x - std::pow(x, 2)
 	};
 
-	return std::sqrt(root) + offset_;
+	return std::sqrt(root) + yOffset_;
 }
 
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-CircularArcCamber::CircularArcCamber(const Stringmap<>& input)
+CircularArcCamber::CircularArcCamber(const Float camber)
 :
-	CamberGeneratorBase {input}
-{
-	buildInputMap();
-}
+	CamberGeneratorBase {camber},
+	yOffset_
+	{
+		-0.5 / std::tan(0.5 * camber_)
+	}
+{}
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-double CircularArcCamber::getInclinationAt(const double x) const
+Float CircularArcCamber::inclination(const Float x) const
 {
 	if
 	(
-		!isInRange(x, 0.0, chord_)
+		!isInRange(x, 0.0, 1.0)
 	)
-		THROW_DOMAIN_ERROR("x out of range [0, chord]");
+		THROW_DOMAIN_ERROR("x out of range [0, 1]");
 
-	double root
+	Float root
 	{
-		std::pow(offset_, 2) + x * chord_ - std::pow(x, 2)
+		std::pow(yOffset_, 2) + x - std::pow(x, 2)
 	};
-	double dydx
+	Float dydx
 	{
-		0.5 * (chord_ - 2.0 * x) / std::sqrt(root)
+		0.5 * (1.0 - 2.0 * x) / std::sqrt(root)
 	};
 
-	return radToDeg(std::atan(dydx));
+	return std::atan(dydx);
 }
 
 

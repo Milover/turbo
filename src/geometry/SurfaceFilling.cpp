@@ -13,9 +13,9 @@ License
 
 #include "gmsh.h"
 
+#include "General.h"
 #include "Surface.h"
 #include "SurfaceFilling.h"
-#include "Utility.h"
 #include "Wire.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -27,13 +27,13 @@ namespace geometry
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-int SurfaceFilling::construct
+Integer SurfaceFilling::construct
 (
 	Wire&& wire,
 	const Surface::Pointvector& points
 ) const noexcept
 {
-	std::vector<int> tags;
+	std::vector<Integer> tags;
 
 	for (auto& p : points)
 		tags.push_back

@@ -17,13 +17,14 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef CURVE_H
-#define CURVE_H
+#ifndef GEOMETRY_CURVE_H
+#define GEOMETRY_CURVE_H
 
 #include <vector>
 
-#include "Shape.h"
+#include "General.h"
 #include "Point.h"
+#include "Shape.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -42,13 +43,13 @@ class Curve
 {
 protected:
 
-	typedef std::vector<Point> Pointvector;
+	using Pointvector = std::vector<Point>;
 
 
 	// Constructors
 
 		//- Construct from tag
-		Curve(const int tag) noexcept;
+		Curve(const Integer tag) noexcept;
 
 
 public:
@@ -68,8 +69,11 @@ public:
 
 	// Member operators
 
-		//- Disallow assignment
+		//- Disallow copy assignment
 		Curve& operator=(const Curve&) = delete;
+
+		//- Disallow move assignment
+		Curve& operator=(Curve&&) = delete;
 
 };
 

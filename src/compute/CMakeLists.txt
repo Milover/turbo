@@ -6,7 +6,7 @@
 
 # add sources
 set(SRC
-	DeHallerCriterion.cpp
+	InitialDesign.cpp
 	)
 
 # append to sources

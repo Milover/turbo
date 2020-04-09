@@ -20,7 +20,12 @@ Description
 #include <type_traits>
 #include <utility>
 
+#include "BladeVelocity.h"
 #include "General.h"
+#include "IncidenceAngle.h"
+#include "InitialDesign.h"
+#include "InletVelocity.h"
+#include "OutletVelocity.h"
 #include "RegistryObject.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -57,6 +62,46 @@ public:
 		explicit CamberAngle(T&& t)
 		:
 			RegBase {std::forward<T>(t)}
+		{}
+
+		//- Compute and construct
+		CamberAngle
+		(
+			const InletVelocity& c_1,
+			const OutletVelocity& c_2,
+			const BladeVelocity& U,
+			const IncidenceAngle& i
+		)
+		:
+			CamberAngle
+			{
+				compute::computeCamberAngle
+				(
+					c_1.value(),
+					c_2.value(),
+					U.value(),
+					i.value()
+				)
+			}
+		{}
+
+		//- Compute assuming zero incidence and construct
+		CamberAngle
+		(
+			const InletVelocity& c_1,
+			const OutletVelocity& c_2,
+			const BladeVelocity& U
+		)
+		:
+			CamberAngle
+			{
+				compute::computeCamberAngle
+				(
+					c_1.value(),
+					c_2.value(),
+					U.value()
+				)
+			}
 		{}
 
 };

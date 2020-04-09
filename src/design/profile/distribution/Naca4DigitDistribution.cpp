@@ -9,11 +9,12 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include <cmath>
-#include <string>
 
-#include "Naca4DigitDistribution.h"
-#include "InputObjectBase.h"
 #include "Error.h"
+#include "General.h"
+#include "InputRegistry.h"
+#include "Naca4DigitDistribution.h"
+#include "StringConverter.h"
 #include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -23,60 +24,33 @@ namespace turbo
 namespace design
 {
 
-// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
-
-void Naca4DigitDistribution::scaleCoefficients()
-{
-	for (auto& a : a_)
-		a *= scale_ * get("maxThickness");
-}
-
-
-// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
-
-void Naca4DigitDistribution::buildInputMap() noexcept
-{
-	store("maxThickness", NAN);	// [-] - % of chord
-}
-
-
-void Naca4DigitDistribution::check() const
-{
-	if
-	(
-		!isInRange(get("maxThickness"), 0.0, 1.0)
-	)
-		THROW_RUNTIME_ERROR("value of keyword 'maxThickness' out of range [0, 1]");
-}
-
-
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
 Naca4DigitDistribution::Naca4DigitDistribution
-(
-	const Stringmap<>& input
-)
 :
-	a_
+	maxThickness_
 	{
-		0.2969,
-	   -0.1260,
-	   -0.3516,
-		0.2843,
-	   -0.1015
+		StringConverter<Float> {}
+		(
+			InputRegistry::get("maxThickness")
+		)
 	}
 {
-	buildInputMap();
-	parse(input);
-	check();
+	if
+	(
+		!isInRange(maxThickness_, 0.0, 1.0)
+	)
+		THROW_RUNTIME_ERROR("maxThickness out of range [0, 1]");
 
-	scaleCoefficients();
+	// scale coefficients
+	for (auto& a : a_)
+		a *= scale_ * maxThickness_;
 }
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-double Naca4DigitDistribution::getThicknessAt(const double x) const noexcept
+Float Naca4DigitDistribution::thickness(const Float x) const noexcept
 {
 	return a_[0] * std::sqrt(x) +
 		   a_[1] * x +

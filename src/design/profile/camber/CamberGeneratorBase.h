@@ -17,14 +17,13 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef CAMBER_GENERATOR_BASE_H
-#define CAMBER_GENERATOR_BASE_H
+#ifndef DESIGN_CAMBER_GENERATOR_BASE_H
+#define DESIGN_CAMBER_GENERATOR_BASE_H
 
-#include <string>
 #include <vector>
 
-#include "InputObjectBase.h"
-#include "Utility.h"
+#include "General.h"
+#include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -38,80 +37,56 @@ namespace design
 \*---------------------------------------------------------------------------*/
 
 class CamberGeneratorBase
-:
-	public InputObjectBase<double>
 {
 private:
 
-	typedef std::vector<PointCoordinates>::iterator Iterator;
-	typedef std::vector<PointCoordinates>::const_iterator Constiterator;
-
-
 	// Private data
 
-		enum class SpacingType
+		enum class Spacing
 		{
 			LINEAR,
 			COSINE
 		};
 
-		double increment_;
-		int camberPoints_ {100};
-		SpacingType spacing_ {SpacingType::COSINE};
-
-		std::vector<PointCoordinates> camber_;
+		Integer camberPoints_ {200};
+		Float increment_;
+		Spacing spacing_ {Spacing::COSINE};
 
 
 	// Member functions
 
 		//- Compute next point on abscissa
-		double computeX(const double x) const noexcept;
-
-		//- Parse number of points
-		void parseCamberPoints(const std::string& value);
-
-		//- Parse spacing type
-		void parseSpacing(const std::string& value);
-
-		//- Set spacing increment
-		void setIncrement() noexcept;
+		Float computeX(const Integer count) const noexcept;
 
 
 protected:
 
+	using Point = Vector;
+
 	// Protected data
 
-		const double chord_ {1.0};
+		const Float camber_;
 
 
 	// Constructors
 
 		//- Default constructor
-		CamberGeneratorBase(const Stringmap<>& input);
+		explicit CamberGeneratorBase(const Float camber);
+			// TODO: clean up a bit
 
 
 	// Member functions
 
-		//- Check values
-		virtual void check() const;
-
-		//- Compute camber parameters to satisfy
-		//  a given camber angle
-		virtual void computeParameters(const double camberAngle) = 0;
-
-		//- Compute camber ordinate at a ``x''
-		virtual double computeY(const double x) const = 0;
-
-		//- Convert value to double
-		double convert(const std::string& value) const final;
-
-		//- Parse input
-		virtual void parse(const Stringmap<>& input) override;
+		//- Compute camber ordinate at a 'x'
+		virtual Float computeY(const Float x) const = 0;
 
 
 public:
 
 	// Constructors
+
+		//- Copy constructor
+		CamberGeneratorBase(const CamberGeneratorBase&) = default;
 
 		//- Move constructor
 		CamberGeneratorBase(CamberGeneratorBase&&) = default;
@@ -123,32 +98,26 @@ public:
 
 	// Member functions
 
-		//- Get iterator to beginning
-		Iterator begin();
-
-		//- Get const iterator to beginning
-		Constiterator begin() const;
-
-		//- Check if empty
-		bool empty() const noexcept;
-
-		//- Get iterator to end
-		Iterator end();
-
-		//- Get const iterator to end
-		Constiterator end() const;
-
 		//- Generate camber line
-		void generate(const double camberAngle) noexcept;
+		std::vector<Point> generate() const noexcept;
 
-		//- Get inlination angle at ``x''
-		virtual double getInclinationAt(const double x) const = 0;
+		//- Get inclination angle at 'x' in radians
+		virtual Float inclination(const Float x) const = 0;
 
-		//- Check if value is initialized
-		bool hasValue(const std::string& key) const noexcept final;
 
-		//- Get size
-		int size() const noexcept;
+	// Member operators
+
+		//- Copy assignment operator
+		CamberGeneratorBase& operator=
+		(
+			const CamberGeneratorBase&
+		) = default;
+
+		//- Move assignment operator
+		CamberGeneratorBase& operator=
+		(
+			CamberGeneratorBase&&
+		) = default;
 
 };
 
