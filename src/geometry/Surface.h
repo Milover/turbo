@@ -44,7 +44,7 @@ class Surface
 protected:
 
 	using Wirevector = std::vector<Wire>;
-	using Pointvector = std::vector<Point;
+	using Pointvector = std::vector<Point>;
 
 
 	// Constructors

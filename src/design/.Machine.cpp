@@ -12,9 +12,10 @@ License
 
 #include "gmsh.h"				// TODO: this shouldn't be here
 
+#include "Machine.h"
+
 #include "Error.h"
 #include "General.h"
-#include "Machine.h"
 #include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

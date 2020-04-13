@@ -11,6 +11,7 @@ License
 #include <utility>
 
 #include "Airfoil.h"
+
 #include "Profile.h"
 #include "ProfileGenerator.h"
 #include "TurboBase.h"
@@ -63,26 +64,28 @@ void Airfoil::construct()
 		data_->cref<input::Solidity>()
 	};
 
-	// build
-	ProfileGenerator generator {camber.value()};
+	// because we need the basic geometry
+	// to compute the stagger
+	ProfileGenerator generator {camber};
 
 	input::StaggerAngle stagger
 	{
 		data_->cref<input::InletVelocity>(),
 		U,
-		data_->cref<input::IncidenceAngle>(),
 		input::InclinationAngle
 		{
 			generator.inclination(0.0)		// leading edge inclination
-		}
+		},
+		data_->cref<input::IncidenceAngle>()
 	};
 
-	geometry.build
+	// now we can build it properly
+	profile.build
 	(
 		generator,
-		chord.value(),
-		radius.value(),
-		stagger.value()
+		chord,
+		data_->cref<input::Radius>(),
+		stagger
 	);
 
 	// store
@@ -101,7 +104,7 @@ void Airfoil::construct()
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-Airfoil::Airfoil(const input::Radius& r);
+Airfoil::Airfoil(const input::Radius& r)
 {
 	data_->store(input::Radius {r});
 
@@ -124,29 +127,6 @@ Airfoil::Airfoil
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
-
-void Airfoil::build()
-{
-
-}
-
-
-void Airfoil::finalize()
-{
-	geometry.wrap()
-}
-
-
-void Airfoil::mesh()
-{
-
-}
-
-
-void Airfoil::parametrize()
-{
-
-}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

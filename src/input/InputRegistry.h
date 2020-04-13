@@ -42,7 +42,7 @@ private:
 
 	// Private data
 
-		inline static HashMap<Word> data_ {};
+		inline static HashMap<String> data_ {};
 
 
 	// Constructors
@@ -72,18 +72,17 @@ public:
 		static bool empty() noexcept;
 
 		//- Get value for coresponding key
-		static Word get(const Word& key);
+		static String get(const String& key);
 
 		//- Check key exists
-		static bool has(const Word& key) noexcept;
+		static bool has(const String& key) noexcept;
 
 		//- Store input map
 		template<typename T>
 		std::enable_if_t
 		<
-			std::is_same_v<T, Map<Word>>
-		 || std::is_same_v<T, HashMap<Word>>,
-			void
+			std::is_same_v<T, Map<String>>
+		 || std::is_same_v<T, HashMap<String>>, void
 		>
 		static store(T&& input);
 
@@ -97,6 +96,30 @@ public:
 		InputRegistry& operator=(const InputRegistry&&) = delete;
 
 };
+
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+template<typename T>
+std::enable_if_t
+<
+	std::is_same_v<T, Map<String>>
+ || std::is_same_v<T, HashMap<String>>, void
+>
+InputRegistry::store(T&& input)
+{
+	if constexpr (std::is_same_v<T, Map<String>>)
+	{
+		for (auto&& [key, value] : std::forward<T>(input))
+			InputRegistry::data_.insert_or_assign
+			(
+				std::forward<decltype(key)>(key),
+				std::forward<decltype(value)>(value)
+			);
+	}
+	else
+		InputRegistry::data_ = std::forward<T>(input);
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

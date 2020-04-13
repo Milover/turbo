@@ -11,9 +11,10 @@ License
 #include <type_traits>
 #include <utility>
 
+#include "InputRegistry.h"
+
 #include "Error.h"
 #include "General.h"
-#include "InputRegistry.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -26,49 +27,29 @@ namespace input
 
 bool InputRegistry::empty() noexcept
 {
-	return data_.empty();
+	return InputRegistry::data_.empty();
 }
 
 
-Word InputRegistry::get(const Word& key)
+String InputRegistry::get(const String& key)
 {
-	auto search {data_.find(key)};
+	auto search {InputRegistry::data_.find(key)};
 
-	if (search == data_.end())
+	if (search == InputRegistry::data_.end())
 		THROW_ARGUMENT_ERROR("key '" + key + "' does not exist");
 
 	return search->second;
 }
 
 
-bool InputRegistry::has(const Word& key) noexcept
+bool InputRegistry::has(const String& key) noexcept
 {
-	auto search {data_.find(key)};
+	auto search {InputRegistry::data_.find(key)};
 
-	if (search == data_.end())
+	if (search == InputRegistry::data_.end())
 		return false;
 
 	return true;
-}
-
-
-template<typename T>
-std::enable_if_t
-<
-	std::is_same_v<T, Map<Word>>
- || std::is_same_v<T, HashMap<Word>>,
-	void
->
-store(T&& input)
-{
-	if constexpr (std::is_same_v<T, Map<Word>>)
-		for (auto&& p : std::forward<T>(input))
-			data_.insert
-			(
-				std::forward<decltype(p)>(p)
-			);
-	else
-		data_ = std::forward<T>(input);
 }
 
 

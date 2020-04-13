@@ -12,13 +12,13 @@ Class
 Description
 	Class Rps (revolutions per second).
 
+SourceFiles
+	Rps.cpp
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef INPUT_RPS_H
 #define INPUT_RPS_H
-
-#include <type_traits>
-#include <utility>
 
 #include "General.h"
 #include "PositiveValue.h"
@@ -31,7 +31,7 @@ namespace input
 {
 
 /*---------------------------------------------------------------------------*\
-						Class Rps Definition
+						Class Rps Declaration
 \*---------------------------------------------------------------------------*/
 
 class Rps final
@@ -42,22 +42,14 @@ public:
 
 	// Public static data
 
-		inline static const Word name {"Rps"};
+		inline static const String name {"Rps"};
 
 
 	// Constructors
 
 		//- Construct from a Float,
 		//  no aditional checking required
-		template
-		<
-			typename T,
-			std::enable_if_t<std::is_same_v<Float, T>, int> = 0>
-		>
-		explicit Rps(T&& t)
-		:
-			PVBase {std::forward<T>(t)}
-		{}
+		explicit Rps(const Float f);
 
 };
 

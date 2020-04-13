@@ -12,13 +12,13 @@ Class
 Description
 	Class ShroudRadius.
 
+SourceFiles
+	ShroudRadius.cpp
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef INPUT_SHROUD_RADIUS_H
 #define INPUT_SHROUD_RADIUS_H
-
-#include <type_traits>
-#include <utility>
 
 #include "General.h"
 #include "PositiveValue.h"
@@ -31,7 +31,7 @@ namespace input
 {
 
 /*---------------------------------------------------------------------------*\
-						Class ShroudRadius Definition
+					Class ShroudRadius Declaration
 \*---------------------------------------------------------------------------*/
 
 class ShroudRadius final
@@ -42,22 +42,14 @@ public:
 
 	// Public static data
 
-		inline static const Word name {"ShroudRadius"};
+		inline static const String name {"ShroudRadius"};
 
 
 	// Constructors
 
 		//- Construct from a Float,
 		//  no aditional checking required
-		template
-		<
-			typename T,
-			std::enable_if_t<std::is_same_v<Float, T>, int> = 0>
-		>
-		explicit ShroudRadius(T&& t)
-		:
-			PVBase {std::forward<T>(t)}
-		{}
+		explicit ShroudRadius(const Float f);
 
 };
 

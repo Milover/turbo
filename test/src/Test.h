@@ -14,6 +14,7 @@ Description
 #ifndef TEST_H
 #define TEST_H
 
+#include <cassert>
 #include <chrono>
 #include <cmath>
 #include <cstring>
@@ -26,7 +27,7 @@ Description
 
 #include "gmsh.h"
 
-#include "Utility.h"
+#include "General.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -37,9 +38,15 @@ namespace test
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+// a handy dandy precison for when isEqual() fails
+inline static constexpr Float eps {1e-15};
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 void initialize
 (
-	std::string s,
+	String s,
 	const bool gui = true
 )
 {
@@ -48,7 +55,7 @@ void initialize
 		gmsh::initialize(0, 0, false);
 		gmsh::fltk::initialize();
 		gmsh::option::setNumber("General.Terminal", 1);
-		gmsh::option::setNumber("General.Verbosity", 100);
+		gmsh::option::setNumber("General.Verbosity", 1);
 		gmsh::option::setNumber("Geometry.Surfaces", 1);
 		gmsh::option::setNumber("Geometry.SurfaceNumbers", 1);
 		gmsh::option::setNumber("Geometry.SurfaceType", 2);
@@ -114,7 +121,7 @@ void finalize(const bool gui)
 
 void updateAndWait
 (
-	[[maybe_unused]] const int d,
+	const Integer d [[maybe_unused]],
 	const bool gui
 )
 {
@@ -137,19 +144,19 @@ void echo(Args&&... args)
 
 void listEntities()
 {
-	turbo::Vectorpair<int> v;
+	turbo::Vectorpair<Integer> v;
 	gmsh::model::getEntities(v);
 
-	for (auto p : v)
+	for (const auto& [dim, tag] : v)
 	{
-		echo ("entity dimTag: ", p.first, ' ', p.second);
+		echo("entity dimTag: ", dim, ' ', tag);
 	}
 }
 
 
-int getNumberOfEntities()
+Integer getNumberOfEntities()
 {
-	turbo::Vectorpair<int> v;
+	turbo::Vectorpair<Integer> v;
 	gmsh::model::getEntities(v);
 
 	return v.size();
@@ -157,7 +164,7 @@ int getNumberOfEntities()
 
 bool parseCommandLineArgs
 (
-	int argc,
+	Integer argc,
 	char* argv[]
 )
 {
@@ -172,12 +179,14 @@ bool parseCommandLineArgs
 }
 
 
-int randomInt
+Integer randomInt
 (
-	int min,
-	int max
+	Integer min,
+	Integer max
 )
 {
+	assert(min < max);
+
     std::random_device randomDevice;
     std::mt19937 generator {randomDevice()};
     std::uniform_int_distribution<> distribution {min, max};
@@ -186,15 +195,21 @@ int randomInt
 }
 
 
-std::string randomString
+bool randomBool()
+{
+	return static_cast<bool>(randomInt(0, 1));
+}
+
+
+String randomString
 (
 	std::size_t length,
-	std::string characters = "0123456789"
-							 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-							 "abcdefghijklmnopqrstuvwxyz"
+	String characters = "0123456789"
+					  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+					  "abcdefghijklmnopqrstuvwxyz"
 )
 {
-	std::string s;
+	String s;
     for (std::size_t i {0}; i < length; ++i)
     {
         s += characters
@@ -212,7 +227,7 @@ void compareTest
 	bool& pass,
 	const bool test,
 	const bool output,
-	const std::string& testString
+	const String& testString
 )
 {
 	auto totalWidth {50};

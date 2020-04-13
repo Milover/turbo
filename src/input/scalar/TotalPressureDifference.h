@@ -12,18 +12,17 @@ Class
 Description
 	Class TotalPressureDifference.
 
+SourceFiles
+	TotalPressureDifference.cpp
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef INPUT_TOTAL_PRESSURE_DIFFERENCE_H
 #define INPUT_TOTAL_PRESSURE_DIFFERENCE_H
 
-#include <type_traits>
-#include <utility>
-
 #include "BladeVelocity.h"
 #include "Density.h"
 #include "General.h"
-#include "InitialDesign.h"
 #include "InletVelocity.h"
 #include "PositiveValue.h"
 #include "OutletVelocity.h"
@@ -35,8 +34,11 @@ namespace turbo
 namespace input
 {
 
+// Forward declarations
+class OutletVelocity;
+
 /*---------------------------------------------------------------------------*\
-						Class TotalPressureDifference Definition
+					Class TotalPressureDifference Declaration
 \*---------------------------------------------------------------------------*/
 
 class TotalPressureDifference final
@@ -47,22 +49,14 @@ public:
 
 	// Public static data
 
-		inline static const Word name {"TotalPressureDifference"};
+		inline static const String name {"TotalPressureDifference"};
 
 
 	// Constructors
 
 		//- Construct from a Float,
 		//  no aditional checking required
-		template
-		<
-			typename T,
-			std::enable_if_t<std::is_same_v<Float, T>, int> = 0>
-		>
-		explicit TotalPressureDifference(T&& t)
-		:
-			PVBase {std::forward<T>(t)}
-		{}
+		explicit TotalPressureDifference(const Float f);
 
 		//- Compute and construct
 		TotalPressureDifference
@@ -71,19 +65,7 @@ public:
 			const OutletVelocity& c_2,
 			const BladeVelocity& U,
 			const Density& rho
-		)
-		:
-			TotalPressureDifference
-			{
-				compute::computeTotalPressureDifference
-				(
-					c_1.value(),
-					c_2.value(),
-					U.value(),
-					rho.value()
-				)
-			}
-		{}
+		);
 
 };
 

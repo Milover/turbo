@@ -14,13 +14,13 @@ Description
 
 	Defaults to 0.0.
 
+SourceFiles
+	IncidenceAngle.cpp
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef INPUT_INCIDENCE_ANGLE_H
 #define INPUT_INCIDENCE_ANGLE_H
-
-#include <type_traits>
-#include <utility>
 
 #include "General.h"
 #include "RegistryObject.h"
@@ -33,7 +33,7 @@ namespace input
 {
 
 /*---------------------------------------------------------------------------*\
-						Class IncidenceAngle Definition
+					Class IncidenceAngle Declaration
 \*---------------------------------------------------------------------------*/
 
 class IncidenceAngle final
@@ -44,28 +44,17 @@ public:
 
 	// Public static data
 
-		inline static const Word name {"IncidenceAngle"};
+		inline static const String name {"IncidenceAngle"};
 
 
 	// Constructors
 
 		//- Default constructor
-		IncidenceAngle() noexcept
-		:
-			RegBase {0.0}
-		{}
+		IncidenceAngle() noexcept;
 
 		//- Construct from a Float,
 		//  no aditional checking required
-		template
-		<
-			typename T,
-			std::enable_if_t<std::is_same_v<Float, T>, int> = 0>
-		>
-		explicit IncidenceAngle(T&& t)
-		:
-			RegBase {std::forward<T>(t)}
-		{}
+		explicit IncidenceAngle(const Float f);
 
 };
 

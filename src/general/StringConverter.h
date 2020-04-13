@@ -17,13 +17,45 @@ Description
 #ifndef STRING_CONVERTER_H
 #define STRING_CONVERTER_H
 
+#include <type_traits>
+#include <sstream>
+
 #include "Error.h"
 #include "General.h"
+#include "Utility.h"
+#include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace turbo
 {
+
+// * * * * * * * * * * * * * * Global Helpers  * * * * * * * * * * * * * * * //
+
+//- A type trait for types convertible from String
+template<typename T>
+struct isConvertible : std::false_type {};
+
+
+//- An ease of use variable alias template
+template<typename T>
+inline constexpr bool isConvertible_v = isConvertible<T>::value;
+
+
+// We know how to convert from String to Integer
+template<>
+struct isConvertible<Integer> : std::true_type {};
+
+
+// We know how to convert from String to Float
+template<>
+struct isConvertible<Float> : std::true_type {};
+
+
+// We know how to convert from String to Vector
+template<>
+struct isConvertible<Vector> : std::true_type {};
+
 
 /*---------------------------------------------------------------------------*\
 					Class StringConverter Declaration
@@ -34,26 +66,32 @@ class StringConverter
 {
 private:
 
+	static_assert(isConvertible_v<T>);
+
+
 	// Private data
 
-		Word::size_type pos_;
-
-
-public:
-
-	using type = typename T;
+		std::stringstream stream_;
 
 
 	// Member functions
 
 		//- Perform conversion
-		T static convert(const Word& s);
+		T convert(const String& s);
+
+		//- Check if conversion was successful
+		void check(const String& s) const;
+
+
+public:
+
+	using type = T;
 
 
 	// Member operators
 
 		//- Function call operator
-		T operator()(const Word& s);
+		T operator()(const String& s);
 
 };
 
@@ -61,47 +99,31 @@ public:
 // * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
 
 template<typename T>
-T StringConverter<T>::operator()(const Word& s)
+T StringConverter<T>::operator()(const String& s)
 {
-	T t
-	{
-		StringConverter<T>::convert(s)
-	};
+	String str {s};
 
-	// we demand complete conversion,
-	// partial matches are not allowed
-	if (this->pos_ != s.size())
-		THROW_ARGUMENT_ERROR("Partial match on: " + s);
-	else
-		return t;
+	// trim leading and trailing whitespace
+	trimWhiteLR(str);
+
+	// reset the stream and read in the string
+	this->stream_ = std::stringstream {};
+	this->stream_ << str;
+
+	// need 's' to print out where the error occured
+	return T {this->convert(s)};
 }
 
 
-template<>
-Float StringConverter<Float>::convert(const Word& s)
-{
-	try
-	{
-		return std::stod(s, &this->pos_);
-	}
-	catch(...)
-	{
-		THROW_ARGUMENT_ERROR("Could not perform conversion on: " + s);
-	}
-}
+// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
-
-template<>
-Integer StringConverter<Integer>::convert(const Word& s)
+template<typename T>
+void StringConverter<T>::check(const String& s) const
 {
-	try
-	{
-		return std::stoi(s, &this->pos_);
-	}
-	catch(...)
-	{
-		THROW_ARGUMENT_ERROR("Could not perform conversion on: " + s);
-	}
+	if (stream_.fail())
+		THROW_RUNTIME_ERROR("Could not perform conversion on: " + s);
+	else if (!stream_.eof())
+		THROW_RUNTIME_ERROR("Partial match: " + s);
 }
 
 

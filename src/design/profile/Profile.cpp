@@ -8,15 +8,16 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include <cmath>
 #include <vector>
+
+#include "Profile.h"
 
 #include "Error.h"
 #include "General.h"
 #include "Geometry.h"
-#include "Profile.h"
 #include "ProfileGenerator.h"
 #include "Utility.h"
+#include "Variables.h"
 #include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -102,27 +103,21 @@ Profile::Constiterator Profile::begin() const
 void Profile::build
 (
 	const ProfileGenerator& generator,
-	const Float chord,
-	const Float radius,
-	const Float stagger
+	const input::Chord& chord,
+	const input::Radius& radius,
+	const input::StaggerAngle& stagger
 )
 {
-	points_.clear();
 	wrapped_ = false;
 
-	points_.insert
-	(
-		points_.begin(),
-		generator.begin(),
-		generator.end()
-	);
+	points_ = generator.generate();
 
-	scale(chord);
+	scale(chord.value());
 	centerOn
 	(
-		Point {0.0, 0.0, radius}
+		Point {0.0, 0.0, radius.value()}
 	);
-	rotate2D(stagger);
+	rotate2D(stagger.value());
 }
 
 
@@ -146,10 +141,7 @@ Profile::Constiterator Profile::end() const
 
 Profile::Point Profile::centroid() const noexcept
 {
-	if (empty())
-		return origin_;
-
-	Point center {origin_};
+	Point center {Point::origin()};
 
 	for (const auto& [top, bot] : points_)
 		center += top + bot;
@@ -160,8 +152,43 @@ Profile::Point Profile::centroid() const noexcept
 }
 
 
+Vector Profile::leDirection() const
+{
+	if (empty())
+		THROW_LOGIC_ERROR("profile not build");
+
+	auto [top, bot]				// next to LE contour points
+	{
+		*(points_.begin() + 1)
+	};
+
+	// because it should point outward
+	return unit
+	(
+		lePoint() - midpoint(top, bot)
+	);
+}
+
+
+Profile::Point Profile::lePoint() const
+{
+	if (empty())
+		THROW_LOGIC_ERROR("profile not build");
+
+	auto [top, bot]
+	{
+		*points_.begin()
+	};
+
+	return midpoint(top, bot);
+}
+
+
 geometry::Spline Profile::getContour() const
 {
+	if (empty())
+		THROW_LOGIC_ERROR("profile not build");
+
 	return geometry::Spline {getPoints()};
 }
 
@@ -169,7 +196,7 @@ geometry::Spline Profile::getContour() const
 std::vector<geometry::Point> Profile::getPoints() const
 {
 	if (empty())
-		THROW_RUNTIME_ERROR("profile not built");
+		THROW_LOGIC_ERROR("profile not build");
 
 	// we have to map from a pair list --- top - bot
 	// ordered from LE to TE, to a uniquely single-valued list
@@ -184,7 +211,7 @@ std::vector<geometry::Point> Profile::getPoints() const
 		points.push_back(points_[i].first);
 
 	for (auto& p : points_)
-		points_.push_back(p.second);
+		points.push_back(p.second);
 
 	return points;
 }
@@ -193,7 +220,7 @@ std::vector<geometry::Point> Profile::getPoints() const
 geometry::Line Profile::getTrailingEdge() const
 {
 	if (empty())
-		THROW_RUNTIME_ERROR("profile not built");
+		THROW_LOGIC_ERROR("profile not build");
 
 	// from bot-TE to top-TE
 	return geometry::Line
@@ -216,9 +243,41 @@ Profile::Sizetype Profile::size() const noexcept
 }
 
 
+Vector Profile::teDirection() const
+{
+	if (empty())
+		THROW_LOGIC_ERROR("profile not build");
+
+	auto [top, bot]				// next to TE contour points
+	{
+		*(points_.rbegin() + 1)
+	};
+
+	// because it should point outward
+	return unit
+	(
+		tePoint() - midpoint(top, bot)
+	);
+}
+
+
+Profile::Point Profile::tePoint() const
+{
+	if (empty())
+		THROW_LOGIC_ERROR("profile not build");
+
+	auto [top, bot]
+	{
+		*points_.rbegin()
+	};
+
+	return midpoint(top, bot);
+}
+
+
 void Profile::wrap() noexcept
 {
-	if (empty() || wrapped_)
+	if (wrapped_)
 		return;
 
 	Float r;		// radius

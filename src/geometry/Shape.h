@@ -83,13 +83,13 @@ public:
 		void release() noexcept;
 
 		//- Return Shape dimTag
-		Pair<Integer> getDimTag() const noexcept;
+		Pair<Integer> dimTag() const noexcept;
 
 		//- Get boundary dimTags
-		Vectorpair<Integer> getBoundary() const noexcept;
+		Vectorpair<Integer> boundary() const noexcept;
 
 		//- Get bounding box
-		Pair<Coordinates> getBoundingBox() const noexcept;
+		Pair<Coordinates> boundingBox() const noexcept;
 
 		//- Check if empty
 		bool empty() const noexcept;

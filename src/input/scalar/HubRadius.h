@@ -12,13 +12,13 @@ Class
 Description
 	Class HubRadius.
 
+SourceFiles
+	HubRadius.cpp
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef INPUT_HUB_RADIUS_H
 #define INPUT_HUB_RADIUS_H
-
-#include <type_traits>
-#include <utility>
 
 #include "General.h"
 #include "PositiveValue.h"
@@ -31,7 +31,7 @@ namespace input
 {
 
 /*---------------------------------------------------------------------------*\
-						Class HubRadius Definition
+						Class HubRadius Declaration
 \*---------------------------------------------------------------------------*/
 
 class HubRadius final
@@ -42,22 +42,14 @@ public:
 
 	// Public static data
 
-		inline static const Word name {"HubRadius"};
+		inline static const String name {"HubRadius"};
 
 
 	// Constructors
 
 		//- Construct from a Float,
 		//  no aditional checking required
-		template
-		<
-			typename T,
-			std::enable_if_t<std::is_same_v<Float, T>, int> = 0>
-		>
-		explicit HubRadius(T&& t)
-		:
-			PVBase {std::forward<T>(t)}
-		{}
+		explicit HubRadius(const Float f);
 
 };
 

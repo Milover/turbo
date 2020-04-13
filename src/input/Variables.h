@@ -14,14 +14,22 @@ Description
 #ifndef INPUT_VARIABLES_H
 #define INPUT_VARIABLES_H
 
+#include "RegistryObjectBase.h"
+#include "RegistryObject.h"
+
 // scalars
 #include "CamberAngle.h"
+#include "CamberPointSpacing.h"
 #include "Chord.h"
 #include "Density.h"
 #include "HubRadius.h"
 #include "IncidenceAngle.h"
 #include "InclinationAngle.h"
+#include "MaxProfileThickness.h"
+#include "MaxCamber.h"
+#include "MaxCamberPosition.h"
 #include "NumberOfBlades.h"
+#include "NumberOfCamberPoints.h"
 #include "Radius.h"
 #include "Rps.h"
 #include "ShroudRadius.h"

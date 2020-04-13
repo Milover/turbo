@@ -14,7 +14,8 @@ Description
 	Checks if floating-point-like values (including vectors) are NaN.
 
 	WARNING:
-		Derived classes must define a static string 'name'.
+		Derived classes must define a static string 'name' which
+		must be identical to the class name.
 
 \*---------------------------------------------------------------------------*/
 
@@ -51,10 +52,12 @@ protected:
 
 	static_assert
 	(
-		std::is_arithmetic_v<T> || std::is_same_v<Vector, T>
+		std::is_arithmetic_v<T>
+	 || std::is_enum_v<T>
+	 || std::is_same_v<Vector, T>
 	);
 
-	using RegBase = typename RegistryObject<T>;
+	using RegBase = RegistryObject<T>;
 
 
 	// Protected data
@@ -65,24 +68,29 @@ protected:
 	// Constructors
 
 		//- Construct from input
-		explicit RegistryObject(T&& t) noexcept(std::is_integral_v<T>);
+		template
+		<
+			typename U,
+			std::enable_if_t<std::is_same_v<T, removeCVRef_t<U>>, int> = 0
+		>
+		explicit RegistryObject(U&& u) noexcept(std::is_integral_v<T>);
 
 		//- Check input
-		virtual void check() const noexcept(std::is_integral_v<T>) override;
+		virtual void check() const override;
 
 
 public:
 
-	using type = typename T;
+	using type = T;
 
 
 	// Constructors
 
 		//- Copy constructor
-		RegistryObject(const RegistryObject<T>&) = default;
+		RegistryObject(const RegistryObject&) = default;
 
 		//- Move constructor
-		RegistryObject(RegistryObject<T>&&) = default;
+		RegistryObject(RegistryObject&&) = default;
 
 
 	//- Destructor
@@ -92,29 +100,89 @@ public:
 	// Member functions
 
 		//- Get value
-		T value() const noexcept;
+		inline T value() const noexcept;
 
 		//- Set value
-		void set(T&& t);
+		template
+		<
+			typename U,
+			std::enable_if_t<std::is_same_v<T, removeCVRef_t<U>>, int> = 0
+		>
+		void set(U&& u);
 
 
 	// Member operators
 
 		//- Copy assignment operator
-		RegistryObject<T>& operator=(const RegistryObject<T>&) = default;
+		RegistryObject& operator=(const RegistryObject&) = default;
 
 		//- Move assignment operator
-		RegistryObject<T>& operator=(RegistryObject<T>&&) = default;
+		RegistryObject& operator=(RegistryObject&&) = default;
 
 };
+
+
+// * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * * //
+
+//- Convert a String into an appropriate type
+//  based on the template parameter of the RegistryObject
+template<typename T>
+typename T::type convert(const String& value)
+{
+	return StringConverter<typename T::type> {}(value);
+}
+
+
+//- Create a RegistryObject by reading the InputRegistry if possible
+//  otherwise default construct if possible
+template<typename T>
+std::enable_if_t<std::is_base_of_v<RegistryObjectBase, T>, T>
+read()
+{
+	// read if special construction is implemented locally
+	if constexpr (std::is_constructible_v<T, String>)
+		if (InputRegistry::has(T::name))
+			return T
+			{
+				InputRegistry::get(T::name)
+			};
+
+	// read-convert only if we know how to convert
+	if constexpr (isConvertible_v<typename T::type>)
+		if (InputRegistry::has(T::name))
+			return T
+			{
+				input::convert<T>
+				(
+					InputRegistry::get(T::name)
+				)
+			};
+
+	// if we can't read, maybe we can default-construct
+	if constexpr (std::is_default_constructible_v<T>)
+		return T {};
+
+	if constexpr (isConvertible_v<typename T::type>)
+		THROW_ARGUMENT_ERROR(T::name + " undefined");
+	else
+	{
+		THROW_ARGUMENT_ERROR("conversion for '" + T::name + "' unimplemented");
+		__builtin_unreachable();
+	}
+}
 
 
 // * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
 
 template<typename T>
-RegistryObject<T>::RegistryObject(T&& t) noexcept(std::is_integral_v<T>)
+template
+<
+	typename U,
+	std::enable_if_t<std::is_same_v<T, removeCVRef_t<U>>, int>
+>
+RegistryObject<T>::RegistryObject(U&& u) noexcept(std::is_integral_v<T>)
 :
-	value_ {std::forward<T>(t)}
+	value_ {std::forward<U>(u)}
 {
 	this->check();
 }
@@ -123,16 +191,18 @@ RegistryObject<T>::RegistryObject(T&& t) noexcept(std::is_integral_v<T>)
 // * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * * //
 
 template<typename T>
-RegistryObject<T>::check()
-void RegistryObject<T>::check() const noexcept(std::is_integral_v<T>)
+void RegistryObject<T>::check() const
 {
 	if constexpr (std::is_floating_point_v<T>)
+	{
 		if (std::isnan(this->value_))
 			THROW_ARGUMENT_ERROR("value is NaN");
+	}
 	else if constexpr (std::is_same_v<Vector, T>)
-		for (auto&& i : this->value_)
-			if (std::isnan(i))
-				THROW_ARGUMENT_ERROR("value is NaN");
+	{
+		if (isNan(this->value_))
+			THROW_ARGUMENT_ERROR("value is NaN");
+	}
 }
 
 
@@ -146,49 +216,15 @@ T RegistryObject<T>::value() const noexcept
 
 
 template<typename T>
-void RegistryObject<T>::set(T&& t)
+template
+<
+	typename U,
+	std::enable_if_t<std::is_same_v<T, removeCVRef_t<U>>, int>
+>
+void RegistryObject<T>::set(U&& u)
 {
-	this->value_ = std::forward<T>(t);
+	this->value_ = std::forward<U>(u);
 	this->check();
-}
-
-
-// * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * * //
-
-//- Convert a Word into an appropriate type
-//  based on the template parameter of the RegistryObject
-template<typename T>
-typename T::type convert(const Word& value)
-{
-	return StringConverter<typename T::type> {}(value);
-}
-
-
-//- Create a RegistryObject by reading the InputRegistry if possible
-//  otherwise default construct if possible
-template<typename T>
-std::enable_if_t<std::is_base_of_v<RegistryObjectBase, T>, T>
-read()
-{
-	if constexpr (std::is_default_constructible_v<T>)
-		if (InputRegistry::has(T::name))
-			return T
-			{
-				input::convert<T>
-				(
-					InputRegistry::get(T::name)
-				)
-			};
-		else
-			return T {};
-	else
-		return T
-		{
-			input::convert<T>
-			(
-				InputRegistry::get(T::name)
-			)
-		};
 }
 
 

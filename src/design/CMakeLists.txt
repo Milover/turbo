@@ -3,7 +3,6 @@
 # See the LICENSE file for license information
 
 # add all subdirectories
-add_subdirectory(compute)
 add_subdirectory(profile)
 
 # add sources

@@ -10,9 +10,10 @@ License
 
 #include <utility>
 
+#include "Surface.h"
+
 #include "General.h"
 #include "Shape.h"
-#include "Surface.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

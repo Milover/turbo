@@ -11,11 +11,12 @@ License
 #include <iostream>
 
 #include "Main.h"
+
 #include "turbo.h"
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int main(int argc, char* argv[])
+int main(int argc [[maybe_unused]], char* argv[] [[maybe_unused]])
 {
 	
 	// print header

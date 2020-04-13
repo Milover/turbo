@@ -11,6 +11,7 @@ License
 #include <utility>
 
 #include "Curve.h"
+
 #include "General.h"
 #include "Shape.h"
 

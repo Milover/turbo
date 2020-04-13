@@ -12,14 +12,14 @@ License
 #include <utility>
 #include <memory>
 
-#include "ConstantDistribution.h"
-#include "CircularArcCamber.h"
+#include "ProfileGenerator.h"
+
+#include "CamberGenerators.h"
+#include "DistributionGenerators.h"
 #include "Error.h"
 #include "General.h"
 #include "InputRegistry.h"
-#include "Naca2DigitCamber.h"
-#include "Naca4DigitDistribution.h"
-#include "ProfileGenerator.h"
+#include "Variables.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -30,53 +30,53 @@ namespace design
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void ProfileGenerator::createCamberGenerator(const Float camber)
+void ProfileGenerator::createCamberGenerator(const input::CamberAngle& camber)
 {
-	Word type
+	auto type
 	{
-		InputRegistry::get("camber")
+		input::InputRegistry::get("Camber")
 	};
 
-	if (type == "naca2Digit")
+	if (type == Naca2DigitCamber::name)
 		cGen_.reset
 		(
-			std::make_unique<Naca2DigitCamber>(camber)
+			new Naca2DigitCamber {camber}
 		);
-	else if (type == "circularArc")
+	else if (type == CircularArcCamber::name)
 		cGen_.reset
 		(
-			std::make_unique<CircularArcCamber>(camber)
+			new CircularArcCamber {camber}
 		);
 	else
-		THROW_RUNTIME_ERROR("unknown camber: " + type);
+		THROW_RUNTIME_ERROR("unknown Camber: " + type);
 }
 
 
 void ProfileGenerator::createDistributionGenerator()
 {
-	Word type
+	auto type
 	{
-		InputRegistry::get("distribution")
+		input::InputRegistry::get("Distribution")
 	};
 
-	if (type == "constant")
+	if (type == ConstantDistribution::name)
 		dGen_.reset
 		(
-			std::make_unique<ConstantDistribution>()
+			new ConstantDistribution {}
 		);
-	else if (type == "naca4Digit")
+	else if (type == Naca4DigitDistribution::name)
 		dGen_.reset
 		(
-			std::make_unique<Naca4DigitDistribution>()
+			new Naca4DigitDistribution {}
 		);
 	else
-		THROW_RUNTIME_ERROR("unknown distribution: " + type);
+		THROW_RUNTIME_ERROR("unknown Distribution: " + type);
 }
 
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-ProfileGenerator::ProfileGenerator(const Float camber)
+ProfileGenerator::ProfileGenerator(const input::CamberAngle& camber)
 {
 	reset(camber);
 }
@@ -138,7 +138,7 @@ Float ProfileGenerator::inclination(const Float x) const noexcept
 }
 
 
-void ProfileGenerator::reset(const Float camber) const
+void ProfileGenerator::reset(const input::CamberAngle& camber)
 {
 	createCamberGenerator(camber);
 	createDistributionGenerator();

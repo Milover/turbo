@@ -14,6 +14,8 @@ Description
 #include <utility>
 
 #include "ConstantDistribution.h"
+#include "General.h"
+#include "InputRegistry.h"
 #include "Utility.h"
 
 #include "Test.h"
@@ -29,52 +31,61 @@ int main(int argc, char* argv[])
 	bool pass {true};
 
 	// test construction
-	Stringmap<> input
-	{
-		{"maxThickness", "0.5"},
-	};
-	geometry::ConstantDistribution temp {input};
-	geometry::ConstantDistribution distribution {std::move(temp)};
+	input::InputRegistry::store
+	(
+		HashMap<String>
+		{
+			{"MaxProfileThickness", "0.5"}
+		}
+	);
 
-	// test construction related stuff
-	test::compareTest
-	(
-		pass,
-		distribution.hasKey("maxThickness"),
-		output,
-		"Checking hasKey()"
-	);
-	test::compareTest
-	(
-		pass,
-		distribution.hasValue("maxThickness"),
-		output,
-		"Checking hasValue()"
-	);
-	test::compareTest
-	(
-		pass,
-		isEqual
-		(
-			distribution.get("maxThickness"), 0.5
-		),
-		output,
-		"Checking get()"
-	);
+	design::ConstantDistribution temp_1 {};
+	design::ConstantDistribution temp_2 {temp_1};
+	design::ConstantDistribution temp_3 {std::move(temp_1)};
+	temp_3 = temp_2;
+	temp_1 = std::move(temp_3);
+
+	test::echo(isGreaterOrEqual(-1.0, 0.0));
+	test::echo(isLessOrEqual(-1.0, 1.0));
+
+	test::echo("here");
+
+	test::echo(isInRange(-1.0, 0.0, 1.0));
+
+	test::echo("here_2");
 
 	// test
-	double x;
-	for (int i {0}; i < 100; i++)
+	Float x;
+	int shouldBeCaught {0};
+	for (int i {-100}; i < 100; ++i)
 	{
-		x = static_cast<double>(i) / 100.0;
+		x = 0.01 * static_cast<Float>(i);
 
-		// checking thickness
-		if
-		(
-			!isEqual(distribution.getThicknessAt(x), 0.25)
-		)
-			pass = false;
+		try
+		{
+			// checking thickness
+			if
+			(
+				!isEqual(temp_1.thickness(x), 0.25)
+			 || !isEqual(temp_2.thickness(x), 0.25)
+			)
+				pass = false;
+		}
+		catch(...)
+		{
+			++shouldBeCaught;
+		}
 	}
+
+	test::echo(shouldBeCaught);
+
+	test::compareTest
+	(
+		pass,
+		(shouldBeCaught == 100),
+		output,
+		"Checking thrown exceptions"
+	);
 
 	// test pass or fail
 	if (pass)

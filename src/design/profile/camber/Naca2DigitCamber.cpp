@@ -10,12 +10,13 @@ License
 
 #include <cmath>
 
+#include "Naca2DigitCamber.h"
+
 #include "CamberGeneratorBase.h"
 #include "Error.h"
 #include "General.h"
-#include "InputRegistry.h"
-#include "Naca2DigitCamber.h"
 #include "Utility.h"
+#include "Variables.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -26,15 +27,15 @@ namespace design
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
-void Naca2DigitCamber::computeMaxCamber() const noexcept
+Float Naca2DigitCamber::computeMaxCamber() noexcept
 {
 	Float root
 	{
-		0.25 / std::pow(std::tan(camber_), 2) +
-		maxCamberPosition_ * (1.0 - maxCamberPosition_)
+		0.25 / std::pow(std::tan(camber_.value()), 2)
+	  + pos_.value() * (1.0 - pos_.value())
 	};
 
-	maxCamber_ = -0.25 / std::tan(camber_) + 0.5 * std::sqrt(root)
+	return -0.25 / std::tan(camber_.value()) + 0.5 * std::sqrt(root);
 }
 
 
@@ -42,42 +43,30 @@ void Naca2DigitCamber::computeMaxCamber() const noexcept
 
 Float Naca2DigitCamber::computeY(const Float x) const
 {
-	if (x < maxCamberPosition_)
-		return maxCamber_ / std::pow(maxCamberPosition_, 2) *
+	if (x < pos_.value())
+		return max_.value() / std::pow(pos_.value(), 2) *
 			(
-				2.0 * maxCamberPosition_ * x - std::pow(x, 2)
+				2.0 * pos_.value() * x - std::pow(x, 2)
 			);
 	else
-		return maxCamber_ / std::pow((1.0 - maxCamberPosition_), 2) *
+		return max_.value() / std::pow((1.0 - pos_.value()), 2) *
 			(
-				1.0 - 2.0 * maxCamberPosition_ * (1.0 + x) - std::pow(x, 2)
+				1.0 - 2.0 * pos_.value() * (1.0 + x) - std::pow(x, 2)
 			);
 }
 
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-// TODO: clean up a bit
-Naca2DigitCamber::Naca2DigitCamber(const Float camber)
+Naca2DigitCamber::Naca2DigitCamber(const input::CamberAngle& camber)
 :
-	CamberGeneratorBase {camber}
-{
-	if (inputRegistry::has("maxCamberPosition"))
+	CamberGeneratorBase {camber},
+	pos_
 	{
-		maxCamberPosition_ = StringConverter<Float> {}
-		(
-			InputRegistry::get("maxCamberPosition")
-		);
-
-		if
-		(
-			!isInRange(maxCamberPosition_, 0.0, 1.0)
-		)
-			THROW_RUNTIME_ERROR("maxCamberPosition out of range [0, 1]");
-	}
-
-	computeMaxCamber();
-}
+		input::read<input::MaxCamberPosition>()
+	},
+	max_ {computeMaxCamber()}
+{}
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
@@ -92,14 +81,14 @@ Float Naca2DigitCamber::inclination(const Float x) const
 
 	Float dydx;
 
-	if (x < maxCamberPosition_)
-		dydx = 2.0 * maxCamber_
-			 / std::pow(maxCamberPosition_, 2)
-			 * (maxCamberPosition_ - x);
+	if (x < pos_.value())
+		dydx = 2.0 * max_.value()
+			 / std::pow(pos_.value(), 2)
+			 * (pos_.value() - x);
 	else
-		dydx = 2.0 * maxCamber_
-			 / std::pow((1.0 - maxCamberPosition_), 2)
-			 * (maxCamberPosition_ - x);
+		dydx = 2.0 * max_.value()
+			 / std::pow((1.0 - pos_.value()), 2)
+			 * (pos_.value() - x);
 
 	return std::atan(dydx);
 }

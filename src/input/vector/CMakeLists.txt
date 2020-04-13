@@ -6,6 +6,10 @@
 
 # add sources
 set(SRC
+	BladeVelocity.cpp
+	InletVelocity.cpp
+	OutletVelocity.cpp
+	RootOutletVelocity.cpp
 	)
 
 # append to sources

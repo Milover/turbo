@@ -7,6 +7,7 @@
 # add sources
 set(SRC
 	turbo.cpp
+	StringConverter.cpp
 	)
 
 # append to sources

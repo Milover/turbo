@@ -13,6 +13,7 @@ License
 #include "gmsh.h"
 
 #include "Shape.h"
+
 #include "Utility.h"
 #include "General.h"
 
@@ -106,13 +107,13 @@ void Shape::release() noexcept
 }
 
 
-Pair<Integer> Shape::getDimTag() const noexcept
+Pair<Integer> Shape::dimTag() const noexcept
 {
 	return dimTag_;
 }
 
 
-Vectorpair<Integer> Shape::getBoundary() const noexcept
+Vectorpair<Integer> Shape::boundary() const noexcept
 {
 	Shape::synchronize();
 	
@@ -120,15 +121,15 @@ Vectorpair<Integer> Shape::getBoundary() const noexcept
 
 	gmsh::model::getBoundary
 	(
-		Vectorpair<Integer> {getDimTag()},
+		Vectorpair<Integer> {dimTag()},
 		outDimTags
 	);
 
-	return std::move(outDimTags);
+	return outDimTags;
 }
 
 
-Pair<Shape::Coordinates> Shape::getBoundingBox() const noexcept
+Pair<Shape::Coordinates> Shape::boundingBox() const noexcept
 {
 	Shape::synchronize();
 
@@ -136,8 +137,8 @@ Pair<Shape::Coordinates> Shape::getBoundingBox() const noexcept
 
 	gmsh::model::getBoundingBox
 	(
-		getDimTag().first,
-		getDimTag().second,
+		dimTag().first,
+		dimTag().second,
 		xmin,
 		ymin,
 		zmin,
@@ -147,10 +148,10 @@ Pair<Shape::Coordinates> Shape::getBoundingBox() const noexcept
 	);
 
 	return std::make_pair
-	{
+	(
 		Coordinates {xmin, ymin, zmin},
 		Coordinates {xmax, ymax, zmax}
-	};
+	);
 }
 
 

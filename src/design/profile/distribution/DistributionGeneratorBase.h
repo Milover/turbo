@@ -45,7 +45,7 @@ public:
 	// Constructors
 
 		//- Copy constructor
-		DistributionGeneratorBase(const DistributionGeneratorBase&&) = default;
+		DistributionGeneratorBase(const DistributionGeneratorBase&) = default;
 
 		//- Move constructor
 		DistributionGeneratorBase(DistributionGeneratorBase&&) = default;
@@ -58,8 +58,7 @@ public:
 	// Member functions
 
 		//- Get thickness at 'x' (half of total thickness)
-		virtual Float thickness(const Float x) const noexcept = 0;
-			// FIXME: we should probably check range here [0, 1]
+		virtual Float thickness(const Float x) const = 0;
 
 
 	// Member operators
@@ -67,7 +66,7 @@ public:
 		//- Copy assignment operator
 		DistributionGeneratorBase& operator=
 		(
-			const DistributionGeneratorBase&&
+			const DistributionGeneratorBase&
 		) = default;
 
 		//- Move assignment operator

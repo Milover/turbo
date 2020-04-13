@@ -13,9 +13,10 @@ License
 
 #include "gmsh.h"
 
+#include "SurfaceSection.h"
+
 #include "General.h"
 #include "Surface.h"
-#include "SurfaceSection.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -34,7 +35,7 @@ Integer SurfaceSection::construct(Surface::Wirevector&& wires) const noexcept
 	for (auto& w : wires)
 		tags.push_back
 		(
-			w.getDimTag().second
+			w.dimTag().second
 		);
 
 	gmsh::model::occ::addThruSections

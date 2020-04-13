@@ -10,12 +10,12 @@ License
 
 #include <cmath>
 
+#include "Naca4DigitDistribution.h"
+
 #include "Error.h"
 #include "General.h"
-#include "InputRegistry.h"
-#include "Naca4DigitDistribution.h"
-#include "StringConverter.h"
 #include "Utility.h"
+#include "Variables.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -26,32 +26,29 @@ namespace design
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-Naca4DigitDistribution::Naca4DigitDistribution
+Naca4DigitDistribution::Naca4DigitDistribution()
 :
-	maxThickness_
+	max_
 	{
-		StringConverter<Float> {}
-		(
-			InputRegistry::get("maxThickness")
-		)
+		input::read<input::MaxProfileThickness>()
 	}
 {
-	if
-	(
-		!isInRange(maxThickness_, 0.0, 1.0)
-	)
-		THROW_RUNTIME_ERROR("maxThickness out of range [0, 1]");
-
 	// scale coefficients
 	for (auto& a : a_)
-		a *= scale_ * maxThickness_;
+		a *= scale_ * max_.value();
 }
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-Float Naca4DigitDistribution::thickness(const Float x) const noexcept
+Float Naca4DigitDistribution::thickness(const Float x) const
 {
+	if
+	(
+		!isInRange(x, 0.0, 1.0)
+	)
+		THROW_DOMAIN_ERROR("x out of range [0, 1]");
+
 	return a_[0] * std::sqrt(x) +
 		   a_[1] * x +
 		   a_[2] * std::pow(x, 2) +

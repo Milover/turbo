@@ -14,8 +14,9 @@ License
 #include <string>
 #include <utility>
 
-#include "Blade.h"
 #include "BladeRow.h"
+
+#include "Blade.h"
 #include "ComponentBase.h"
 #include "InputObjectBase.h"
 #include "Error.h"

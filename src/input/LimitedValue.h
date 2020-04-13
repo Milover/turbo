@@ -48,13 +48,19 @@ protected:
 	static_assert(std::is_arithmetic_v<T>);
 	static_assert(Low < High);
 
-	using LVBase = typename LimitedValue<T, Low, High>;
+	using RegBase = RegistryObject<T>;
+	using LVBase = LimitedValue<T, Low, High>;
 
 
 	// Constructors
 
-		//- Default constructor
-		explicit LimitedValue(T&& t);
+		//- Construct from input
+		template
+		<
+			typename U,
+			std::enable_if_t<std::is_same_v<T, removeCVRef_t<U>>, int> = 0
+		>
+		explicit LimitedValue(U&& u);
 
 
 	// Member functions
@@ -64,6 +70,9 @@ protected:
 
 
 public:
+
+	using type = T;
+
 
 	// Constructors
 
@@ -92,9 +101,14 @@ public:
 // * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
 
 template<typename T, Integer Low, Integer High>
-LimitedValue<T, Low, High>::LimitedValue(T&& t)
+template
+<
+	typename U,
+	std::enable_if_t<std::is_same_v<T, removeCVRef_t<U>>, int>
+>
+LimitedValue<T, Low, High>::LimitedValue(U&& u)
 :
-	RegBase {std::forward<T>(t)}
+	RegBase {std::forward<U>(u)}
 {
 	this->check();
 }
@@ -106,6 +120,7 @@ template<typename T, Integer Low, Integer High>
 void LimitedValue<T, Low, High>::check() const
 {
 	if constexpr (std::is_integral_v<T>)
+	{
 		if
 		(
 			this->value_ < Low || this->value_ > High
@@ -115,7 +130,9 @@ void LimitedValue<T, Low, High>::check() const
 				"value not in range [" + std::to_string(Low)
 			  + ", " + std::to_string(High) + "]"
 			);
+	}
 	else
+	{
 		if
 		(
 			!isInRange
@@ -130,6 +147,7 @@ void LimitedValue<T, Low, High>::check() const
 				"value not in range [" + std::to_string(Low)
 			  + ", " + std::to_string(High) + "]"
 			);
+	}
 }
 
 

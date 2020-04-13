@@ -9,6 +9,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "TurboBase.h"
+
 #include "General.h"
 #include "Registry.h"
 
@@ -24,16 +25,16 @@ namespace design
 TurboBase::TurboBase() noexcept
 :
 	owns_ {true},
-	data_ {new Registry()}	// we own and manage
+	data_ {new input::Registry()}	// we own and manage
 {}
 
 
-TurboBase::TurboBase(const Registry& r) noexcept
+TurboBase::TurboBase(const input::Registry& r) noexcept
 :
 	owns_ {false},
 	data_					// we don't own or manage but have access
 	{
-		&const_cast<Registry&>(r).create()
+		&const_cast<input::Registry&>(r).create()
 	}
 {}
 

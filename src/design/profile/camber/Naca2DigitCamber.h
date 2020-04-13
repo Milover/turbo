@@ -28,6 +28,7 @@ SourceFiles
 
 #include "CamberGeneratorBase.h"
 #include "General.h"
+#include "Variables.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -48,15 +49,14 @@ private:
 
 	// Private data
 
-		maxCamber_;
-		maxCamberPosition_ {0.4};
-			// TODO: implement search for optimal maxCamberPosition_
+		input::MaxCamberPosition pos_;	// TODO: implement search for optimal
+		input::MaxCamber max_;
 
 	// Member functions
 
 		//- Compute max camber for a given
 		//  camber angle and max camber position
-		void computeMaxCamber() const noexcept;
+		Float computeMaxCamber() noexcept;
 
 
 protected:
@@ -69,11 +69,15 @@ protected:
 
 public:
 
+	// Public data
+
+		inline static const String name {"Naca2DigitCamber"};
+
+
 	// Constructors
 
-		//- Default constructor
-		explicit Naca2DigitCamber(const Float camber);
-			// TODO: clean up a bit
+		//- Construct from camber
+		explicit Naca2DigitCamber(const input::CamberAngle& camber);
 
 
 	// Member functions

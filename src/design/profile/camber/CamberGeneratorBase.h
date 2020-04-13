@@ -23,6 +23,7 @@ SourceFiles
 #include <vector>
 
 #include "General.h"
+#include "Variables.h"
 #include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -40,17 +41,15 @@ class CamberGeneratorBase
 {
 private:
 
+	using Spacing = input::CamberPointSpacing::Type;
+
+
 	// Private data
 
-		enum class Spacing
-		{
-			LINEAR,
-			COSINE
-		};
+		input::NumberOfCamberPoints nPoints_;
+		input::CamberPointSpacing spacing_;
 
-		Integer camberPoints_ {200};
 		Float increment_;
-		Spacing spacing_ {Spacing::COSINE};
 
 
 	// Member functions
@@ -65,14 +64,13 @@ protected:
 
 	// Protected data
 
-		const Float camber_;
+		const input::CamberAngle camber_;
 
 
 	// Constructors
 
 		//- Default constructor
-		explicit CamberGeneratorBase(const Float camber);
-			// TODO: clean up a bit
+		explicit CamberGeneratorBase(const input::CamberAngle& camber);
 
 
 	// Member functions

@@ -52,7 +52,7 @@ public:
 
 	// Public data
 
-		Profile geometry;
+		Profile profile;
 
 
 	// Constructors
@@ -66,21 +66,6 @@ public:
 			const input::Radius& r,
 			const input::Registry& reg
 		);
-
-
-	// Member functions
-
-		//- Build geometry
-		void build() final;
-
-		//- Finalize geometry
-		void finalize() final;
-
-		//- Build mesh
-		void mesh() final;
-
-		//- Parametrize
-		void parametrize() final;
 
 };
 

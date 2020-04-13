@@ -12,8 +12,9 @@ License
 
 #include "gmsh.h"
 
-#include "General.h"
 #include "Point.h"
+
+#include "General.h"
 #include "Shape.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -56,7 +57,7 @@ Point::Point
 {}
 
 
-Point::Point(const Shape::Coordinates& c) noexcept
+Point::Point(const Point::Coordinates& c) noexcept
 :
 	Point
 	{
@@ -67,9 +68,9 @@ Point::Point(const Shape::Coordinates& c) noexcept
 
 // * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * * //
 
-Shape::Coordinates Point::coordinates() const noexcept
+Point::Coordinates Point::coordinates() const noexcept
 {
-	return getBoundingBox().first;
+	return boundingBox().first;
 }
 
 

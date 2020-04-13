@@ -12,13 +12,13 @@ Class
 Description
 	Class Density.
 
+SourceFiles
+	Density.cpp
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef INPUT_DENSITY_H
 #define INPUT_DENSITY_H
-
-#include <type_traits>
-#include <utility>
 
 #include "General.h"
 #include "PositiveValue.h"
@@ -31,7 +31,7 @@ namespace input
 {
 
 /*---------------------------------------------------------------------------*\
-						Class Density Definition
+						Class Density Declaration
 \*---------------------------------------------------------------------------*/
 
 class Density final
@@ -42,22 +42,14 @@ public:
 
 	// Public static data
 
-		inline static const Word name {"Density"};
+		inline static const String name {"Density"};
 
 
 	// Constructors
 
 		//- Construct from a Float,
 		//  no aditional checking required
-		template
-		<
-			typename T,
-			std::enable_if_t<std::is_same_v<Float, T>, int> = 0>
-		>
-		explicit Density(T&& t)
-		:
-			PVBase {std::forward<T>(t)}
-		{}
+		explicit Density(const Float f);
 
 };
 

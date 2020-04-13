@@ -12,13 +12,13 @@ Class
 Description
 	Class InclinationAngle.
 
+SourceFiles
+	InclinationAngle.cpp
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef INPUT_INCLINATION_ANGLE_H
 #define INPUT_INCLINATION_ANGLE_H
-
-#include <type_traits>
-#include <utility>
 
 #include "General.h"
 #include "RegistryObject.h"
@@ -31,7 +31,7 @@ namespace input
 {
 
 /*---------------------------------------------------------------------------*\
-						Class InclinationAngle Definition
+					Class InclinationAngle Declaration
 \*---------------------------------------------------------------------------*/
 
 class InclinationAngle final
@@ -42,22 +42,14 @@ public:
 
 	// Public static data
 
-		inline static const Word name {"InclinationAngle"};
+		inline static const String name {"InclinationAngle"};
 
 
 	// Constructors
 
 		//- Construct from a Float,
 		//  no aditional checking required
-		template
-		<
-			typename T,
-			std::enable_if_t<std::is_same_v<Float, T>, int> = 0>
-		>
-		explicit InclinationAngle(T&& t)
-		:
-			RegBase {std::forward<T>(t)}
-		{}
+		explicit InclinationAngle(const Float f);
 
 };
 

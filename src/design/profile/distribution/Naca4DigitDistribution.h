@@ -25,6 +25,7 @@ SourceFiles
 
 #include "DistributionGeneratorBase.h"
 #include "General.h"
+#include "Variables.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -55,9 +56,14 @@ private:
 		   -0.1015
 		};
 
-		Float maxThickness_;
+		input::MaxProfileThickness max_;
 
 public:
+
+	// Private data
+
+		inline static const String name {"Naca4DigitDistribution"};
+
 
 	// Constructors
 
@@ -68,7 +74,7 @@ public:
 	// Member functions
 
 		//- Get thickness at 'x' (half of total thickness)
-		Float thickness(const Float x) const noexcept override;
+		Float thickness(const Float x) const override;
 
 };
 

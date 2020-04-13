@@ -10,10 +10,10 @@ License
 
 #include <cmath>
 
+#include "CircularArcCamber.h"
+
 #include "CamberGeneratorBase.h"
 #include "Error.h"
-#include "InputObjectBase.h"
-#include "CircularArcCamber.h"
 #include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -38,12 +38,12 @@ Float CircularArcCamber::computeY(const Float x) const noexcept
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-CircularArcCamber::CircularArcCamber(const Float camber)
+CircularArcCamber::CircularArcCamber(const input::CamberAngle& camber)
 :
 	CamberGeneratorBase {camber},
 	yOffset_
 	{
-		-0.5 / std::tan(0.5 * camber_)
+		-0.5 / std::tan(0.5 * camber_.value())
 	}
 {}
 

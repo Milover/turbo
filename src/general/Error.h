@@ -15,8 +15,9 @@ Description
 #define ERROR_H
 
 #include <stdexcept>
-#include <string>
 #include <type_traits>
+
+#include "General.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -25,27 +26,27 @@ namespace turbo
 
 // * * * * * * * * * * * * * * Constants * * * * * * * * * * * * * * * * * * //
 
-static const std::string boldOn {"\e[1m"};
+static const String boldOn {"\033[1m"};
 
 
-static const std::string redBoldOn {"\e[1;31m"};
+static const String redBoldOn {"\033[1;31m"};
 
 
-static const std::string boldOff {"\e[0m"};
+static const String boldOff {"\033[0m"};
 
 
 // * * * * * * * * * * * * * * Functions * * * * * * * * * * * * * * * * * * //
 
 //- Construct error message
-inline std::string errorMessage
+inline String errorMessage
 (
-	const std::string& function,
-	const std::string& file,
+	const String& function,
+	const String& file,
 	const long line,
-	const std::string& message
+	const String& message
 )
 {
-	std::string error
+	String error
 	{
 		boldOn +
 		file + ": " +
@@ -73,7 +74,7 @@ template<typename T>
 	std::is_base_of_v<std::runtime_error, T> ||
 	std::is_base_of_v<std::logic_error, T>
 >
-throwError(const std::string& message)
+throwError(const String& message)
 {
 	throw T(message);
 }

@@ -14,6 +14,8 @@ Description
 #ifndef UTILITY_H
 #define UTILITY_H
 
+#include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <limits>
 #include <type_traits>
@@ -30,7 +32,7 @@ namespace turbo
 static constexpr Float pi {M_PI};
 
 
-// * * * * * * * * * * * * * * Functions * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * Arithmetic Functions  * * * * * * * * * * * * * //
 
 //- Compare two numbers (up to ``about'' machine precision)
 template<typename T>
@@ -91,7 +93,7 @@ isInRange
 	Integer ulp = 2
 )
 {
-	return isGreaterOrEqual(x, min, ulp) ||
+	return isGreaterOrEqual(x, min, ulp) &&
 		   isLessOrEqual(x, max, ulp);
 }
 
@@ -115,6 +117,48 @@ degToRad(const T t)
 	static constexpr Float degRad {pi / 180.0};
 
 	return t * degRad;
+}
+
+
+// * * * * * * * * * * * * * Formatting Functions  * * * * * * * * * * * * * //
+
+//- Trim leading whitespace (left trim)
+inline void trimWhiteL(String& s)
+{
+	s.erase
+	(
+		s.begin(),
+		std::find_if
+		(
+			s.begin(),
+			s.end(),
+			[](int ch) { return !std::isspace(ch); }
+		)
+	);
+}
+
+
+//- Trim trailing whitespace (right trim)
+inline void trimWhiteR(String& s)
+{
+	s.erase
+	(
+		std::find_if
+		(
+			s.rbegin(),
+			s.rend(),
+			[](int ch) { return !std::isspace(ch); }
+		).base(),
+		s.end()
+	);
+}
+
+
+//- Trim leading and trailing whitespace (left-right trim)
+inline void trimWhiteLR(String& s)
+{
+	trimWhiteL(s);
+	trimWhiteR(s);
 }
 
 

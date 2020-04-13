@@ -13,9 +13,10 @@ License
 
 #include "gmsh.h"
 
+#include "SurfaceFilling.h"
+
 #include "General.h"
 #include "Surface.h"
-#include "SurfaceFilling.h"
 #include "Wire.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -38,12 +39,12 @@ Integer SurfaceFilling::construct
 	for (auto& p : points)
 		tags.push_back
 		(
-			p.getDimTag().second
+			p.dimTag().second
 		);
 
 	return gmsh::model::occ::addSurfaceFilling
 	(
-		wire.getDimTag().second,
+		wire.dimTag().second,
 		-1,		// don't assign tag
 		tags
 	);

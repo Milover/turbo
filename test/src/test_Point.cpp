@@ -12,13 +12,12 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include <vector>
-
 #include "gmsh.h"
 
-#include "Axis.h"
+#include "General.h"
 #include "Point.h"
 #include "Utility.h"
+#include "Vector.h"
 
 #include "Test.h"
 
@@ -35,13 +34,17 @@ int main(int argc, char* argv[]) {
 	// Test Point construction
 	geometry::Point p1 {0,0};	// construct from components
 	geometry::Point p2 {p1};	// construct from Point
+	geometry::Point p3			// construct from Vector (Coordinates)
+	{
+		Vector {0.0, 0.0}
+	};
 
 	test::updateAndWait(1, output);
 
 	// try to modify
 	gmsh::model::occ::translate
 	(
-		Vectorpair<int> {p2.getDimTag()},
+		Vectorpair<Integer> {p2.dimTag()},
 		2,
 		0,
 		0
@@ -54,61 +57,53 @@ int main(int argc, char* argv[]) {
 	(
 		pass,
 		(
-			p1.getDimTag().first == 0 &&
-			p2.getDimTag().first == 0
+			p1.dimTag().first == 0 &&
+			p2.dimTag().first == 0
 		),
 		output,
 		"Checking dimension"
 	);
 
-	PointCoordinates coordinates;
-	coordinates = p1.getCoordinates();
+	Vector coordinates;
+	coordinates = p1.coordinates();
 	test::compareTest
 	(
 		pass,
 		(
-			coordinates.at(geometry::Axis::X) == 0 &&
-			coordinates.at(geometry::Axis::Y) == 0 &&
-			coordinates.at(geometry::Axis::Z) == 0
+			coordinates == Vector {0.0, 0.0}
 		),
 		output,
 		"Checking coordinates"
 	);
 
-	coordinates = p2.getCoordinates();
+	coordinates = p2.coordinates();
 	test::compareTest
 	(
 		pass,
 		(
-			coordinates.at(geometry::Axis::X) == 2 &&
-			coordinates.at(geometry::Axis::Y) == 0 &&
-			coordinates.at(geometry::Axis::Z) == 0
+			coordinates == Vector {2.0, 0.0}
 		),
 		output,
 		"Checking coordinates"
 	);
 	
-	Vectorpair<double> pBox {p1.getBoundingBox()};
+	auto [min_1, max_1] {p1.boundingBox()};
 	test::compareTest
 	(
 		pass,
 		(
-			isEqual(pBox[0].first, 0.0) &&
-			isEqual(pBox[1].first, 0.0) &&
-			isEqual(pBox[2].first, 0.0)
+			min_1 == Vector {0.0, 0.0}
 		),
 		output,
 		"Checking bounding box"
 	);
 	
-	pBox = p2.getBoundingBox();
+	auto [min_2, max_2] {p2.boundingBox()};
 	test::compareTest
 	(
 		pass,
 		(
-			isEqual(pBox[0].first, 2.0) &&
-			isEqual(pBox[1].first, 0.0) &&
-			isEqual(pBox[2].first, 0.0)
+			min_2 == Vector {2.0, 0.0}
 		),
 		output,
 		"Checking bounding box"

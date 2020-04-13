@@ -63,7 +63,7 @@ private:
 		{
 			std::vector<Integer> tags
 			{
-				t.getDimTag().second...
+				t.dimTag().second...
 			};
 			
 			return gmsh::model::occ::addWire(tags);
@@ -82,10 +82,10 @@ public:
 			Shape
 			{
 				std::make_pair
-				{
+				(
 					1,		// dimension
 					construct(t...)
-				}
+				)
 			}
 		{
 			// we cannot call the destructor regularly because gmsh's

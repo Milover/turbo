@@ -12,17 +12,15 @@ Class
 Description
 	Class InletVelocity.
 
+SourceFiles
+	InletVelocity.cpp
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef INPUT_INLET_VELOCITY_H
 #define INPUT_INLET_VELOCITY_H
 
-#include <type_traits>
-#include <utility>
-
-#include "General.h"
 #include "HubRadius.h"
-#include "InitialDesign.h"
 #include "RegistryObject.h"
 #include "ShroudRadius.h"
 #include "Vector.h"
@@ -36,7 +34,7 @@ namespace input
 {
 
 /*---------------------------------------------------------------------------*\
-						Class InletVelocity Definition
+					Class InletVelocity Declaration
 \*---------------------------------------------------------------------------*/
 
 class InletVelocity final
@@ -47,22 +45,14 @@ public:
 
 	// Public static data
 
-		inline static const Word name {"InletVelocity"};
+		inline static const String name {"InletVelocity"};
 
 
 	// Constructors
 
 		//- Construct from a Vector,
 		//  no aditional checking required
-		template
-		<
-			typename T,
-			std::enable_if_t<std::is_same_v<Vector, T>, int> = 0>
-		>
-		explicit InletVelocity(T&& t)
-		:
-			RegBase {std::forward<T>(t)}
-		{}
+		explicit InletVelocity(const Vector& v);
 
 		//- Compute and construct
 		InletVelocity
@@ -70,18 +60,7 @@ public:
 			const VolumeFlowRate& Q,
 			const HubRadius& r_h,
 			const ShroudRadius& r_s
-		)
-		:
-			InletVelocity
-			{
-				compute::computeInletVelocity
-				(
-					Q.value(),
-					r_h.value(),
-					r_s.value()
-				)
-			}
-		{}
+		);
 
 };
 

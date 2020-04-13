@@ -12,18 +12,16 @@ Class
 Description
 	Class OutletVelocity.
 
+SourceFiles
+	OutletVelocity.cpp
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef INPUT_OUTLET_VELOCITY_H
 #define INPUT_OUTLET_VELOCITY_H
 
-#include <type_traits>
-#include <utility>
-
 #include "BladeVelocity.h"
-#include "General.h"
 #include "HubRadius.h"
-#include "InitialDesign.h"
 #include "InletVelocity.h"
 #include "Radius.h"
 #include "RegistryObject.h"
@@ -38,8 +36,11 @@ namespace turbo
 namespace input
 {
 
+// Forward declarations
+class RootOutletVelocity;
+
 /*---------------------------------------------------------------------------*\
-						Class OutletVelocity Definition
+					Class OutletVelocity Declaration
 \*---------------------------------------------------------------------------*/
 
 class OutletVelocity final
@@ -50,22 +51,14 @@ public:
 
 	// Public static data
 
-		inline static const Word name {"OutletVelocity"};
+		inline static const String name {"OutletVelocity"};
 
 
 	// Constructors
 
 		//- Construct from a Vector,
 		//  no aditional checking required
-		template
-		<
-			typename T,
-			std::enable_if_t<std::is_same_v<Vector, T>, int> = 0>
-		>
-		explicit OutletVelocity(T&& t)
-		:
-			RegBase {std::forward<T>(t)}
-		{}
+		explicit OutletVelocity(const Vector& v);
 
 		//- Compute and construct
 		OutletVelocity
@@ -74,19 +67,7 @@ public:
 			const VortexDistributionExponent& n,
 			const Radius& r,
 			const HubRadius& r_h
-		)
-		:
-			OutletVelocity
-			{
-				compute::computeVortexDistributionVelocity
-				(
-					c_2_h.value(),
-					n.value(),
-					r.value(),
-					r_h.value()
-				)
-			}
-		{}
+		);
 
 		//- Compute by applying deHaller criterion and construct
 		OutletVelocity
@@ -95,26 +76,9 @@ public:
 			const RootOutletVelocity& c_2_h,
 			const VortexDistributionExponent& n,
 			const Radius& r,
-			const HubRadius& r_h
+			const HubRadius& r_h,
 			const BladeVelocity& U
-		)
-		:
-			OutletVelocity
-			{
-				compute::deHaller
-				(
-					c_1.value(),
-					compute::computeVortexDistributionVelocity
-					(
-						c_2_h.value(),
-						n.value(),
-						r.value(),
-						r_h.value()
-					),
-					U.value()
-				)
-			}
-		{}
+		);
 
 };
 

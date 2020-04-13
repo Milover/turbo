@@ -13,6 +13,8 @@ Description
 
 #include <utility>
 
+#include "General.h"
+#include "InputRegistry.h"
 #include "Naca4DigitDistribution.h"
 #include "Utility.h"
 
@@ -29,48 +31,46 @@ int main(int argc, char* argv[])
 	bool pass {true};
 
 	// test construction
-	Stringmap<> input
-	{
-		{"maxThickness", "0.5"},
-	};
-	geometry::Naca4DigitDistribution temp {input};
-	geometry::Naca4DigitDistribution distribution {std::move(temp)};
+	InputRegistry::store
+	(
+		Stringmap<>
+		{
+			{"maxThickness", "0.5"}
+		}
+	);
 
-	// test construction related stuff
-	test::compareTest
-	(
-		pass,
-		distribution.hasKey("maxThickness"),
-		output,
-		"Checking hasKey()"
-	);
-	test::compareTest
-	(
-		pass,
-		distribution.hasValue("maxThickness"),
-		output,
-		"Checking hasValue()"
-	);
-	test::compareTest
-	(
-		pass,
-		isEqual
-		(
-			distribution.get("maxThickness"), 0.5
-		),
-		output,
-		"Checking get()"
-	);
+	geometry::Naca4DigitDistribution temp_1 {};
+	geometry::Naca4DigitDistribution temp_2 {temp_1};
+	geometry::Naca4DigitDistribution temp_3 {std::move(temp_1)};
+	temp_3 = temp_2;
+	temp_1 = std::move(temp_3);
 
 	// test
-	double x;
-	for (int i {0}; i < 100; i++)
+	Float x;
+	auto shouldBeCought {0};
+	for (auto i {-100}; i < 100; ++i)
 	{
-		x = static_cast<double>(i) / 100.0;
+		x = 0.01 * static_cast<Float>(i);
 
-		if (output)
-			std::cout << distribution.getThicknessAt(x) << '\n';
+		try
+			// checking thickness
+			if
+			(
+				!isEqual(temp_1.thickness(x), "NEED_CONSTEXPR_TABLE_OF_POINTS")
+			 || !isEqual(temp_2.thickness(x), "NEED_CONSTEXPR_TABLE_OF_POINTS")
+			)
+				pass = false;
+		catch(...)
+			++shouldBeCought;
 	}
+
+	test::compareTest
+	(
+		pass,
+		(shouldBeCought == 100),
+		output,
+		"Checking thrown exceptions"
+	);
 
 	// test pass or fail
 	if (pass)

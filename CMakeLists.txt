@@ -24,13 +24,17 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(CMAKE_VERBOSE_MAKEFILE FALSE)
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
+# < new
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+# < new
 
 # compiler flags
 add_compile_options(
-		"-Wall" "-Wextra"
-		"$<$<CONFIG:DEBUG>:-O2>"
+		"-Wall" "-Wextra" "-Wshadow" "-pedantic"
+		"$<$<CONFIG:DEBUG>:-O0>"
 		"$<$<CONFIG:RELEASE>:-O3>"
 )
+
 
 # output paths
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib")
@@ -44,9 +48,15 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/tools/cmake")
 
 # prerequisites
 find_package(Gmsh REQUIRED)
+# < new
+find_package(Threads REQUIRED)
+# < new
 
 set(TURBO_INCLUDE_DIRS ${GMSH_INCLUDE_DIRS})
 set(TURBO_LIBRARIES ${GMSH_LIBRARIES})
+# < new
+list(APPEND TURBO_LIBRARIES "Threads::Threads")
+# < new
 
 # add sources macro
 macro(append_turbo_src DIRNAME FILES)

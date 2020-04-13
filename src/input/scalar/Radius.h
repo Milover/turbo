@@ -12,13 +12,13 @@ Class
 Description
 	Class Radius.
 
+SourceFiles
+	Radius.cpp
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef INPUT_RADIUS_H
 #define INPUT_RADIUS_H
-
-#include <type_traits>
-#include <utility>
 
 #include "General.h"
 #include "PositiveValue.h"
@@ -31,7 +31,7 @@ namespace input
 {
 
 /*---------------------------------------------------------------------------*\
-						Class Radius Definition
+						Class Radius Declaration
 \*---------------------------------------------------------------------------*/
 
 class Radius final
@@ -42,22 +42,14 @@ public:
 
 	// Public static data
 
-		inline static const Word name {"Radius"};
+		inline static const String name {"Radius"};
 
 
 	// Constructors
 
 		//- Construct from a Float,
 		//  no aditional checking required
-		template
-		<
-			typename T,
-			std::enable_if_t<std::is_same_v<Float, T>, int> = 0>
-		>
-		explicit Radius(T&& t)
-		:
-			PVBase {std::forward<T>(t)}
-		{}
+		explicit Radius(const Float f);
 
 };
 

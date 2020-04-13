@@ -22,6 +22,7 @@ Description
 #include <utility>
 
 #include "Error.h"
+#include "General.h"
 #include "RegistryObject.h"
 #include "Utility.h"
 
@@ -45,13 +46,19 @@ protected:
 
 	static_assert(std::is_arithmetic_v<T>);
 
-	using PVBase = typename PositiveValue<T>;
+	using RegBase = RegistryObject<T>;
+	using PVBase = PositiveValue<T>;
 
 
 	// Constructors
 
-		//- Default constructor
-		explicit PositiveValue(T&& t);
+		//- Construct from value
+		template
+		<
+			typename U,
+			std::enable_if_t<std::is_same_v<T, removeCVRef_t<U>>, int> = 0
+		>
+		explicit PositiveValue(U&& u);
 
 
 	// Member functions
@@ -61,6 +68,9 @@ protected:
 
 
 public:
+
+	using type = T;
+
 
 	// Constructors
 
@@ -89,9 +99,14 @@ public:
 // * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
 
 template<typename T>
-PositiveValue<T>::PositiveValue(T&& t)
+template
+<
+	typename U,
+	std::enable_if_t<std::is_same_v<T, removeCVRef_t<U>>, int>
+>
+PositiveValue<T>::PositiveValue(U&& u)
 :
-	RegBase {std::forward<T>(t)}
+	RegBase {std::forward<U>(u)}
 {
 	this->check();
 }
@@ -103,14 +118,18 @@ template<typename T>
 void PositiveValue<T>::check() const
 {
 	if constexpr (std::is_integral_v<T>)
+	{
 		if (this->value_ < 0)
 			THROW_ARGUMENT_ERROR("value < 0");
+	}
 	else
+	{
 		if
 		(
 			!isGreaterOrEqual(this->value_, 0.0)
 		)
 			THROW_ARGUMENT_ERROR("value < 0");
+	}
 }
 
 

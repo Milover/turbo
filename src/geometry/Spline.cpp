@@ -12,10 +12,11 @@ License
 
 #include "gmsh.h"
 
+#include "Spline.h"
+
 #include "Curve.h"
 #include "General.h"
 #include "Point.h"
-#include "Spline.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -40,17 +41,17 @@ Integer Spline::construct
 		if (&p == &points.front())
 			tags.push_back
 			(
-				start.getDimTag().second
+				start.dimTag().second
 			);
 		else if (&p == &points.back())
 			tags.push_back
 			(
-				end.getDimTag().second
+				end.dimTag().second
 			);
 		else
 			tags.push_back
 			(
-				p.getDimTag().second
+				p.dimTag().second
 			);
 	}
 

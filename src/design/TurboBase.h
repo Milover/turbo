@@ -20,6 +20,8 @@ SourceFiles
 #ifndef DESIGN_TURBO_BASE_H
 #define DESIGN_TURBO_BASE_H
 
+#include <type_traits>
+
 #include "General.h"
 #include "Registry.h"
 
@@ -41,7 +43,7 @@ protected:
 	// Protected data
 
 		bool owns_;
-		Registry* data_;
+		input::Registry* data_;
 
 
 	// Constructors
@@ -50,7 +52,7 @@ protected:
 		TurboBase() noexcept;
 
 		//- Construct with (owner) Registry
-		TurboBase(const Registry&) noexcept;
+		TurboBase(const input::Registry&) noexcept;
 
 
 public:
@@ -71,25 +73,26 @@ public:
 	// Member functions
 
 		//- Build geometry
-		virtual void build() = 0;
+		//virtual void build() = 0;
 
 		//- Finalize geometry
-		virtual void finalize() = 0;
+		//virtual void finalize() = 0;
 
 		//- Access data
-		template<typename T, enum Registry::Scope S = Registry::LOCAL>
-		T get() const;
+		template<typename T, typename R = NoRecurse>
+		std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, T>
+		get() const;
 
 		//- Querry data
-		template<enum Registry::Scope S = Registry::LOCAL>
-		bool has(const Word& key) const noexcept;
+		template<typename R = NoRecurse>
+		std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, bool>
+		has(const String& key) const noexcept;
 
 		//- Build mesh
-		virtual void mesh() = 0;
+		//virtual void mesh() = 0;
 
 		//- Parametrize
-		virtual void parametrize() = 0;
-
+		//virtual void parametrize() = 0;
 
 		//- Optimize
 		//virtual void optimize() = 0;
@@ -108,17 +111,19 @@ public:
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-template<typename T, enum Registry::Scope S>
-T TurboBase::get() const
+template<typename T, typename R>
+std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, T>
+TurboBase::get() const
 {
-	return data_->get<T, S>();
+	return data_->get<T, R>();
 }
 
 
-template<enum Registry::Scope S>
-bool TurboBase::has(const Word& key) const noexcept
+template<typename R>
+std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, bool>
+TurboBase::has(const String& key) const noexcept
 {
-	return data_->has<S>(key);
+	return data_->has<R>(key);
 }
 
 

@@ -9,13 +9,13 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include <cmath>
-#include <string>
 
 #include "CamberGeneratorBase.h"
+
 #include "Error.h"
 #include "General.h"
-#include "InputRegistry.h"
 #include "Utility.h"
+#include "Variables.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -28,9 +28,8 @@ namespace design
 
 Float CamberGeneratorBase::computeX(const Integer count) const noexcept
 {
-	if (spacing_ == Spacing::LINEAR)
+	if (spacing_.value() == Spacing::LINEAR)
 		return static_cast<Float>(count) * increment_;
-	// Spacing::COSINE is default
 	else
 	{
 		Float angle
@@ -46,38 +45,22 @@ Float CamberGeneratorBase::computeX(const Integer count) const noexcept
 
 // * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
 
-// TODO: clean up a bit
-CamberGeneratorBase::CamberGeneratorBase(const Float camber)
+CamberGeneratorBase::CamberGeneratorBase(const input::CamberAngle& camber)
 :
+	nPoints_
+	{
+		input::read<input::NumberOfCamberPoints>()
+	},
+	spacing_
+	{
+		input::read<input::CamberPointSpacing>()
+	},
 	camber_ {camber}
 {
-	if (inputRegistry::has("camberPoints"))
-	{
-		camberPoints_ = StringConverter<Integer> {}
-		(
-			InputRegistry::get("camberPoints")
-		);
-
-		if (camberPoints_ < 0)
-			THROW_RUNTIME_ERROR("camberPoints < 0");
-	}
-
-	if (inputRegistry::has("spacing"))
-	{
-		auto type InputRegistry::get("camberPoints")
-
-		if (type == "linear")
-			spacing_ = Spacing::LINEAR;
-		else if (type == "cosine")
-			spacing_ = Spacing::COSINE;
-		else
-			THROW_RUNTIME_ERROR("unknown spacing: " + type);
-	}
-
-	if (spacing_ == Spacing::LINEAR)
-		increment_ = 1.0 / static_cast<Float>(camberPoints_ - 1);
+	if (spacing_.value() == Spacing::LINEAR)
+		increment_ = 1.0 / static_cast<Float>(nPoints_.value() - 1);
 	else
-		increment_ = pi / static_cast<Float>(camberPoints_ - 1);
+		increment_ = pi / static_cast<Float>(nPoints_.value() - 1);
 }
 
 
@@ -87,12 +70,12 @@ std::vector<CamberGeneratorBase::Point>
 CamberGeneratorBase::generate() const noexcept
 {
 	std::vector<Point> points;
-	points.reserve(camberPoints_);
+	points.reserve(nPoints_.value());
 
 	Float x;
 	Float y;
 
-	for (auto i {0}; i < points_.size(); ++i)
+	for (auto i {0}; i < nPoints_.value(); ++i)
 	{
 		x = computeX(i);	// increment x
 		y = computeY(x);	// compute new y

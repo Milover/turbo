@@ -14,6 +14,7 @@ Description
 
 #include "gmsh.h"
 
+#include "General.h"
 #include "Line.h"
 #include "Point.h"
 #include "Utility.h"
@@ -44,7 +45,7 @@ int main(int argc, char* argv[]) {
 
 	test::updateAndWait(1, output);
 
-	int numberOfEntities {test::getNumberOfEntities()};
+	Integer numberOfEntities {test::getNumberOfEntities()};
 
 	// 3 raw points,
 	// 2 points per line (6),
@@ -60,7 +61,7 @@ int main(int argc, char* argv[]) {
 	// Test dependency manipulation
 	gmsh::model::occ::translate
 	(
-		Vectorpair<int> {l3.getDimTag()},
+		Vectorpair<Integer> {l3.dimTag()},
 		0,
 		1,
 		0

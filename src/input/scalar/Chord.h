@@ -12,16 +12,15 @@ Class
 Description
 	Class Chord.
 
+SourceFiles
+	Chord.cpp
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef INPUT_CHORD_H
 #define INPUT_CHORD_H
 
-#include <type_traits>
-#include <utility>
-
 #include "General.h"
-#include "InitialDesign.h"
 #include "NumberOfBlades.h"
 #include "PositiveValue.h"
 #include "Radius.h"
@@ -35,7 +34,7 @@ namespace input
 {
 
 /*---------------------------------------------------------------------------*\
-						Class Chord Definition
+						Class Chord Declaration
 \*---------------------------------------------------------------------------*/
 
 class Chord final
@@ -46,22 +45,14 @@ public:
 
 	// Public static data
 
-		inline static const Word name {"Chord"};
+		inline static const String name {"Chord"};
 
 
 	// Constructors
 
 		//- Construct from a Float,
 		//  no aditional checking required
-		template
-		<
-			typename T,
-			std::enable_if_t<std::is_same_v<Float, T>, int> = 0>
-		>
-		explicit Chord(T&& t)
-		:
-			PVBase {std::forward<T>(t)}
-		{}
+		explicit Chord(const Float f);
 
 		//- Compute and construct
 		Chord
@@ -69,18 +60,7 @@ public:
 			const NumberOfBlades& N_b,
 			const Radius& r,
 			const Solidity& sigma
-		)
-		:
-			Chord
-			{
-				compute::computeChord
-				(
-					N_b.value(),
-					r.value(),
-					sigma.value()
-				)
-			}
-		{}
+		);
 
 };
 

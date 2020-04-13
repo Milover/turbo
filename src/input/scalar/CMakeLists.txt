@@ -6,6 +6,26 @@
 
 # add sources
 set(SRC
+	CamberAngle.cpp
+	CamberPointSpacing.cpp
+	Chord.cpp
+	Density.cpp
+	HubRadius.cpp
+	IncidenceAngle.cpp
+	InclinationAngle.cpp
+	MaxCamber.cpp
+	MaxCamberPosition.cpp
+	MaxProfileThickness.cpp
+	NumberOfBlades.cpp
+	NumberOfCamberPoints.cpp
+	Radius.cpp
+	Rps.cpp
+	ShroudRadius.cpp
+	Solidity.cpp
+	StaggerAngle.cpp
+	TotalPressureDifference.cpp
+	VolumeFlowRate.cpp
+	VortexDistributionExponent.cpp
 	)
 
 # append to sources

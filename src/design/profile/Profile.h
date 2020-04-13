@@ -25,6 +25,7 @@ SourceFiles
 #include "General.h"
 #include "Geometry.h"
 #include "ProfileGenerator.h"
+#include "Variables.h"
 #include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -53,7 +54,6 @@ private:
 		Vectorpair<Point> points_;
 
 		bool wrapped_ {false};
-		static constexpr Point origin_ {0.0, 0.0, 0.0};
 
 
 	// Member functions
@@ -88,9 +88,9 @@ public:
 		void build
 		(
 			const ProfileGenerator& generator,
-			const Float chord,
-			const Float radius,
-			const Float stagger
+			const input::Chord& chord,
+			const input::Radius& radius,
+			const input::StaggerAngle& stagger
 		);
 
 		//- Check if empty
@@ -105,8 +105,18 @@ public:
 		//- Get geometric center
 		Point centroid() const noexcept;
 
+		//- Get the unit direction vector
+		//	of the camberline tangent at
+		//	the leading edge.
+		//	The vector points outward with
+		//	respect to the profile contour.
+		Vector leDirection() const;
+
+		//- Get LE point
+		Vector lePoint() const;
+
 		//- Get contour
-		geometry::Spline getContour() const;	
+		geometry::Spline getContour() const;
 
 		//- Get points ordered from top (upper) TE to
 		//	bot (lower) TE
@@ -120,6 +130,16 @@ public:
 
 		//- Get size
 		Sizetype size() const noexcept;
+
+		//- Get the unit direction vector
+		//	of the camberline tangent at
+		//	the trailing edge.
+		//	The vector points outward with
+		//	respect to the profile contour.
+		Vector teDirection() const;
+
+		//- Get TE point
+		Vector tePoint() const;
 
 		//- Wrap to cylinder
 		void wrap() noexcept;

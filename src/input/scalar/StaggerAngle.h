@@ -12,19 +12,18 @@ Class
 Description
 	Class StaggerAngle.
 
+SourceFiles
+	StaggerAngle.cpp
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef INPUT_STAGGER_ANGLE_H
 #define INPUT_STAGGER_ANGLE_H
 
-#include <type_traits>
-#include <utility>
-
 #include "BladeVelocity.h"
 #include "General.h"
 #include "IncidenceAngle.h"
 #include "InclinationAngle.h"
-#include "InitialDesign.h"
 #include "InletVelocity.h"
 #include "RegistryObject.h"
 
@@ -36,7 +35,7 @@ namespace input
 {
 
 /*---------------------------------------------------------------------------*\
-						Class StaggerAngle Definition
+						Class StaggerAngle Declaration
 \*---------------------------------------------------------------------------*/
 
 class StaggerAngle final
@@ -47,22 +46,14 @@ public:
 
 	// Public static data
 
-		inline static const Word name {"StaggerAngle"};
+		inline static const String name {"StaggerAngle"};
 
 
 	// Constructors
 
 		//- Construct from a Float,
 		//  no aditional checking required
-		template
-		<
-			typename T,
-			std::enable_if_t<std::is_same_v<Float, T>, int> = 0>
-		>
-		explicit StaggerAngle(T&& t)
-		:
-			RegBase {std::forward<T>(t)}
-		{}
+		explicit StaggerAngle(const Float f);
 
 		//- Compute and construct
 		StaggerAngle
@@ -71,19 +62,7 @@ public:
 			const BladeVelocity& U,
 			const InclinationAngle& zeta,
 			const IncidenceAngle& i
-		)
-		:
-			StaggerAngle
-			{
-				compute::computeStaggerAngle
-				(
-					c_1.value(),
-					U.value(),
-					zeta.value(),
-					i.value()
-				)
-			}
-		{}
+		);
 
 		//- Compute assuming zero incidence and construct
 		StaggerAngle
@@ -91,18 +70,7 @@ public:
 			const InletVelocity& c_1,
 			const BladeVelocity& U,
 			const InclinationAngle& zeta
-		)
-		:
-			StaggerAngle
-			{
-				compute::computeStaggerAngle
-				(
-					c_1.value(),
-					U.value(),
-					zeta.value()
-				)
-			}
-		{}
+		);
 
 };
 

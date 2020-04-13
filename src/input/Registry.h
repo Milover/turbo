@@ -20,9 +20,12 @@ SourceFiles
 #ifndef INPUT_REGISTRY_H
 #define INPUT_REGISTRY_H
 
+#include <functional>
+#include <utility>
 #include <type_traits>
 
 #include "General.h"
+#include "RegistryObject.h"
 #include "RegistryObjectBase.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -40,6 +43,9 @@ class Registry
 {
 private:
 
+	using Data = HashMap<Uptr<RegistryObjectBase>>;
+
+
 	// Private data
 
 		Registry* owner_ {nullptr};
@@ -49,7 +55,7 @@ private:
 			// 		 and no resize after removal of a slave)
 			// 		 should we manage this?
 
-		HashMap<Uptr<RegistryObjectBase>> data_;
+		Uptr<Data> data_;
 
 
 	// Constructors
@@ -60,27 +66,44 @@ private:
 
 	// Member functions
 
-		//- Recursively get a registry object (value, ref or cref)
-		//  i.e. search through global scope.
-		//  If a registry object doesn't exist
-		//  do a 'read()' (if possible) and store locally
-		template<typename T, enum Registry::Scope S = Registry::GLOBAL>
+		//- Get a registry object pointer (recursively or
+		//	non-recursively) if the object exists,
+		//	return a nullptr otherwise.
+		//	TODO: try to get rid of the raw pointer
+		template
+		<
+			typename T,
+			typename R,
+			typename std::enable_if_t
+			<
+				std::is_base_of_v<RecursionFlag, R>, int
+			> = 0
+		>
+		T* obtainStored() const;
+
+		//- Get a registry object by ref/cref/value
+		//	(recursively or non-recursively).
+		//	If a registry object doesn't yet exist
+		//	do a 'read()' (if possible) and store locally
+		//  and return it by ref/cref/value.
+		template
+		<
+			typename T,
+			typename R,
+			typename std::enable_if_t
+			<
+				std::is_base_of_v<RecursionFlag, R>, int
+			> = 0
+		>
 		auto&& obtain() const;
 
 
 public:
 
-	enum Scope
-	{
-		LOCAL,
-		GLOBAL
-	};
-
-
 	// Constructors
 
 		//- Default constructor
-		Registry() = default;
+		Registry() noexcept;
 
 		//- Dissallow move constructor
 		Registry(Registry&&) = delete;
@@ -96,31 +119,36 @@ public:
 		Registry& create() noexcept;
 
 		//- Recursively get a const reference to a registry object
-		template<typename T>
-		const T& cref() const;
+		template<typename T, typename R = Recurse>
+		std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, const T&>
+		cref() const;
 
 		//- Recursively get a registry object
-		template<typename T, enum Registry::Scope S = Registry::GLOBAL>
-		T get() const;
+		template<typename T, typename R = Recurse>
+		std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, T>
+		get() const;
 
 		//- Check if a registry object exists (locally or globally)
-		template<typename T, enum Registry::Scope S = Registry::GLOBAL>
-		bool has() const noexcept;
+		template<typename T, typename R = Recurse>
+		std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, bool>
+		has() const noexcept;
 
 		//- Check if a registry object (key) exists (locally or globally)
-		template<enum Registry::Scope S = Registry::GLOBAL>
-		bool has(const Word& key) const noexcept;
+		template<typename R = Recurse>
+		std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, bool>
+		has(const String& key) const noexcept;
 
 		//- Get owner
 		Registry* owner() const noexcept;
 
 		//- Recursively get a reference to a registry object
-		template<typename T>
-		T& ref();
+		template<typename T, typename R = Recurse>
+		std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, T&>
+		ref();
 
 		//- Store (insert or assign) a registry object (locally)
 		template<typename T>
-		[[maybe_unused]] auto store(T&& t);
+		[[maybe_unused]] Pair<Data::iterator, bool> store(T&& t) const;
 
 
 	// Member operators
@@ -140,7 +168,7 @@ public:
 template<typename Container, typename T, typename... Ts>
 void storeAll(Container&& c, T&& t, Ts&&... ts)
 {
-	if constexpr (sizeof...(Ts) == 0)
+	if constexpr (sizeof...(Ts) != 0)
 		storeAll
 		(
 			std::forward<Container>(c),
@@ -151,6 +179,123 @@ void storeAll(Container&& c, T&& t, Ts&&... ts)
 		c->store(std::forward<T>(t));
 	else
 		c.store(std::forward<T>(t));
+}
+
+
+// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
+
+template
+<
+	typename T,
+	typename R,
+	typename std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, int>
+>
+T* Registry::obtainStored() const
+{
+	auto search {data_->find(T::name)};
+
+	// return if found
+	if (search != data_->end())
+		return static_cast<T*>(search->second.get());
+
+	// ask owner if recursing
+	if constexpr (std::is_same_v<Recurse, R>)
+		if (owner_)
+			return owner_->obtainStored<T, R>();
+
+	return nullptr;
+}
+
+
+template
+<
+	typename T,
+	typename R,
+	typename std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, int>
+>
+auto&& Registry::obtain() const
+{
+	// get if someone has it already
+	T* t {obtainStored<T, R>()};
+
+	if (t)
+		return *t;
+
+	// try to construct and store from input otherwise
+	auto [iter, success]
+	{
+		store(input::read<T>())
+	};
+
+	return *(static_cast<T*>(iter->second.get()));
+}
+
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+template<typename T, typename R>
+std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, const T&>
+Registry::cref() const
+{
+	return this->obtain<T, R>();
+}
+
+
+template<typename T, typename R>
+std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, T>
+Registry::get() const
+{
+	return this->obtain<T, R>();
+}
+
+
+template<typename T, typename R>
+std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, bool>
+Registry::has() const noexcept
+{
+	return has<R>(T::name);
+}
+
+
+template<typename R>
+std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, bool>
+Registry::has(const String& key) const noexcept
+{
+	auto search {data_->find(key)};
+
+	if (search != data_->end())
+		return true;
+
+	if constexpr (std::is_same_v<R, Recurse>)
+	{
+		// recurse if possible
+		if (owner_)
+			return owner_->has<R>(key);
+		else
+			return false;
+	}
+	else
+		return false;
+}
+
+
+template<typename T, typename R>
+std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, T&>
+Registry::ref()
+{
+	return this->obtain<T, R>();
+}
+
+
+template<typename T>
+[[maybe_unused]] Pair<Registry::Data::iterator, bool>
+Registry::store(T&& t) const
+{
+	return data_->insert_or_assign
+	(
+		removeCVRef_t<T>::name,
+		std::make_unique<removeCVRef_t<T>>(std::forward<T>(t))
+	);
 }
 
 

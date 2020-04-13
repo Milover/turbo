@@ -64,7 +64,7 @@ public:
 		) noexcept;
 
 		//- Construct from point coordinates
-		Point(const Shape::Coordinates& c) noexcept;
+		Point(const Point::Coordinates& c) noexcept;
 
 		//- Copy constructor
 		Point(const Point&) = default;
@@ -80,7 +80,7 @@ public:
 	// Member functions
 
 		//- Get coordinates
-		Shape::Coordinates coordinates() const noexcept;
+		Point::Coordinates coordinates() const noexcept;
 
 		//- Return origin
 		static Point origin();

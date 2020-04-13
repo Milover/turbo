@@ -10,8 +10,9 @@ License
 
 #include "gmsh.h"
 
-#include "Curve.h"
 #include "Line.h"
+
+#include "Curve.h"
 #include "Point.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -49,8 +50,8 @@ Line::Line
 	{
 		construct
 		(
-			start.getDimTag().second,
-			end.getDimTag().second
+			start.dimTag().second,
+			end.dimTag().second
 		)
 	}
 {}

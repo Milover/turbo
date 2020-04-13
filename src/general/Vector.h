@@ -60,24 +60,14 @@ public:
 		Vector() = default;
 		
 		//- Construct from components
-		template
-		<
-			typename T,
-			std::enable_if_t<std::is_same_v<Float, T>, int> = 0
-		>
 		constexpr Vector
 		(
-			T&& x,
-			T&& y,
-			T&& z = 0.0
+			const Float x,
+			const Float y,
+			const Float z = 0.0
 		) noexcept
 		:
-			data_
-			{
-				std::forward<T>(x),
-				std::forward<T>(y),
-				std::forward<T>(z)
-			}
+			data_ {x, y, z}
 		{}
 
 
@@ -107,6 +97,12 @@ public:
 			return data_.end();
 		}
 
+		//- Return origin point
+		inline static constexpr Vector origin()
+		{
+			return Vector {0.0, 0.0, 0.0};
+		}
+
 		//- Access X component by reference
 		inline Float& x() noexcept
 		{
@@ -117,6 +113,12 @@ public:
 		inline const Float& x() const noexcept
 		{
 			return data_[0];
+		}
+
+		//- Return unit x-axis vector
+		inline static constexpr Vector xAxis()
+		{
+			return Vector {1.0, 0.0, 0.0};
 		}
 
 		//- Access Y component by reference
@@ -131,6 +133,12 @@ public:
 			return data_[1];
 		}
 
+		//- Return unit y-axis vector
+		inline static constexpr Vector yAxis()
+		{
+			return Vector {0.0, 1.0, 0.0};
+		}
+
 		//- Access Z component by reference
 		inline Float& z() noexcept
 		{
@@ -141,6 +149,12 @@ public:
 		inline const Float& z() const noexcept
 		{
 			return data_[2];
+		}
+
+		//- Return unit z-axis vector
+		inline static constexpr Vector zAxis()
+		{
+			return Vector {0.0, 0.0, 1.0};
 		}
 
 
@@ -201,9 +215,9 @@ public:
 		//- Equality operator
 		inline bool operator==(const Vector& v) const noexcept
 		{
-			return data_[0] == v.data_[0]
-				&& data_[1] == v.data_[1]
-				&& data_[2] == v.data_[2];
+			return isEqual(data_[0], v.data_[0])
+				&& isEqual(data_[1], v.data_[1])
+				&& isEqual(data_[2], v.data_[2]);
 		}
 
 };
@@ -265,7 +279,7 @@ inline bool operator!=(const Vector& lhs, const Vector& rhs) noexcept
 }
 
 
-// * * * * * * * * * * * * * * Vector Operations * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Global Operations * * * * * * * * * * * * * * //
 
 // Magnitude
 inline Float mag(const Vector& v) noexcept
@@ -301,6 +315,25 @@ inline Vector cross(const Vector& v1, const Vector& v2) noexcept
 		v1.z() * v2.x() - v1.x() * v2.z(),
 		v1.x() * v2.y() - v1.y() * v2.x()
 	};
+}
+
+
+// Midpoint
+inline Vector midpoint(const Vector& v1, const Vector& v2) noexcept
+{
+	return Vector
+	{
+		(v1 + v2) * 0.5
+	};
+}
+
+
+// Is NAN
+inline bool isNan(const Vector& v) noexcept
+{
+	return std::isnan(v.x())
+		&& std::isnan(v.y())
+		&& std::isnan(v.z());
 }
 
 

@@ -12,13 +12,13 @@ Class
 Description
 	Class NumberOfBlades.
 
+SourceFiles
+	NumberOfBlades.cpp
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef INPUT_NUMBER_OF_BLADES_H
 #define INPUT_NUMBER_OF_BLADES_H
-
-#include <type_traits>
-#include <utility>
 
 #include "General.h"
 #include "PositiveValue.h"
@@ -31,7 +31,7 @@ namespace input
 {
 
 /*---------------------------------------------------------------------------*\
-						Class NumberOfBlades Definition
+					Class NumberOfBlades Declaration
 \*---------------------------------------------------------------------------*/
 
 class NumberOfBlades final
@@ -42,22 +42,14 @@ public:
 
 	// Public static data
 
-		inline static const Word name {"NumberOfBlades"};
+		inline static const String name {"NumberOfBlades"};
 
 
 	// Constructors
 
 		//- Construct from a Integer,
 		//  no aditional checking required
-		template
-		<
-			typename T,
-			std::enable_if_t<std::is_same_v<Float, T>, int> = 0>
-		>
-		explicit NumberOfBlades(T&& t)
-		:
-			PVBase {std::forward<T>(t)}
-		{}
+		explicit NumberOfBlades(const Integer i);
 
 };
 

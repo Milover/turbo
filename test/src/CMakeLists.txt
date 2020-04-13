@@ -4,7 +4,7 @@
 
 # compiler flags
 add_compile_options(
-		"-Wall" "-Wextra" "-O2"
+		"-Wall" "-Wextra" "-Wshadow" "-pedantic"
 )
 
 # append to include directories

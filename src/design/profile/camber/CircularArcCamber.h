@@ -59,10 +59,15 @@ protected:
 
 public:
 
+	// Public data
+
+		inline static const String name {"CircularArcCamber"};
+
+
 	// Constructors
 
-		//- Default constructor
-		explicit CircularArcCamber(const Float camber);
+		//- Construct from camber
+		explicit CircularArcCamber(const input::CamberAngle& camber);
 
 
 	// Member functions

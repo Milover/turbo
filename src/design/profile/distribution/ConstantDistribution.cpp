@@ -9,11 +9,11 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "ConstantDistribution.h"
+
 #include "Error.h"
 #include "General.h"
-#include "InputRegistry.h"
-#include "StringConverter.h"
 #include "Utility.h"
+#include "Variables.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -26,27 +26,24 @@ namespace design
 
 ConstantDistribution::ConstantDistribution()
 :
-	maxThickness_
+	max_
 	{
-		StringConverter<Float> {}
-		(
-			InputRegistry::get("maxThickness")
-		)
+		input::read<input::MaxProfileThickness>()
 	}
-{
-	if
-	(
-		!isInRange(maxThickness_, 0.0, 1.0)
-	)
-		THROW_RUNTIME_ERROR("maxThickness out of range [0, 1]");
-}
+{}
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-Float ConstantDistribution::thickness(const Float x) const noexcept
+Float ConstantDistribution::thickness(const Float x) const
 {
-	return 0.5 * maxThickness_;
+	if
+	(
+		!isInRange(x, 0.0, 1.0)
+	)
+		THROW_DOMAIN_ERROR("x out of range [0, 1]");
+
+	return 0.5 * max_.value();
 }
 
 

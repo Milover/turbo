@@ -14,6 +14,7 @@ Description
 
 #include "gmsh.h"
 
+#include "General.h"
 #include "Point.h"
 #include "Spline.h"
 #include "Utility.h"
@@ -55,7 +56,7 @@ int main(int argc, char* argv[]) {
 	};
 
 	// Test Line construction
-	geometry::Spline s1 {points};		// construct from spline
+	geometry::Spline s1 {points};			// construct from spline
 	geometry::Spline s2 {fromVector()};		// construct from spline
 
 	test::updateAndWait(1, output);
@@ -76,7 +77,7 @@ int main(int argc, char* argv[]) {
 	// Test dependency manipulation
 	gmsh::model::occ::translate
 	(
-		Vectorpair<int> {s1.getDimTag()},
+		Vectorpair<int> {s1.dimTag()},
 		0,
 		1,
 		0

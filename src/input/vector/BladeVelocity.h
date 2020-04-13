@@ -12,21 +12,18 @@ Class
 Description
 	Class BladeVelocity.
 
+SourceFiles
+	BladeVelocity.cpp
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef INPUT_BLADE_VELOCITY_H
 #define INPUT_BLADE_VELOCITY_H
 
-#include <type_traits>
-#include <utility>
-
-#include "General.h"
-#include "InitialDesign.h"
 #include "RegistryObject.h"
 #include "Radius.h"
 #include "Rps.h"
 #include "Vector.h"
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -36,7 +33,7 @@ namespace input
 {
 
 /*---------------------------------------------------------------------------*\
-						Class BladeVelocity Definition
+					Class BladeVelocity Declaration
 \*---------------------------------------------------------------------------*/
 
 class BladeVelocity final
@@ -47,39 +44,21 @@ public:
 
 	// Public static data
 
-		inline static const Word name {"BladeVelocity"};
+		inline static const String name {"BladeVelocity"};
 
 
 	// Constructors
 
 		//- Construct from a Vector,
 		//  no aditional checking required
-		template
-		<
-			typename T,
-			std::enable_if_t<std::is_same_v<Vector, T>, int> = 0>
-		>
-		explicit BladeVelocity(T&& t)
-		:
-			RegBase {std::forward<T>(t)}
-		{}
+		explicit BladeVelocity(const Vector& v);
 
 		//- Compute and construct
 		BladeVelocity
-		{
+		(
 			const Rps& rps,
 			const Radius& r
-		}
-		:
-			BladeVelocity
-			{
-				compute::computeBladeVelocity
-				(
-					rps.value(),
-					r.value()
-				)
-			}
-		{}
+		);
 
 };
 

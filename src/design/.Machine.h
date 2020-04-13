@@ -41,7 +41,7 @@ private:
 
 	// Private data
 
-		Word name_ {"machine"};
+		String name_ {"machine"};
 
 		Registry& data_;
 		Uptr<BladeRow> rotor_;				// TODO: implement multiples at some point

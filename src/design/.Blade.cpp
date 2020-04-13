@@ -17,8 +17,9 @@ License
 #include <iostream>
 #include "gmsh.h"					// TODO: this shouldn't be here
 
-#include "Airfoil.h"
 #include "Blade.h"
+
+#include "Airfoil.h"
 #include "ComponentBase.h"
 #include "Error.h"
 #include "InputObjectBase.h"
