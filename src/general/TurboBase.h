@@ -17,12 +17,13 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef DESIGN_TURBO_BASE_H
-#define DESIGN_TURBO_BASE_H
+#ifndef TURBO_BASE_H
+#define TURBO_BASE_H
 
 #include <type_traits>
 
 #include "General.h"
+#include "Model.h"
 #include "Registry.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -42,17 +43,31 @@ protected:
 
 	// Protected data
 
-		bool owns_;
+		bool ownsData_;
 		input::Registry* data_;
+		Uptr<geometry::Model> model_;
 
 
 	// Constructors
 
-		//- Default constructor
-		TurboBase() noexcept;
+		//- Default constructor,
+		//	creates an owned Registry and
+		//	creates a model
+		TurboBase();
 
-		//- Construct with (owner) Registry
-		TurboBase(const input::Registry&) noexcept;
+		//- Construct with (owner) Registry,
+		//	creates a non-owned, accessible registry and
+		//	doesn't create a model
+		TurboBase(const input::Registry& reg);
+
+		//- Construct with (owner) Registry,
+		//	creates a non-owned accessible registry and
+		//	take ownership of a model
+		TurboBase
+		(
+			const input::Registry& reg,
+			geometry::Model&& mod
+		);
 
 
 public:
@@ -86,7 +101,7 @@ public:
 		//- Querry data
 		template<typename R = NoRecurse>
 		std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, bool>
-		has(const String& key) const noexcept;
+		has(const String& key) const;
 
 		//- Build mesh
 		//virtual void mesh() = 0;
@@ -121,7 +136,7 @@ TurboBase::get() const
 
 template<typename R>
 std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, bool>
-TurboBase::has(const String& key) const noexcept
+TurboBase::has(const String& key) const
 {
 	return data_->has<R>(key);
 }

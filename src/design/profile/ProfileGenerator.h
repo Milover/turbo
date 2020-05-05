@@ -22,8 +22,9 @@ SourceFiles
 
 #include <vector>
 
-#include "CamberGeneratorBase.h"
-#include "DistributionGeneratorBase.h"
+#include "CamberGenerators.h"
+#include "DistributionGenerators.h"
+#include "Error.h"
 #include "General.h"
 #include "Variables.h"
 
@@ -54,7 +55,10 @@ private:
 	// Member functions
 
 		//- Set camber type
-		void createCamberGenerator(const input::CamberAngle& camber);
+		void createCamberGenerator
+		(
+			const input::CamberAngle& camber
+		);
 
 		//- Set distribution type
 		void createDistributionGenerator();
@@ -71,7 +75,7 @@ public:
 	// Member functions
 
 		//- Generate a profile
-		Vectorpair<Point> generate() const;
+		Vectorpair<Point> generate() const noexcept(ndebug);
 
 		//- Get camber line inclination at 'x',
 		//	x ∈ [0, 1] 0 being the LE and 1 being the TE

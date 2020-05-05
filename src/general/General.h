@@ -39,6 +39,12 @@ using Float = double;
 using String = std::string;
 
 
+using Intvector = std::vector<Integer>;
+
+
+using Floatvector = std::vector<Float>;
+
+
 template<typename T, typename U = T>
 using Pair = std::pair<T, U>;
 
@@ -48,15 +54,27 @@ using Uptr = std::unique_ptr<T>;
 
 
 template<typename T>
-using Vectorpair = std::vector<Pair<T>>;
+using Sptr = std::shared_ptr<T>;
 
 
 template<typename T>
-using Ptrvector = std::vector<Uptr<T>>;
+using Wptr = std::weak_ptr<T>;
 
 
-template<typename T = String>
-using Stringmap = std::map<String, T>;
+template<typename T, typename U = T>
+using Vectorpair = std::vector<Pair<T, U>>;
+
+
+template<typename T>
+using Uptrvector = std::vector<Uptr<T>>;
+
+
+template<typename T>
+using Sptrvector = std::vector<Sptr<T>>;
+
+
+template<typename T>
+using Wptrvector = std::vector<Wptr<T>>;
 
 
 template<typename T>
@@ -69,8 +87,73 @@ using HashMap = std::unordered_map<String, T>;
 
 // * * * * * * * * * * * * * * * Type Traits * * * * * * * * * * * * * * * * //
 
+//- Remove const, volatile and reference from a type
 template<typename T>
 using removeCVRef_t = std::remove_cv_t<std::remove_reference_t<T>>;
+
+
+//- Check if a type is a Uptr
+template<typename T, typename Element = void>
+struct isUptr : std::false_type {};
+
+template<typename T>
+struct isUptr<T, std::void_t<typename removeCVRef_t<T>::element_type>>
+:
+	std::bool_constant
+	<
+		std::is_same_v
+		<
+			Uptr<typename removeCVRef_t<T>::element_type>,
+			removeCVRef_t<T>
+		>
+	>
+{};
+
+template<typename T>
+inline constexpr bool isUptr_v = isUptr<T>::value;
+
+
+//- Check if a type is a Sptr
+template<typename T, typename = void>
+struct isSptr : std::false_type {};
+
+template<typename T>
+struct isSptr<T, std::void_t<typename removeCVRef_t<T>::element_type>>
+:
+	std::bool_constant
+	<
+		std::is_same_v
+		<
+			Sptr<typename removeCVRef_t<T>::element_type>,
+			removeCVRef_t<T>
+		>
+	>
+{};
+
+template<typename T>
+inline constexpr bool isSptr_v = isSptr<T>::value;
+
+
+
+//- Check if a type is a Wptr
+template<typename T, typename Element = void>
+struct isWptr : std::false_type {};
+
+template<typename T>
+struct isWptr<T, std::void_t<typename removeCVRef_t<T>::element_type>>
+:
+	std::bool_constant
+	<
+		std::is_same_v
+		<
+			Wptr<typename removeCVRef_t<T>::element_type>,
+			removeCVRef_t<T>
+		>
+	>
+{};
+
+template<typename T>
+inline constexpr bool isWptr_v = isWptr<T>::value;
 
 
 // * * * * * * * * * * * * * * * * Flags * * * * * * * * * * * * * * * * * * //
@@ -85,7 +168,6 @@ struct Recurse : RecursionFlag {};
 
 //- A dummy class to flag non-recursive actions in templates
 struct NoRecurse : RecursionFlag {};
-
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

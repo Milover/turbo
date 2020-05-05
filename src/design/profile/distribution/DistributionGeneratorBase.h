@@ -17,6 +17,7 @@ Description
 #ifndef DESIGN_DISTRIBUTION_GENERATOR_BASE_H
 #define DESIGN_DISTRIBUTION_GENERATOR_BASE_H
 
+#include "Error.h"
 #include "General.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -45,7 +46,7 @@ public:
 	// Constructors
 
 		//- Copy constructor
-		DistributionGeneratorBase(const DistributionGeneratorBase&) = default;
+		DistributionGeneratorBase(const DistributionGeneratorBase&) = delete;
 
 		//- Move constructor
 		DistributionGeneratorBase(DistributionGeneratorBase&&) = default;
@@ -58,7 +59,7 @@ public:
 	// Member functions
 
 		//- Get thickness at 'x' (half of total thickness)
-		virtual Float thickness(const Float x) const = 0;
+		virtual Float thickness(const Float x) const noexcept(ndebug) = 0;
 
 
 	// Member operators
@@ -67,7 +68,7 @@ public:
 		DistributionGeneratorBase& operator=
 		(
 			const DistributionGeneratorBase&
-		) = default;
+		) = delete;
 
 		//- Move assignment operator
 		DistributionGeneratorBase& operator=

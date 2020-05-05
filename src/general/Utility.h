@@ -42,7 +42,7 @@ isEqual
 	T x,
 	T y,
 	Integer ulp = 2
-)
+) noexcept
 {
 	// the machine epsilon has to be scaled to the magnitude
 	// of the values used and multiplied by the desired precision
@@ -62,7 +62,7 @@ isLessOrEqual
 	T x,
 	T y,
 	Integer ulp = 2
-)
+) noexcept
 {
 	return x < y || isEqual(x, y, ulp);
 }
@@ -76,7 +76,7 @@ isGreaterOrEqual
 	T x,
 	T y,
 	Integer ulp = 2
-)
+) noexcept
 {
 	return x > y || isEqual(x, y, ulp);
 }
@@ -91,7 +91,7 @@ isInRange
 	T min,
 	T max,
 	Integer ulp = 2
-)
+) noexcept
 {
 	return isGreaterOrEqual(x, min, ulp) &&
 		   isLessOrEqual(x, max, ulp);

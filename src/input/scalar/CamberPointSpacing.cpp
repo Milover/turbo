@@ -33,7 +33,7 @@ CamberPointSpacing::Type CamberPointSpacing::convert(String& s) const
 	else if (s == "Cosine")
 		return Type::COSINE;
 	else
-		THROW_RUNTIME_ERROR("unknown CamberPointSpacing: " + s);
+		error(FUNC_INFO, "unknown CamberPointSpacing: ", s);
 }
 
 

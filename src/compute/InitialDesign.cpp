@@ -25,11 +25,11 @@ namespace compute
 
 // * * * * * * * * * * * * * * Functions * * * * * * * * * * * * * * * * * * //
 
-Vector computeBladeVelocity
+Vector computeBladeVelocity 
 (
 	const Float N,			// rev. per second
 	const Float r			// radius
-)
+) noexcept
 {
 	return Vector
 	{
@@ -39,14 +39,14 @@ Vector computeBladeVelocity
 }
 
 
-Float computeCamberAngle
+Float computeCamberAngle 
 (
 	const Vector& c_1,		// abs. fluid inlet velocity
 	const Vector& c_2,		// abs. fluid outlet velocity
 	const Vector& U,  		// blade velocity
 	const Float i,			// incidence angle
 	const Float delta		// deviation angle
-)
+) noexcept
 {
 	Float beta_1			// fluid inlet angle
 	{
@@ -63,41 +63,48 @@ Float computeCamberAngle
 
 Float computeChord
 (
+	const Float l,			// pitch
+	const Float sigma		// solidity
+) noexcept
+{
+	return sigma * l;
+}
+
+
+Float computeChord 
+(
 	const Integer N_b,		// number of blades
 	const Float r,			// radius
 	const Float sigma		// solidity
-)
+) noexcept
 {
 	Float l					// pitch
 	{
-		2.0 * pi * r / static_cast<Float>(N_b)
+		computePitch(N_b, r);
 	};
 
 	return sigma * l;
 }
 
 
-Float computeFluidAngle
+Float computeFluidAngle 
 (
 	const Vector& c,		// abs. fluid inlet/outlet velocity
 	const Vector& U			// blade velocity
-)
+) noexcept
 {
 	Vector w {c - U};		// rel. fluid inlet/outlet velocity
 
-	return pi - std::acos
-	(
-		dot(U, w) / (mag(U) * mag(w))
-	);
+	return pi - angle(U, w);
 }
 
 
-Vector computeInletVelocity
+Vector computeInletVelocity 
 (
 	const Float Q,			// volume flow rate
 	const Float r_h,		// hub radius
 	const Float r_s			// shroud radius
-)
+) noexcept
 {
 	Float A					// inlet cross-sectional area
 	{
@@ -112,14 +119,24 @@ Vector computeInletVelocity
 }
 
 
-Vector computeRootOutletVelocity
+Float computePitch
+(
+	const Integer N_b,		// number of blades
+	const Float r			// radius
+) noexcept
+{
+	return 2.0 * pi * r / static_cast<Float>(N_b);
+}
+
+
+Vector computeRootOutletVelocity 
 (
 	const Vector& c_1,		// abs. fluid inlet velocity
 	const Float dp,			// total pressure difference
 	const Float N,			// rev. per second
 	const Float r_h,		// hub radius
 	const Float rho			// density
-)
+) noexcept
 {
 	Float dc_y
 	{
@@ -134,37 +151,37 @@ Vector computeRootOutletVelocity
 }
 
 
-Float computeStaggerAngle
+Float computeStaggerAngle 
 (
 	const Vector& c_1,		// abs. fluid inlet velocity
 	const Vector& U,  		// blade velocity
 	const Float zeta,		// leading edge inclination
 	const Float i			// incidence angle
-)
+) noexcept
 {
 	return i + computeFluidAngle(c_1, U) - zeta;
 }
 
 
-Float computeTotalPressureDifference
+Float computeTotalPressureDifference 
 (
 	const Vector& c_1,		// abs. fluid inlet velocity
 	const Vector& c_2,		// abs. fluid outlet velocity
 	const Vector& U,		// blade velocity
 	const Float rho			// density
-)
+) noexcept
 {
 	return rho * mag(U) * (c_2.y() - c_1.y());
 }
 
 
-Vector computeVortexDistributionVelocity
+Vector computeVortexDistributionVelocity 
 (
 	const Vector& c_2_h,	// abs. root (hub) fluid outlet velocity
 	const Float n,			// vortex distribution exponent
 	const Float r,			// radius
 	const Float r_h			// hub radius
-)
+) noexcept
 {
 	Float k
 	{
@@ -182,12 +199,12 @@ Vector computeVortexDistributionVelocity
 }
 
 
-Vector deHaller
+Vector deHaller 
 (
 	const Vector& c_1,		// abs. fluid inlet velocity
 	const Vector& c_2,		// abs. fluid outlet velocity
 	const Vector& U			// blade velocity
-)
+) noexcept
 {
 	static constexpr Float DH {0.72};	// deHaller constant
 

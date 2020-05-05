@@ -8,13 +8,13 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include <utility>
-
-#include "gmsh.h"
+#include <cassert>
 
 #include "Point.h"
 
 #include "General.h"
+#include "GmshPoint.h"
+#include "PlaceholderPoint.h"
 #include "Shape.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -24,16 +24,20 @@ namespace turbo
 namespace geometry
 {
 
-// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
+// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
-Integer Point::construct
-(
-	const Float x,
-	const Float y,
-	const Float z
-) const noexcept
+void Point::construct() const noexcept
 {
-	return gmsh::model::occ::addPoint(x, y, z);
+	auto tag
+	{
+		interface::GmshPoint {}
+		(
+			tag_,
+			coords_
+		)
+	};
+
+	assert(tag == tag_);
 }
 
 
@@ -46,37 +50,45 @@ Point::Point
 	const Float z
 ) noexcept
 :
-	Shape
-	{
-		std::make_pair
-		(
-			0,		// dimension
-			construct(x, y, z)
-		)
-	}
+	Point {Coordinates {x, y, z}}
 {}
 
 
-Point::Point(const Point::Coordinates& c) noexcept
+Point::Point(const detail::PlaceholderPoint& p) noexcept
 :
-	Point
-	{
-		c.x(), c.y(), c.z()
-	}
-{}
+	ShapeBase {p.tag}
+{
+	coords_ = p.coordinates();
+}
+
+
+Point::Point(const Coordinates& c) noexcept
+:
+	coords_ {c}
+{
+	construct();
+}
+
+
+Point::Point(Coordinates&& c) noexcept
+:
+	coords_ {std::move(c)}
+{
+	construct();
+}
 
 
 // * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * * //
 
 Point::Coordinates Point::coordinates() const noexcept
 {
-	return boundingBox().first;
+	return coords_;
 }
 
 
-Point Point::origin()
+Point Point::origin() noexcept
 {
-	return Point {0, 0};
+	return Point {Coordinates::origin()};
 }
 
 

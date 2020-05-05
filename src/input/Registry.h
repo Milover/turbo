@@ -49,7 +49,7 @@ private:
 	// Private data
 
 		Registry* owner_ {nullptr};
-		Uptr<Ptrvector<Registry>> slaves_ {nullptr};
+		Uptr<Uptrvector<Registry>> slaves_ {nullptr};
 			// NOTE: currently grows infinitely i.e.
 			// 		 no removal of slaves (only removed once owner destructs
 			// 		 and no resize after removal of a slave)
@@ -61,7 +61,7 @@ private:
 	// Constructors
 
 		//- Default construct and set owner
-		Registry(const Registry&) noexcept;
+		Registry(const Registry&);
 
 
 	// Member functions
@@ -74,10 +74,7 @@ private:
 		<
 			typename T,
 			typename R,
-			typename std::enable_if_t
-			<
-				std::is_base_of_v<RecursionFlag, R>, int
-			> = 0
+			typename = std::enable_if_t<std::is_base_of_v<RecursionFlag, R>>
 		>
 		T* obtainStored() const;
 
@@ -90,10 +87,7 @@ private:
 		<
 			typename T,
 			typename R,
-			typename std::enable_if_t
-			<
-				std::is_base_of_v<RecursionFlag, R>, int
-			> = 0
+			typename = std::enable_if_t<std::is_base_of_v<RecursionFlag, R>>
 		>
 		auto&& obtain() const;
 
@@ -103,7 +97,7 @@ public:
 	// Constructors
 
 		//- Default constructor
-		Registry() noexcept;
+		Registry();
 
 		//- Dissallow move constructor
 		Registry(Registry&&) = delete;
@@ -116,7 +110,7 @@ public:
 	// Member functions
 
 		//- Create a new (slave) registry
-		Registry& create() noexcept;
+		Registry& create();
 
 		//- Recursively get a const reference to a registry object
 		template<typename T, typename R = Recurse>
@@ -131,12 +125,12 @@ public:
 		//- Check if a registry object exists (locally or globally)
 		template<typename T, typename R = Recurse>
 		std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, bool>
-		has() const noexcept;
+		has() const;
 
 		//- Check if a registry object (key) exists (locally or globally)
 		template<typename R = Recurse>
 		std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, bool>
-		has(const String& key) const noexcept;
+		has(const String& key) const;
 
 		//- Get owner
 		Registry* owner() const noexcept;
@@ -184,12 +178,7 @@ void storeAll(Container&& c, T&& t, Ts&&... ts)
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
-template
-<
-	typename T,
-	typename R,
-	typename std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, int>
->
+template<typename T, typename R, typename>
 T* Registry::obtainStored() const
 {
 	auto search {data_->find(T::name)};
@@ -207,12 +196,7 @@ T* Registry::obtainStored() const
 }
 
 
-template
-<
-	typename T,
-	typename R,
-	typename std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, int>
->
+template<typename T, typename R, typename>
 auto&& Registry::obtain() const
 {
 	// get if someone has it already
@@ -251,7 +235,7 @@ Registry::get() const
 
 template<typename T, typename R>
 std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, bool>
-Registry::has() const noexcept
+Registry::has() const
 {
 	return has<R>(T::name);
 }
@@ -259,7 +243,7 @@ Registry::has() const noexcept
 
 template<typename R>
 std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, bool>
-Registry::has(const String& key) const noexcept
+Registry::has(const String& key) const
 {
 	auto search {data_->find(key)};
 

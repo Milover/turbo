@@ -29,9 +29,8 @@ Description
 
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-#include "gmsh.h"
+#include <gmsh.h>
 
 #include "Shape.h"
 #include "Curve.h"
@@ -61,7 +60,7 @@ private:
 		std::enable_if_t<std::conjunction_v<std::is_base_of<Curve, T>...>, Integer>
 		construct(const T&... t) const noexcept
 		{
-			std::vector<Integer> tags
+			Intvector tags
 			{
 				t.dimTag().second...
 			};

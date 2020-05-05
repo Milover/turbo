@@ -15,7 +15,7 @@ License
 #include <vector>
 
 #include <iostream>
-#include "gmsh.h"					// TODO: this shouldn't be here
+#include <gmsh.h>			// TODO: this shouldn't be here
 
 #include "Blade.h"
 
@@ -130,7 +130,7 @@ void Blade::buildSurfaces() noexcept	// TODO: implement properly
 void Blade::checkNumberOfStations() const
 {
 	if (numberOfStations_ == 0)
-		THROW_RUNTIME_ERROR("number of stations == 0");
+		error(FUNC_INFO, "number of stations == 0");
 }
 
 
@@ -147,14 +147,14 @@ void Blade::checkOffsets() const		// NOTE: disabled until tip/root profile
 	(
 		isLessOrEqual(get("span"), offsets)
 	)
-		THROW_RUNTIME_ERROR("offsets larger than span");
+		error(FUNC_INFO, "offsets larger than span");
 */
 	if
 	(
 		!isEqual(get("hubOffset"), 0.0) ||
 		!isEqual(get("tipOffset"), 0.0)
 	)
-		THROW_RUNTIME_ERROR("station offsetting not implemented, set offsets to 0");
+		error(FUNC_INFO, "station offsetting not implemented, set offsets to 0");
 }
 
 
@@ -211,7 +211,7 @@ void Blade::check() const
 		if (key == "vortexLawExponent")
 			continue;
 		else if (value < 0.0)
-			THROW_RUNTIME_ERROR("value of keyword '" + key + "' < 0");
+			error(FUNC_INFO, "value of keyword '", key, "' < 0");
 	}
 	
 	checkNumberOfStations();
@@ -259,7 +259,7 @@ void Blade::parse(const Stringmap<>& input)
 		}
 		catch (...)
 		{
-			THROW_ARGUMENT_ERROR("can't convert '" + search->second + "' to int");
+			error(FUNC_INFO, "can't convert '", search->second, "' to int");
 		}
 	}
 }

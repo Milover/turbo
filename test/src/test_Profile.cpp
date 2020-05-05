@@ -17,6 +17,7 @@ Description
 #include <cmath>
 
 #include "General.h"
+#include "GmshControl.h"
 #include "Geometry.h"
 #include "InputRegistry.h"
 #include "Profile.h"
@@ -31,11 +32,10 @@ using namespace turbo;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int main(int argc, char* argv[]) {
-	
-	bool output {test::parseCommandLineArgs(argc, argv)};
-	test::initialize("test", output);
-	bool pass {true};
+int main(int argc, char* argv[])
+{
+	#include "TestInclude.h"
+	#include "TestGmshInclude.h"
 
 	input::CamberAngle camber	{0.25 * M_PI};	// TODO: should mass test this
 	input::Chord chord			{0.5};			// so we can see the scaling
@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
 	auto contour {profile.getContour()};
 	auto trailingEdge {profile.getTrailingEdge()};
 
-	test::updateAndWait(1, output);
+	updateAndWait(1);
 	// (250 * 2 - 1) points, 1 spline & 2 points, 1 line & 2 points
 	test::compareTest
 	(
@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
 		output,
 		"Checking entitites after build"
 	);
-	test::updateAndWait(1, output);
+	updateAndWait(1);
 
 	// shouldn't be wrapped
 	test::compareTest
@@ -117,7 +117,7 @@ int main(int argc, char* argv[]) {
 	auto wrappedContour {profile.getContour()};
 	auto wrappedTrailingEdge {profile.getTrailingEdge()};
 
-	test::updateAndWait(1, output);
+	updateAndWait(1);
 
 	// 2 x what it was before
 	test::compareTest
@@ -129,7 +129,7 @@ int main(int argc, char* argv[]) {
 		output,
 		"Checking entitites after wrap"
 	);
-	test::updateAndWait(1, output);
+	updateAndWait(1);
 
 	// should be wrapped
 	test::compareTest
@@ -142,11 +142,12 @@ int main(int argc, char* argv[]) {
 
 	// test pass or fail
 	if (pass)
-		test::echo(1);
-	else
 		test::echo(0);
+	else
+		test::echo(1);
 
-	test::finalize(output);
+	control.update();
+	control.run();
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

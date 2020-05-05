@@ -24,8 +24,9 @@ Description
 #include <random>
 #include <string>
 #include <thread>
+#include <type_traits>
 
-#include "gmsh.h"
+#include <gmsh.h>
 
 #include "General.h"
 
@@ -43,19 +44,16 @@ inline static constexpr Float eps {1e-15};
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-void initialize
-(
-	String s,
-	const bool gui = true
-)
+/*
+[[deprecated("use the GmshControl::initialize()")]]
+void initialize(const bool gui = true)
 {
 	if (gui)
 	{
 		gmsh::initialize(0, 0, false);
 		gmsh::fltk::initialize();
 		gmsh::option::setNumber("General.Terminal", 1);
-		gmsh::option::setNumber("General.Verbosity", 1);
+		gmsh::option::setNumber("General.Verbosity", 1);		// <- this guy
 		gmsh::option::setNumber("Geometry.Surfaces", 1);
 		gmsh::option::setNumber("Geometry.SurfaceNumbers", 1);
 		gmsh::option::setNumber("Geometry.SurfaceType", 2);
@@ -68,33 +66,11 @@ void initialize
 	gmsh::option::setNumber("General.NumThreads", 0);
 	gmsh::option::setNumber("Geometry.AutoCoherence", 0);
 	gmsh::option::setNumber("Geometry.Tolerance", 1e-17);
-	gmsh::model::add(s);
+	gmsh::option::setNumber("Mesh.MshFileVersion", 2);
 }
 
 
-void initializeNoModel(const bool gui = true)
-{
-	if (gui)
-	{
-		gmsh::initialize();
-		gmsh::fltk::initialize();
-		gmsh::option::setNumber("General.Terminal", 1);
-		gmsh::option::setNumber("General.Verbosity", 100);
-		gmsh::option::setNumber("Geometry.Surfaces", 1);
-		gmsh::option::setNumber("Geometry.SurfaceNumbers", 1);
-		gmsh::option::setNumber("Geometry.SurfaceType", 2);
-		gmsh::option::setNumber("Geometry.NumSubEdges", 200);
-	}
-	else
-	{
-		gmsh::initialize(0, 0, false);
-	}
-	gmsh::option::setNumber("General.NumThreads", 0);
-	gmsh::option::setNumber("Geometry.AutoCoherence", 0);
-	gmsh::option::setNumber("Geometry.Tolerance", 1e-17);
-}
-
-
+[[deprecated("use the GmshControl::update()")]]
 void update(const bool gui)
 {
 	gmsh::model::occ::synchronize();
@@ -107,6 +83,7 @@ void update(const bool gui)
 }
 
 
+[[deprecated("use the GmshControl class and member functions")]]
 void finalize(const bool gui)
 {
 	update(gui);
@@ -114,19 +91,18 @@ void finalize(const bool gui)
 	if (gui)
 	{
 		gmsh::fltk::run();
-		gmsh::finalize();
 	}
+
+	gmsh::finalize();
 }
 
-
-void updateAndWait
+*/
+void pause
 (
 	const Integer d [[maybe_unused]],
 	const bool gui
 )
 {
-	update(gui);
-
 	if (gui)
 	{
 		std::chrono::seconds time(d);
@@ -244,10 +220,13 @@ void compareTest
 	else
 	{
 		if (output)
+		{
 			std::cout << std::setw(outputWidth) << "FAIL\n";
+		}
 		pass = false;
 	}
 }
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -22,6 +22,7 @@ SourceFiles
 
 #include "General.h"
 #include "NumberOfBlades.h"
+#include "Pitch.h"
 #include "PositiveValue.h"
 #include "Radius.h"
 #include "Solidity.h"
@@ -53,6 +54,13 @@ public:
 		//- Construct from a Float,
 		//  no aditional checking required
 		explicit Chord(const Float f);
+
+		//- Compute and construct
+		Chord
+		(
+			const Pitch& l,
+			const Solidity& sigma
+		);
 
 		//- Compute and construct
 		Chord

@@ -22,6 +22,7 @@ SourceFiles
 
 #include <vector>
 
+#include "Error.h"
 #include "General.h"
 #include "Geometry.h"
 #include "ProfileGenerator.h"
@@ -93,6 +94,12 @@ public:
 			const input::StaggerAngle& stagger
 		);
 
+		//- Get the camber line
+		Vectorpair<Point> camberLine() const noexcept(ndebug);
+
+		//- Get geometric center
+		Point centroid() const noexcept;
+
 		//- Check if empty
 		bool empty() const noexcept;
 
@@ -102,30 +109,31 @@ public:
 		//- Get const iterator to end
 		Constiterator end() const;
 
-		//- Get geometric center
-		Point centroid() const noexcept;
+		//- Get contour. Outputs to current model.
+		geometry::Spline getContour() const noexcept(ndebug);
+
+		//- Get geometry points ordered from top (upper) TE to
+		//	bot (lower) TE. Outputs to current model.
+		std::vector<geometry::Point> getPoints() const noexcept(ndebug);
+
+		//- Get trailing edge. Outputs to current model.
+		geometry::Line getTrailingEdge() const noexcept(ndebug);
 
 		//- Get the unit direction vector
 		//	of the camberline tangent at
 		//	the leading edge.
 		//	The vector points outward with
 		//	respect to the profile contour.
-		Vector leDirection() const;
+		Vector leDirection() const noexcept(ndebug);
 
 		//- Get LE point
-		Vector lePoint() const;
+		Point lePoint() const noexcept(ndebug);
 
-		//- Get contour
-		geometry::Spline getContour() const;
+		//- Get raw points ordered from top (upper) TE
+		//	to bot (lower) TE
+		std::vector<Point> orderedPoints() const noexcept;
 
-		//- Get points ordered from top (upper) TE to
-		//	bot (lower) TE
-		std::vector<geometry::Point> getPoints() const;
-
-		//- Get trailing edge
-		geometry::Line getTrailingEdge() const;
-
-		//- Get data (raw points)
+		//- Get raw data (raw points)
 		Vectorpair<Point> points() const noexcept;
 
 		//- Get size
@@ -136,10 +144,10 @@ public:
 		//	the trailing edge.
 		//	The vector points outward with
 		//	respect to the profile contour.
-		Vector teDirection() const;
+		Vector teDirection() const noexcept(ndebug);
 
 		//- Get TE point
-		Vector tePoint() const;
+		Point tePoint() const noexcept(ndebug);
 
 		//- Wrap to cylinder
 		void wrap() noexcept;

@@ -8,49 +8,52 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "TurboBase.h"
+#include <cassert>
+
+#include <gmsh.h>
+
+#include "GmshLine.h"
 
 #include "General.h"
-#include "Registry.h"
+#include "GmshControl.h"
+#include "Point.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace turbo
 {
-namespace design
+namespace geometry
+{
+namespace interface
 {
 
-// * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
 
-TurboBase::TurboBase() noexcept
-:
-	owns_ {true},
-	data_ {new input::Registry()}	// we own and manage
-{}
-
-
-TurboBase::TurboBase(const input::Registry& r) noexcept
-:
-	owns_ {false},
-	data_					// we don't own or manage but have access
-	{
-		&const_cast<input::Registry&>(r).create()
-	}
-{}
-
-
-// * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
-
-TurboBase::~TurboBase() noexcept
+std::size_t GmshLine::operator()
+(
+	const std::size_t tag,
+	const Point& start,
+	const Point& end
+) const noexcept
 {
-	if (owns_)
-		delete data_;
+	assert(GmshControl::initialized());
+
+	return static_cast<std::size_t>
+	(
+		gmsh::model::occ::addLine
+		(
+			static_cast<Integer>(start.tag()),
+			static_cast<Integer>(end.tag()),
+			static_cast<Integer>(tag)
+		)
+	);
 }
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace design
+} // End namespace interface
+} // End namespace geometry
 } // End namespace turbo
 
 // ************************************************************************* //

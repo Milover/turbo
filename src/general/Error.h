@@ -14,10 +14,11 @@ Description
 #ifndef ERROR_H
 #define ERROR_H
 
-#include <stdexcept>
-#include <type_traits>
-
-#include "General.h"
+#include <cstdlib>
+#include <iostream>
+#include <utility>
+#include <tuple>
+#include <sstream>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -26,85 +27,101 @@ namespace turbo
 
 // * * * * * * * * * * * * * * Constants * * * * * * * * * * * * * * * * * * //
 
-static const String boldOn {"\033[1m"};
+#ifdef NDEBUG
+
+	// debugging disabled
+	static constexpr bool ndebug {true};
+
+#else
+
+	// debugging enabled
+	static constexpr bool ndebug {false};
+
+#endif
 
 
-static const String redBoldOn {"\033[1;31m"};
+static constexpr char boldOn[] {"\033[1m"};
 
+static constexpr char redBoldOn[] {"\033[1;31m"};
 
-static const String boldOff {"\033[0m"};
-
+static constexpr char boldOff[] {"\033[0m"};
 
 // * * * * * * * * * * * * * * Functions * * * * * * * * * * * * * * * * * * //
 
-//- Construct error message
-inline String errorMessage
-(
-	const String& function,
-	const String& file,
-	const long line,
-	const String& message
-)
+//- Construct a string formatted bold red
+template<typename... T>
+constexpr std::string redBold(T&&... t)
 {
-	String error
-	{
-		boldOn +
-		file + ": " +
-		boldOff +
-		"In function " +
-		boldOn +
-		"'" + function + "':\n" +
-		file + ":" +
-		std::to_string(line) + ": " +
-		boldOff +
-		redBoldOn +
-		"error: " +
-		boldOff +
-		message +
-		"\n"
-	};
+	std::stringstream ss;
 
-	return error;
+	ss << redBoldOn;
+	(ss << ... << t);
+	ss << boldOff;
+
+	return ss.str();
 }
 
 
-//- Throw an error
-template<typename T>
-[[noreturn]] std::enable_if_t<
-	std::is_base_of_v<std::runtime_error, T> ||
-	std::is_base_of_v<std::logic_error, T>
->
-throwError(const String& message)
+//- Construct a string formatted bold
+template<typename... T>
+constexpr std::string bold(T&&... t)
 {
-	throw T(message);
+	std::stringstream ss;
+
+	ss << boldOn;
+	(ss << ... << t);
+	ss << boldOff;
+
+	return ss.str();
+}
+
+
+//- Cleanup and exit with failure code and print an error message.
+//	The first argument should be the FUNC_INFO macro, the 'message' can be
+//	composed from any printable types
+template<typename... T>
+[[noreturn]] void error
+(
+	std::tuple<std::string, std::string, long>&& func_info,
+	T&&... message
+)
+{
+	auto func {std::move(std::get<0>(func_info))};
+	auto file {std::move(std::get<1>(func_info))};
+	auto line {std::move(std::get<2>(func_info))};
+
+	std::string error
+	{
+		bold(file, ": ")
+	  + "In function "
+	  + bold("'", func, "':\n", file, ":", line, ": ")
+	  + redBold("error: ")
+	};
+
+	if constexpr (ndebug)
+	{
+		std::cerr << error;
+		(std::cerr << ... << std::forward<T>(message)) << '\n';
+		std::exit(EXIT_FAILURE);
+	}
+	else
+	{
+		std::stringstream ss;
+
+		ss << error;
+		(ss << ... << std::forward<T>(message)) << '\n';
+
+		throw std::runtime_error(ss.str());
+	}
 }
 
 
 // * * * * * * * * * * * * * * Macros  * * * * * * * * * * * * * * * * * * * //
 
-#define THROW_ARGUMENT_ERROR(message) \
-	throwError<std::invalid_argument> \
-		(errorMessage(__PRETTY_FUNCTION__, __FILE__, __LINE__, (message)))
-
-
-#define THROW_DOMAIN_ERROR(message) \
-	throwError<std::domain_error> \
-		(errorMessage(__PRETTY_FUNCTION__, __FILE__, __LINE__, (message)))
-
-
-#define THROW_LOGIC_ERROR(message) \
-	throwError<std::logic_error> \
-		(errorMessage(__PRETTY_FUNCTION__, __FILE__, __LINE__, (message)))
-
-
-#define THROW_RANGE_ERROR(message) \
-	throwError<std::out_of_range> \
-		(errorMessage(__PRETTY_FUNCTION__, __FILE__, __LINE__, (message)))
-
-
-#define THROW_RUNTIME_ERROR(message) \
-	throwError<std::runtime_error> \
-		(errorMessage(__PRETTY_FUNCTION__, __FILE__, __LINE__, (message)))
+//- A macro which constructs a tuple containing the current function, source
+//	file and line information
+#define FUNC_INFO \
+		std::forward_as_tuple(__PRETTY_FUNCTION__, __FILE__, __LINE__)
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

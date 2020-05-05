@@ -8,12 +8,11 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "gmsh.h"
+#include <cassert>
 
 #include "Line.h"
 
-#include "Curve.h"
-#include "Point.h"
+#include "GmshLine.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -22,39 +21,22 @@ namespace turbo
 namespace geometry
 {
 
-// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
+// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
-Integer Line::construct
-(
-	const Integer startTag,
-	const Integer endTag
-) const noexcept
+void Line::construct() const noexcept
 {
-	return gmsh::model::occ::addLine
-	(
-		startTag,
-		endTag
-	);
-}
-
-
-// * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
-
-Line::Line
-(
-	Point start,
-	Point end
-) noexcept
-:
-	Curve
+	auto returnTag
 	{
-		construct
+		interface::GmshLine {}
 		(
-			start.dimTag().second,
-			end.dimTag().second
+			tag_,
+			startRef(),
+			endRef()
 		)
-	}
-{}
+	};
+
+	assert(returnTag == tag_);
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

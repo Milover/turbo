@@ -50,13 +50,13 @@ CircularArcCamber::CircularArcCamber(const input::CamberAngle& camber)
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-Float CircularArcCamber::inclination(const Float x) const
+Float CircularArcCamber::inclination(const Float x) const noexcept(ndebug)
 {
 	if
 	(
 		!isInRange(x, 0.0, 1.0)
 	)
-		THROW_DOMAIN_ERROR("x out of range [0, 1]");
+		error(FUNC_INFO, x, " out of range [0, 1]");
 
 	Float root
 	{

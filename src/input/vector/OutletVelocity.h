@@ -21,6 +21,7 @@ SourceFiles
 #define INPUT_OUTLET_VELOCITY_H
 
 #include "BladeVelocity.h"
+#include "Error.h"
 #include "HubRadius.h"
 #include "InletVelocity.h"
 #include "Radius.h"
@@ -58,7 +59,7 @@ public:
 
 		//- Construct from a Vector,
 		//  no aditional checking required
-		explicit OutletVelocity(const Vector& v);
+		explicit OutletVelocity(const Vector& v) noexcept(ndebug);
 
 		//- Compute and construct
 		OutletVelocity
@@ -67,7 +68,7 @@ public:
 			const VortexDistributionExponent& n,
 			const Radius& r,
 			const HubRadius& r_h
-		);
+		) noexcept(ndebug);
 
 		//- Compute by applying deHaller criterion and construct
 		OutletVelocity
@@ -78,7 +79,7 @@ public:
 			const Radius& r,
 			const HubRadius& r_h,
 			const BladeVelocity& U
-		);
+		) noexcept(ndebug);
 
 };
 

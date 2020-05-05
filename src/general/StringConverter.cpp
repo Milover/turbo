@@ -10,6 +10,7 @@ License
 
 #include "StringConverter.h"
 
+#include "Error.h"
 #include "General.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

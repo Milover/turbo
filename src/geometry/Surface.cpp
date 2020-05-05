@@ -8,11 +8,15 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include <utility>
+#include <vector>
 
 #include "Surface.h"
 
+#include "Curve.h"
+#include "Error.h"
 #include "General.h"
+#include "PlaceholderSurface.h"
+#include "Point.h"
 #include "Shape.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -22,19 +26,65 @@ namespace turbo
 namespace geometry
 {
 
-// * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * * //
 
-Surface::Surface(const Integer tag) noexcept
+Surface::Surface(const detail::PlaceholderSurface& s)
 :
-	Shape
+	ShapeBase {s.tag}
+{
+	auto curves {s.boundary()};
+
+	boundary_.reserve(curves.size());
+
+	for (auto& [phC, sptrC] : curves)
 	{
-		std::make_pair
-		(
-			2,		// dimension
-			tag
-		)
+		if (sptrC)
+			boundary_.emplace_back(sptrC);
+		else
+			boundary_.emplace_back
+			(
+				new Curve {phC}
+			);
 	}
-{}
+}
+
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+Sptrvector<Curve>& Surface::boundaryRef() noexcept
+{
+	return boundary_;
+}
+
+
+Sptrvector<Point>& Surface::cornersRef() noexcept(ndebug)
+{
+	if (!corners_)
+		error(FUNC_INFO, "corners have not been assigned");
+
+	return *corners_;
+}
+
+
+std::vector<Sptrvector<Curve>>& Surface::holesRef() noexcept(ndebug)
+{
+	if (!holes_)
+		error(FUNC_INFO, "surface doesn't have holes");
+
+	return *holes_;
+}
+
+
+bool Surface::hasCorners() const noexcept
+{
+	return bool(corners_);
+}
+
+
+bool Surface::hasHoles() const noexcept
+{
+	return bool(holes_);
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

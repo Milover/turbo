@@ -10,6 +10,7 @@ License
 
 #include "InletVelocity.h"
 
+#include "Error.h"
 #include "HubRadius.h"
 #include "InitialDesign.h"
 #include "ShroudRadius.h"
@@ -25,7 +26,7 @@ namespace input
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-InletVelocity::InletVelocity(const Vector& v)
+InletVelocity::InletVelocity(const Vector& v) noexcept(ndebug)
 :
 	RegBase {v}
 {}
@@ -36,7 +37,7 @@ InletVelocity::InletVelocity
 	const VolumeFlowRate& Q,
 	const HubRadius& r_h,
 	const ShroudRadius& r_s
-)
+) noexcept(ndebug)
 :
 	InletVelocity
 	{

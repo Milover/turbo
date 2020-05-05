@@ -21,6 +21,7 @@ SourceFiles
 #define DESIGN_CONSTANT_DISTRIBUTION_H
 
 #include "DistributionGeneratorBase.h"
+#include "Error.h"
 #include "General.h"
 #include "Variables.h"
 
@@ -62,7 +63,7 @@ public:
 	// Member functions
 
 		//- Get thickness at 'x' (half of total thickness)
-		Float thickness(const Float x) const override;
+		Float thickness(const Float x) const noexcept(ndebug) override;
 
 };
 

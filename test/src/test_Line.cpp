@@ -8,82 +8,161 @@ License
 
 Description
 	Testing Line class basic funtionality and dependency behaviour
-	of the Point class
+	of the Line class
 
 \*---------------------------------------------------------------------------*/
 
-#include "gmsh.h"
-
 #include "General.h"
+#include "GmshControl.h"
 #include "Line.h"
+#include "Model.h"
 #include "Point.h"
-#include "Utility.h"
 
 #include "Test.h"
+#include "TestCurves.h"
 
 using namespace turbo;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int main(int argc, char* argv[]) {
-	
-	bool output {test::parseCommandLineArgs(argc, argv)};
-	test::initialize("test", output);
-	bool pass {true};
+geometry::Line fromFunction()
+{
+	return geometry::Line
+	{
+		geometry::Point {0.0, 0.0},
+		geometry::Point {1.0, 0.0}
+	};
+}
 
-	// Test Point construction
-	geometry::Point p1 {0,0};		// construct from components
-	geometry::Point p2 {1,0};
-	geometry::Point p3 {2,0};		// construct from Point
 
-	test::updateAndWait(1, output);
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+int main(int argc, char* argv[])
+{
+	#include "TestInclude.h"
+	#include "TestGmshInclude.h"
+
+	geometry::Point::Coordinates c1 {0.0, 0.0};
+	geometry::Point::Coordinates c2 {1.0, 0.0};
 
 	// Test Line construction
-	geometry::Line l1 {p1, p2};		// construct from Points
-	geometry::Line l2 {p2, p3};
-	geometry::Line l3 {l1};			// construct from Line
+	std::vector<Uptr<geometry::Curve>> curves;
 
-	test::updateAndWait(1, output);
+	curves.push_back
+	(
+		Uptr<geometry::Line>				// Coordinates&
+		{
+			new geometry::Line {c1, c2}
+		}
+	);
+	curves.push_back
+	(
+		Uptr<geometry::Line>				// Coordinates&&
+		{
+			new geometry::Line
+			{
+				geometry::Point::Coordinates {0.0, 0.0},
+				geometry::Point::Coordinates {1.0, 0.0}
+			}
+		}
+	);
+	curves.push_back
+	(
+		Uptr<geometry::Line>				// Point&&
+		{
+			new geometry::Line
+			{
+				geometry::Point {c1},
+				geometry::Point {c2}
+			}
+		}
+	);
+	Sptr<geometry::Point> sp1 {new geometry::Point {c1}};
+	Sptr<geometry::Point> sp2 {new geometry::Point {c2}};
+	curves.push_back
+	(
+		Uptr<geometry::Line>				// Sptr<Point>&
+		{
+			new geometry::Line {sp1, sp2}
+		}
+	);
+	curves.push_back
+	(
+		Uptr<geometry::Line>				// Sptr<Point>&&
+		{
+			new geometry::Line
+			{
+				Sptr<geometry::Point> {new geometry::Point {0.0, 0.0}},
+				Sptr<geometry::Point> {new geometry::Point {1.0, 0.0}}
+			}
+		}
+	);
+	curves.push_back
+	(
+		Uptr<geometry::Line>				// Line&&
+		{
+			new geometry::Line {fromFunction()}
+		}
+	);
+
+	updateAndWait(1);
 
 	Integer numberOfEntities {test::getNumberOfEntities()};
 
-	// 3 raw points,
-	// 2 points per line (6),
-	// 3 lines
+	// 2 points per line (12),
+	// 6 curves
 	test::compareTest
 	(
 		pass,
-		(numberOfEntities == 12),
+		(numberOfEntities == 18),
 		output,
-		"Checking entitites (12)"
+		"Checking entitites (18)"
 	);
 
-	// Test dependency manipulation
-	gmsh::model::occ::translate
-	(
-		Vectorpair<Integer> {l3.dimTag()},
-		0,
-		1,
-		0
-	);
-	test::updateAndWait(1, output);
-
-	// should have the same entities as before translation
+	// check dimension
 	test::compareTest
 	(
 		pass,
-		(numberOfEntities == test::getNumberOfEntities()),
+		test::checkCurveDimension(curves),
 		output,
-		"Checking entitites"
+		"Checking dimensions"
+	);
+
+	// check curve tags
+	test::compareTest
+	(
+		pass,
+		test::checkCurveTags(curves),
+		output,
+		"Checking tags"
+	);
+
+	// check boundary points
+	test::compareTest
+	(
+		pass,
+		test::checkCurveBoundary(curves),
+		output,
+		"Checking start/end points"
+	);
+
+	// we've created 12 points
+	test::compareTest
+	(
+		pass,
+		geometry::Point::count() == 12,
+		output,
+		"Checking number of created points"
 	);
 
 	// test pass or fail
 	if (pass)
-		test::echo(1);
-	else
 		test::echo(0);
+	else
+		test::echo(1);
 
-	test::finalize(output);
+	control.update();
+	control.run();
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

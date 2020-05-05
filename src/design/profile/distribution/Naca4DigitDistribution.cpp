@@ -41,13 +41,13 @@ Naca4DigitDistribution::Naca4DigitDistribution()
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-Float Naca4DigitDistribution::thickness(const Float x) const
+Float Naca4DigitDistribution::thickness(const Float x) const noexcept(ndebug)
 {
 	if
 	(
 		!isInRange(x, 0.0, 1.0)
 	)
-		THROW_DOMAIN_ERROR("x out of range [0, 1]");
+		error(FUNC_INFO, x, " out of range [0, 1]");
 
 	return a_[0] * std::sqrt(x) +
 		   a_[1] * x +

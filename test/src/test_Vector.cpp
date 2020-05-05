@@ -27,7 +27,6 @@ using namespace turbo;
 int main(int argc, char* argv[])
 {
 	[[maybe_unused]] bool output {test::parseCommandLineArgs(argc, argv)};
-	test::initialize("test", false);
 	bool pass {true};
 
 	std::vector<Vector> v;
@@ -189,9 +188,9 @@ int main(int argc, char* argv[])
 
 	// test pass or fail
 	if (pass)
-		test::echo(1);
-	else
 		test::echo(0);
+	else
+		test::echo(1);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

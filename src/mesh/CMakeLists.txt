@@ -3,9 +3,11 @@
 # See the LICENSE file for license information
 
 # add all subdirectories
+add_subdirectory(generators)
 
 # add sources
 set(SRC
+	Mesh.cpp
 	)
 
 # append to sources

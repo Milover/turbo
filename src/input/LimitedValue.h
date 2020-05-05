@@ -58,15 +58,15 @@ protected:
 		template
 		<
 			typename U,
-			std::enable_if_t<std::is_same_v<T, removeCVRef_t<U>>, int> = 0
+			typename = std::enable_if_t<std::is_same_v<T, removeCVRef_t<U>>>
 		>
-		explicit LimitedValue(U&& u);
+		explicit LimitedValue(U&& u) noexcept(ndebug);
 
 
 	// Member functions
 
 		//- Check input
-		virtual void check() const override;
+		virtual void check() const noexcept(ndebug) override;
 
 
 public:
@@ -101,12 +101,8 @@ public:
 // * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
 
 template<typename T, Integer Low, Integer High>
-template
-<
-	typename U,
-	std::enable_if_t<std::is_same_v<T, removeCVRef_t<U>>, int>
->
-LimitedValue<T, Low, High>::LimitedValue(U&& u)
+template<typename U, typename>
+LimitedValue<T, Low, High>::LimitedValue(U&& u) noexcept(ndebug)
 :
 	RegBase {std::forward<U>(u)}
 {
@@ -117,7 +113,7 @@ LimitedValue<T, Low, High>::LimitedValue(U&& u)
 // * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * * //
 
 template<typename T, Integer Low, Integer High>
-void LimitedValue<T, Low, High>::check() const
+void LimitedValue<T, Low, High>::check() const noexcept(ndebug)
 {
 	if constexpr (std::is_integral_v<T>)
 	{
@@ -125,10 +121,10 @@ void LimitedValue<T, Low, High>::check() const
 		(
 			this->value_ < Low || this->value_ > High
 		)
-			THROW_ARGUMENT_ERROR
+			error
 			(
-				"value not in range [" + std::to_string(Low)
-			  + ", " + std::to_string(High) + "]"
+				FUNC_INFO,
+				"value not in range [", Low, ", ", High, "]"
 			);
 	}
 	else
@@ -142,10 +138,10 @@ void LimitedValue<T, Low, High>::check() const
 				static_cast<Float>(High)
 			)
 		)
-			THROW_ARGUMENT_ERROR
+			error
 			(
-				"value not in range [" + std::to_string(Low)
-			  + ", " + std::to_string(High) + "]"
+				FUNC_INFO,
+				"value not in range [", Low, ", ", High, "]"
 			);
 	}
 }

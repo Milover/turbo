@@ -121,6 +121,37 @@ void Profile::build
 }
 
 
+std::vector<Profile::Point> camberLine const noexcept(ndebug)
+{
+	if (empty())
+		error(FUNC_INFO, "profile not built");
+
+	std::vector<Profile::Point> camberLine;
+	camberLine.reserve(points_.size());
+
+	for (auto& [top, bot] : points_)
+		camberLine.emplace_back
+		(
+			midpoint(top, bot)
+		);
+
+	return camberLine;
+}
+
+
+Profile::Point Profile::centroid() const noexcept
+{
+	Point center {Point::origin()};
+
+	for (const auto& [top, bot] : points_)
+		center += top + bot;
+
+	center /= static_cast<Float>(2 * size());
+
+	return center;
+}
+
+
 bool Profile::empty() const noexcept
 {
 	return points_.empty();
@@ -139,23 +170,50 @@ Profile::Constiterator Profile::end() const
 }
 
 
-Profile::Point Profile::centroid() const noexcept
+geometry::Spline Profile::getContour() const noexcept(ndebug)
 {
-	Point center {Point::origin()};
+	if (empty())
+		error(FUNC_INFO, "profile not built");
 
-	for (const auto& [top, bot] : points_)
-		center += top + bot;
-
-	center /= static_cast<Float>(2 * size());
-
-	return center;
+	return geometry::Spline {orderedPoints()};
 }
 
 
-Vector Profile::leDirection() const
+std::vector<geometry::Point> Profile::getPoints() const noexcept(ndebug)
 {
 	if (empty())
-		THROW_LOGIC_ERROR("profile not build");
+		error(FUNC_INFO, "profile not built");
+
+	std::vector<Profile::Point> op {orderedPoints()};
+
+	std::vector<geometry::Point> points;
+	points.reserve(op.size());
+
+	for (auto& p : op)
+		points.push_back(p);
+
+	return points;
+}
+
+
+geometry::Line Profile::getTrailingEdge() const noexcept(ndebug)
+{
+	if (empty())
+		error(FUNC_INFO, "profile not built");
+
+	// from bot-TE to top-TE
+	return geometry::Line
+	{
+		points_.back().first,
+		points_.back().second
+	};
+}
+
+
+Vector Profile::leDirection() const noexcept(ndebug)
+{
+	if (empty())
+		error(FUNC_INFO, "profile not built");
 
 	auto [top, bot]				// next to LE contour points
 	{
@@ -170,10 +228,10 @@ Vector Profile::leDirection() const
 }
 
 
-Profile::Point Profile::lePoint() const
+Profile::Point Profile::lePoint() const noexcept(ndebug)
 {
 	if (empty())
-		THROW_LOGIC_ERROR("profile not build");
+		error(FUNC_INFO, "profile not built");
 
 	auto [top, bot]
 	{
@@ -184,27 +242,15 @@ Profile::Point Profile::lePoint() const
 }
 
 
-geometry::Spline Profile::getContour() const
+std::vector<Profile::Point> Profile::orderedPoints() const noexcept
 {
-	if (empty())
-		THROW_LOGIC_ERROR("profile not build");
-
-	return geometry::Spline {getPoints()};
-}
-
-
-std::vector<geometry::Point> Profile::getPoints() const
-{
-	if (empty())
-		THROW_LOGIC_ERROR("profile not build");
-
 	// we have to map from a pair list --- top - bot
 	// ordered from LE to TE, to a uniquely single-valued list
 	// ordered from top-TE to bot-TE i.e. we have to
 	// skip one LE point (both top and bot lists have it)
 	// and unwrap (reorder) the list properly, eg:
 	// [[0, 0], [1, 1], [2, 2]] -> [2, 1, 0, 1, 2]
-	std::vector<geometry::Point> points;
+	std::vector<Point> points;
 	points.reserve(2 * size() - 1);
 
 	for (auto i {size() - 1}; i > 0; --i)
@@ -214,20 +260,6 @@ std::vector<geometry::Point> Profile::getPoints() const
 		points.push_back(p.second);
 
 	return points;
-}
-
-
-geometry::Line Profile::getTrailingEdge() const
-{
-	if (empty())
-		THROW_LOGIC_ERROR("profile not build");
-
-	// from bot-TE to top-TE
-	return geometry::Line
-	{
-		geometry::Point {points_.back().first},
-		geometry::Point {points_.back().second}
-	};
 }
 
 
@@ -243,10 +275,10 @@ Profile::Sizetype Profile::size() const noexcept
 }
 
 
-Vector Profile::teDirection() const
+Vector Profile::teDirection() const noexcept(ndebug)
 {
 	if (empty())
-		THROW_LOGIC_ERROR("profile not build");
+		error(FUNC_INFO, "profile not built");
 
 	auto [top, bot]				// next to TE contour points
 	{
@@ -261,10 +293,10 @@ Vector Profile::teDirection() const
 }
 
 
-Profile::Point Profile::tePoint() const
+Profile::Point Profile::tePoint() const noexcept(ndebug)
 {
 	if (empty())
-		THROW_LOGIC_ERROR("profile not build");
+		error(FUNC_INFO, "profile not built");
 
 	auto [top, bot]
 	{

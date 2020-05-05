@@ -21,6 +21,7 @@ SourceFiles
 #define INPUT_ROOT_OUTLET_VELOCITY_H
 
 #include "Density.h"
+#include "Error.h"
 #include "HubRadius.h"
 #include "InletVelocity.h"
 #include "RegistryObject.h"
@@ -57,7 +58,7 @@ public:
 
 		//- Construct from a Vector,
 		//  no aditional checking required
-		explicit RootOutletVelocity(const Vector& v);
+		explicit RootOutletVelocity(const Vector& v) noexcept(ndebug);
 
 		//- Compute and construct
 		RootOutletVelocity
@@ -67,7 +68,7 @@ public:
 			const Rps& rps,
 			const HubRadius& r_h,
 			const Density& rho
-		);
+		) noexcept(ndebug);
 
 };
 

@@ -18,6 +18,7 @@ Description
 
 #include "Airfoil.h"
 #include "General.h"
+#include "GmshControl.h"
 #include "Geometry.h"
 #include "InputRegistry.h"
 #include "Variables.h"
@@ -28,11 +29,10 @@ using namespace turbo;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int main(int argc, char* argv[]) {
-
-	bool output {test::parseCommandLineArgs(argc, argv)};
-	test::initialize("test", output);
-	bool pass {true};
+int main(int argc, char* argv[])
+{
+	#include "TestInclude.h"
+	#include "TestGmshInclude.h"
 
 	input::InputRegistry::store					// TODO: should mass test this
 	(
@@ -104,7 +104,7 @@ int main(int argc, char* argv[]) {
 		airfoil.profile.getTrailingEdge()
 	};
 
-	test::updateAndWait(1, output);
+	updateAndWait(1);
 
 	// (150 * 2 - 1) points, 1 spline & 2 points, 1 line & 2 points
 	test::compareTest
@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
 		output,
 		"Checking entitites after construction"
 	);
-	test::updateAndWait(1, output);
+	updateAndWait(1);
 
 	// shouldn't be wrapped
 	test::compareTest
@@ -152,8 +152,7 @@ int main(int argc, char* argv[]) {
 	{
 		airfoil.profile.getTrailingEdge()
 	};
-
-	test::updateAndWait(1, output);
+	updateAndWait(1);
 
 	// 2 x what it was before
 	test::compareTest
@@ -165,15 +164,16 @@ int main(int argc, char* argv[]) {
 		output,
 		"Checking entitites after wrapping"
 	);
-	test::updateAndWait(1, output);
+	updateAndWait(1);
 
 	// test pass or fail
 	if (pass)
-		test::echo(1);
-	else
 		test::echo(0);
+	else
+		test::echo(1);
 
-	test::finalize(output);
+	control.update();
+	control.run();
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

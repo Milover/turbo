@@ -38,6 +38,6 @@ foreach(TESTFILE ${TEST_SRC})
 	)
 	set_tests_properties(${FILENAME}
 		PROPERTIES
-			PASS_REGULAR_EXPRESSION "1"
+			PASS_REGULAR_EXPRESSION "0"
 	)
 endforeach()

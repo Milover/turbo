@@ -36,13 +36,13 @@ String InputRegistry::get(const String& key)
 	auto search {InputRegistry::data_.find(key)};
 
 	if (search == InputRegistry::data_.end())
-		THROW_ARGUMENT_ERROR("key '" + key + "' does not exist");
+		error(FUNC_INFO, "key '", key, "' does not exist");
 
 	return search->second;
 }
 
 
-bool InputRegistry::has(const String& key) noexcept
+bool InputRegistry::has(const String& key)
 {
 	auto search {InputRegistry::data_.find(key)};
 

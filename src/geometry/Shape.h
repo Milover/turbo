@@ -10,7 +10,13 @@ Class
 	turbo::geometry::Shape
 
 Description
-	Abstract base class for geometry objects
+	Abstract base class for geometry objects.
+
+	WARNING:
+		Does not check wheather a Model is active nor wheather a Model has
+		removed the geometry by going out of scope; Godspeed brave adventurer.
+
+		See full disclaimer in 'Model.h'.
 
 SourceFiles
 	Shape.cpp
@@ -20,7 +26,10 @@ SourceFiles
 #ifndef GEOMETRY_SHAPE_H
 #define GEOMETRY_SHAPE_H
 
-#include "General.h"
+#include <type_traits>
+
+#include "GmshBase.h"
+#include "GmshRemove.h"
 #include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -34,71 +43,62 @@ namespace geometry
 						Class Shape Declaration
 \*---------------------------------------------------------------------------*/
 
+
+template
+<
+	typename Entity,
+	typename Remover = interface::GmshRemove
+>
 class Shape
+:
+	public Entity,
+	public interface::GmshBase
 {
-private:
-
-	// Private data
-
-		const Pair<Integer> dimTag_;
-		bool empty_;
-		static bool sync_;
-
-
-	// Member functions
-
-		//- Remove Shape geometry
-		void remove() const noexcept;
-
-		//- Copy Shape geometry and return tag
-		Integer copy() const noexcept;
-
-
 protected:
+
+	using ShapeBase = Shape<Entity, Remover>;
+
+	static_assert
+	(
+		std::is_same_v<Entity0D, Entity>
+	 || std::is_same_v<Entity1D, Entity>
+	 || std::is_same_v<Entity2D, Entity>
+	 || std::is_same_v<Entity3D, Entity>
+	);
+
+	static_assert
+	(
+		std::is_nothrow_default_constructible_v<Remover>
+	 && std::is_nothrow_destructible_v<Remover>
+	 && std::is_nothrow_invocable_v<Remover, Entity*>
+	);
+
+
+	// Constructors
+
+		//- Default constructor
+		Shape() = default;
+
+		//- Construct from tag
+		Shape(const std::size_t) noexcept;
+
+
+public:
 
 	using Coordinates = Vector;
 
 
 	// Constructors
 
-		//- Construct from tag
-		Shape(const Pair<Integer> dimTag) noexcept;
-
-		//- Copy constructor
-		Shape(const Shape&) noexcept;
+		//- Disallow copy construction
+		Shape(const Shape&) = delete;
 
 		//- Move constructor
-		Shape(Shape&&) noexcept;
+		Shape(Shape&&) = default;
 
-
-public:
 
 	//- Destructor
 	virtual ~Shape() noexcept;
-
-
-	// Member functions
-
-		//- Release ownership of underlying geometry
-		void release() noexcept;
-
-		//- Return Shape dimTag
-		Pair<Integer> dimTag() const noexcept;
-
-		//- Get boundary dimTags
-		Vectorpair<Integer> boundary() const noexcept;
-
-		//- Get bounding box
-		Pair<Coordinates> boundingBox() const noexcept;
-
-		//- Check if empty
-		bool empty() const noexcept;
-
-		//- Check if synchronized
-		static bool sync() noexcept;
-
-		//- Synchronize geometry
-		static void synchronize() noexcept;
 
 
 	// Member operators
@@ -106,10 +106,39 @@ public:
 		//- Disallow copy assignment
 		Shape& operator=(const Shape&) = delete;
 
-		//- Disallow move assignment
+		//- Move assignment operator
 		Shape& operator=(Shape&&) = delete;
 
 };
+
+// * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
+
+template
+<
+	typename Entity,
+	typename Remover
+>
+Shape<Entity, Remover>::Shape(const std::size_t tag) noexcept
+:
+	Entity {tag}
+{}
+
+
+// * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
+
+template
+<
+	typename Entity,
+	typename Remover
+>
+Shape<Entity, Remover>::~Shape() noexcept
+{
+	if (this->tag_ != 0)
+	{
+		Remover {}(this);
+		this->sync_ = false;
+	}
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

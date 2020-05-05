@@ -26,9 +26,7 @@ using namespace turbo;
 
 int main(int argc, char* argv[])
 {
-
-	bool output {test::parseCommandLineArgs(argc, argv)};
-	bool pass {true};
+	#include "TestInclude.h"
 
 	// test construction
 	input::InputRegistry::store
@@ -40,10 +38,9 @@ int main(int argc, char* argv[])
 	);
 
 	design::ConstantDistribution temp_1 {};
-	design::ConstantDistribution temp_2 {temp_1};
-	design::ConstantDistribution temp_3 {std::move(temp_1)};
-	temp_3 = temp_2;
-	temp_1 = std::move(temp_3);
+	design::ConstantDistribution temp_2 {std::move(temp_1)};
+	design::ConstantDistribution temp_3 {};
+	temp_3 = std::move(temp_2);
 
 	test::echo(isGreaterOrEqual(-1.0, 0.0));
 	test::echo(isLessOrEqual(-1.0, 1.0));
@@ -66,8 +63,7 @@ int main(int argc, char* argv[])
 			// checking thickness
 			if
 			(
-				!isEqual(temp_1.thickness(x), 0.25)
-			 || !isEqual(temp_2.thickness(x), 0.25)
+				!isEqual(temp_3.thickness(x), 0.25)
 			)
 				pass = false;
 		}
@@ -89,9 +85,9 @@ int main(int argc, char* argv[])
 
 	// test pass or fail
 	if (pass)
-		test::echo(1);
-	else
 		test::echo(0);
+	else
+		test::echo(1);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

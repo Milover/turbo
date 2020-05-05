@@ -10,7 +10,7 @@ License
 
 #include <utility>
 
-#include "gmsh.h"				// TODO: this shouldn't be here
+#include <gmsh.h>		// TODO: this shouldn't be here
 
 #include "Machine.h"
 
@@ -40,7 +40,7 @@ void Machine::check() const
 {
 	for (const auto& [key, value] : this->inputMap_)
 		if (isLessOrEqual(value, 0.0))
-			THROW_RUNTIME_ERROR("value of keyword '" + key + "' <= 0");
+			error(FUNC_INFO, "value of keyword '", key, "' <= 0");
 }
 
 

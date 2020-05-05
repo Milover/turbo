@@ -7,77 +7,61 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::SurfaceSection
+	turbo::input::SmootherIter
 
 Description
-	SurfaceSection class
+	Class SmootherIter.
 
 SourceFiles
-	SurfaceSection.cpp
+	SmootherIter.cpp
+
+	Defaults to 10.
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef GEOMETRY_SURFACE_SECTION_H
-#define GEOMETRY_SURFACE_SECTION_H
+#ifndef INPUT_SMOOTHER_ITER_H
+#define INPUT_SMOOTHER_ITER_H
 
 #include "General.h"
-#include "Surface.h"
+#include "PositiveValue.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace turbo
 {
-namespace geometry
+namespace input
 {
 
 /*---------------------------------------------------------------------------*\
-						Class SurfaceSection Declaration
+					Class SmootherIter Declaration
 \*---------------------------------------------------------------------------*/
 
-class SurfaceSection final
+class SmootherIter final
 :
-	public Surface
+	public PositiveValue<Integer>
 {
-private:
-
-	// Member functions
-
-		//- Construct surface geometry
-		Integer construct(Surface::Wirevector&& wires) const noexcept;
-
-
 public:
+
+	// Public static data
+
+		inline static const String name {"SmootherIter"};
+
 
 	// Constructors
 
-		//- Construct from a vector of wires
-		SurfaceSection(Surface::Wirevector&& wires) noexcept;
+		//- Default constructor
+		SmootherIter() noexcept;
 
-		//- Copy constructor
-		SurfaceSection(const SurfaceSection&) = default;
-
-		//- Copy constructor
-		SurfaceSection(SurfaceSection&&) = default;
-
-
-	//- Destructor
-	~SurfaceSection() = default;
-
-
-	// Member operators
-
-		//- Disallow copy assignment
-		SurfaceSection& operator=(const SurfaceSection&) = delete;
-
-		//- Disallow move assignment
-		SurfaceSection& operator=(SurfaceSection&&) = delete;
+		//- Construct from a Integer,
+		//  no aditional checking required
+		explicit SmootherIter(const Integer i);
 
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace geometry
+} // End namespace input
 } // End namespace turbo
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

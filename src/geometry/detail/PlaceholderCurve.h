@@ -7,22 +7,24 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::geometry::SurfaceFilling
+	turbo::geometry::detail::PlaceholderCurve
 
 Description
-	SurfaceFilling class
+	PlaceholderCurve class
 
 SourceFiles
-	SurfaceFilling.cpp
+	PlaceholderCurve.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef GEOMETRY_SURFACE_FILLING_H
-#define GEOMETRY_SURFACE_FILLING_H
+#ifndef GEOMETRY_DETAIL_PLACEHOLDER_CURVE_H
+#define GEOMETRY_DETAIL_PLACEHOLDER_CURVE_H
 
+#include "Error.h"
 #include "General.h"
-#include "Surface.h"
-#include "Wire.h"
+#include "PlaceholderPoint.h"
+#include "PlaceholderShape.h"
+#include "Point.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -30,63 +32,47 @@ namespace turbo
 {
 namespace geometry
 {
+namespace detail
+{
 
 /*---------------------------------------------------------------------------*\
-						Class SurfaceFilling Declaration
+						Class PlaceholderCurve Declaration
 \*---------------------------------------------------------------------------*/
 
-class SurfaceFilling final
+class PlaceholderCurve final
 :
-	public Surface
+	public PlaceholderShape
 {
 private:
 
-	// Member functions
+	// Private Data
 
-		//- Construct surface geometry
-		Integer construct
-		(
-			Wire&& wire,
-			const Surface::Pointvector& points
-		) const noexcept;
+		Vectorpair<PlaceholderPoint, Sptr<Point>> boundary_;
 
 
 public:
 
 	// Constructors
 
-		//- Construct from a closed wire (loop),
-		//  interpolate through points if provided
-		SurfaceFilling
-		(
-			Wire&& wire,
-			const Surface::Pointvector& points = Pointvector {}
-		) noexcept;
-
-		//- Copy constructor
-		SurfaceFilling(const SurfaceFilling&) = default;
-
-		//- Copy constructor
-		SurfaceFilling(SurfaceFilling&&) = default;
+		//- Construct from a tag and get the boundary curves
+		explicit PlaceholderCurve(const std::size_t t) noexcept(ndebug);
 
 
-	//- Destructor
-	~SurfaceFilling() = default;
+	// Member functions
 
+		//- Get boundary points
+		Vectorpair<PlaceholderPoint, Sptr<Point>> boundary() const noexcept;
 
-	// Member operators
-
-		//- Disallow copy assignment
-		SurfaceFilling& operator=(const SurfaceFilling&) = delete;
-
-		//- Disallow move assignment
-		SurfaceFilling& operator=(SurfaceFilling&&) = delete;
+		//- Store a point sptr if it refers to
+		//	a boundary point placeholder
+		void tryStore(const Sptr<Point>& point) noexcept;
 
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace detail
 } // End namespace geometry
 } // End namespace turbo
 

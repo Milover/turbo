@@ -12,12 +12,9 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "gmsh.h"
-
-#include "General.h"
+#include "GmshControl.h"
+#include "Model.h"
 #include "Point.h"
-#include "Utility.h"
-#include "Vector.h"
 
 #include "Test.h"
 
@@ -25,97 +22,77 @@ using namespace turbo;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
+	#include "TestInclude.h"
+	#include "TestGmshInclude.h"
 
-	bool output {test::parseCommandLineArgs(argc, argv)};
-	test::initialize("test", output);
-	bool pass {true};
+	geometry::Point::Coordinates c {1.0, 0.0};
 
 	// Test Point construction
-	geometry::Point p1 {0,0};	// construct from components
-	geometry::Point p2 {p1};	// construct from Point
-	geometry::Point p3			// construct from Vector (Coordinates)
+	geometry::Point p1 {0.0, 0.0};		// raw Floats
+	geometry::Point p2 {c};				// Coordinates&
+	geometry::Point p3					// Coordinates&&
 	{
-		Vector {0.0, 0.0}
+		geometry::Point::Coordinates {2.0, 0.0}
+	};
+	geometry::Point p4					// Point&&
+	{
+		geometry::Point {3.0, 0.0}
 	};
 
-	test::updateAndWait(1, output);
+	updateAndWait(1);
 
-	// try to modify
-	gmsh::model::occ::translate
-	(
-		Vectorpair<Integer> {p2.dimTag()},
-		2,
-		0,
-		0
-	);
-
-	test::updateAndWait(1, output);
-
-	// Test Point member functions
+	// check dimension
 	test::compareTest
 	(
 		pass,
 		(
-			p1.dimTag().first == 0 &&
-			p2.dimTag().first == 0
+			p1.dim == 0
+		 && p2.dim == 0
+		 && p3.dim == 0
+		 && p4.dim == 0
 		),
 		output,
-		"Checking dimension"
+		"Checking dimensions"
 	);
 
-	Vector coordinates;
-	coordinates = p1.coordinates();
+	// check tags (we've only made 3 points)
 	test::compareTest
 	(
 		pass,
 		(
-			coordinates == Vector {0.0, 0.0}
+			p1.tag() == 1
+		 && p2.tag() == 2
+		 && p3.tag() == 3
+		 && p4.tag() == 4
 		),
 		output,
-		"Checking coordinates"
+		"Checking tags"
 	);
 
-	coordinates = p2.coordinates();
+	// check coordinates
 	test::compareTest
 	(
 		pass,
 		(
-			coordinates == Vector {2.0, 0.0}
+			p1.coordinates() == geometry::Point::Coordinates {0.0, 0.0}
+		 && p2.coordinates() == geometry::Point::Coordinates {1.0, 0.0}
+		 && p3.coordinates() == geometry::Point::Coordinates {2.0, 0.0}
+		 && p4.coordinates() == geometry::Point::Coordinates {3.0, 0.0}
 		),
 		output,
 		"Checking coordinates"
-	);
-	
-	auto [min_1, max_1] {p1.boundingBox()};
-	test::compareTest
-	(
-		pass,
-		(
-			min_1 == Vector {0.0, 0.0}
-		),
-		output,
-		"Checking bounding box"
-	);
-	
-	auto [min_2, max_2] {p2.boundingBox()};
-	test::compareTest
-	(
-		pass,
-		(
-			min_2 == Vector {2.0, 0.0}
-		),
-		output,
-		"Checking bounding box"
 	);
 
 	// test pass or fail
 	if (pass)
-		test::echo(1);
-	else
 		test::echo(0);
+	else
+		test::echo(1);
 
-	test::finalize(output);
+	control.update();
+	control.run();
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

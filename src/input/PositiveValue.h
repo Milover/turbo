@@ -56,15 +56,15 @@ protected:
 		template
 		<
 			typename U,
-			std::enable_if_t<std::is_same_v<T, removeCVRef_t<U>>, int> = 0
+			typename = std::enable_if_t<std::is_same_v<T, removeCVRef_t<U>>>
 		>
-		explicit PositiveValue(U&& u);
+		explicit PositiveValue(U&& u) noexcept(ndebug);
 
 
 	// Member functions
 
 		//- Check input
-		virtual void check() const override;
+		virtual void check() const noexcept(ndebug) override;
 
 
 public:
@@ -99,12 +99,8 @@ public:
 // * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
 
 template<typename T>
-template
-<
-	typename U,
-	std::enable_if_t<std::is_same_v<T, removeCVRef_t<U>>, int>
->
-PositiveValue<T>::PositiveValue(U&& u)
+template<typename U, typename>
+PositiveValue<T>::PositiveValue(U&& u) noexcept(ndebug)
 :
 	RegBase {std::forward<U>(u)}
 {
@@ -115,12 +111,12 @@ PositiveValue<T>::PositiveValue(U&& u)
 // * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * * //
 
 template<typename T>
-void PositiveValue<T>::check() const
+void PositiveValue<T>::check() const noexcept(ndebug)
 {
 	if constexpr (std::is_integral_v<T>)
 	{
 		if (this->value_ < 0)
-			THROW_ARGUMENT_ERROR("value < 0");
+			error(FUNC_INFO, "value < 0");
 	}
 	else
 	{
@@ -128,7 +124,7 @@ void PositiveValue<T>::check() const
 		(
 			!isGreaterOrEqual(this->value_, 0.0)
 		)
-			THROW_ARGUMENT_ERROR("value < 0");
+			error(FUNC_INFO, "value < 0");
 	}
 }
 

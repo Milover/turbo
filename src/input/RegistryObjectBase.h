@@ -17,6 +17,8 @@ Description
 #ifndef INPUT_REGISTRY_OBJECT_BASE_H
 #define INPUT_REGISTRY_OBJECT_BASE_H
 
+#include "Error.h"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace turbo
@@ -41,7 +43,7 @@ protected:
 	// Member functions
 
 		//- Check input
-		virtual void check() const = 0;
+		virtual void check() const noexcept(ndebug) = 0;
 
 
 public:

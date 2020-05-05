@@ -9,14 +9,14 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include <utility>
-#include <vector>
 
 #include "gmsh.h"
 
-#include "SurfaceSection.h"
+#include "SurfaceFilling.h"
 
 #include "General.h"
 #include "Surface.h"
+#include "Wire.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -27,39 +27,40 @@ namespace geometry
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-Integer SurfaceSection::construct(Surface::Wirevector&& wires) const noexcept
+Integer SurfaceFilling::construct
+(
+	Wire&& wire,
+	const Pointvector& points
+) const noexcept
 {
-	std::vector<Integer> tags;
-	Vectorpair<Integer> outDimTags;
+	Intvector tags;
 
-	for (auto& w : wires)
-		tags.push_back
-		(
-			w.dimTag().second
-		);
+	for (auto& p : points)
+		tags.push_back(p.tag());
 
-	gmsh::model::occ::addThruSections
+	return gmsh::model::occ::addSurfaceFilling
 	(
-		tags,
-		outDimTags,
-		-1,			// don't assign tag
-		false,		// don't make solid
-		false		// don't make ruled
+		wire.tag()
+		-1,		// don't assign tag
+		tags
 	);
-
-	return outDimTags.front().second;
 }
 
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-SurfaceSection::SurfaceSection(Surface::Wirevector&& wires) noexcept
+SurfaceFilling::SurfaceFilling
+(
+	Wire&& wire,
+	const Pointvector& points
+) noexcept
 :
 	Surface
 	{
 		construct
 		(
-			std::move(wires)
+			std::move(wire),
+			points
 		)
 	}
 {}

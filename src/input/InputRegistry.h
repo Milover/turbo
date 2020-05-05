@@ -75,7 +75,7 @@ public:
 		static String get(const String& key);
 
 		//- Check key exists
-		static bool has(const String& key) noexcept;
+		static bool has(const String& key);
 
 		//- Store input map
 		template<typename T>

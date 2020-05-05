@@ -14,6 +14,7 @@ Description
 #ifndef DESIGN_CAMBER_GENERATORS_H
 #define DESIGN_CAMBER_GENERATORS_H
 
+#include "CamberGeneratorBase.h"
 #include "CircularArcCamber.h"
 #include "Naca2DigitCamber.h"
 

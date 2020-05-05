@@ -6,8 +6,10 @@
 
 # add sources
 set(SRC
-	turbo.cpp
 	StringConverter.cpp
+	TurboBase.cpp
+	turbo.cpp
+	Vector.cpp
 	)
 
 # append to sources

@@ -25,6 +25,7 @@ SourceFiles
 #define DESIGN_CIRCULAR_ARC_CAMBER_H
 
 #include "CamberGeneratorBase.h"
+#include "Error.h"
 #include "General.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -73,7 +74,7 @@ public:
 	// Member functions
 
 		//- Get inlination angle at 'x' in radians
-		Float inclination(const Float x) const override;
+		Float inclination(const Float x) const noexcept(ndebug) override;
 
 };
 

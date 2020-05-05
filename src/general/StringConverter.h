@@ -80,7 +80,7 @@ private:
 		T convert(const String& s);
 
 		//- Check if conversion was successful
-		void check(const String& s) const;
+		void check(const String& s) const noexcept(ndebug);
 
 
 public:
@@ -118,12 +118,12 @@ T StringConverter<T>::operator()(const String& s)
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
 template<typename T>
-void StringConverter<T>::check(const String& s) const
+void StringConverter<T>::check(const String& s) const noexcept(ndebug)
 {
 	if (stream_.fail())
-		THROW_RUNTIME_ERROR("Could not perform conversion on: " + s);
+		error(FUNC_INFO, "Could not perform conversion on: ", s);
 	else if (!stream_.eof())
-		THROW_RUNTIME_ERROR("Partial match: " + s);
+		error(FUNC_INFO, "Partial match: ", s);
 }
 
 

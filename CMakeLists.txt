@@ -8,10 +8,10 @@ cmake_minimum_required(VERSION 3.2)
 project(turbo)
 
 # build type
-if(DEFINED CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose build type")
-else()
-	set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose build type")
+if(NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE Debug CACHE STRING
+		"Choose type of build, options are: Debug Release"
+		FORCE)
 endif()
 
 # install prefix
@@ -24,15 +24,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(CMAKE_VERBOSE_MAKEFILE FALSE)
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
-# < new
 set(THREADS_PREFER_PTHREAD_FLAG ON)
-# < new
 
 # compiler flags
 add_compile_options(
 		"-Wall" "-Wextra" "-Wshadow" "-pedantic"
 		"$<$<CONFIG:DEBUG>:-O0>"
-		"$<$<CONFIG:RELEASE>:-O3>"
+		"$<$<CONFIG:RELEASE>:-march=native>"
 )
 
 
@@ -48,15 +46,11 @@ set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/tools/cmake")
 
 # prerequisites
 find_package(Gmsh REQUIRED)
-# < new
 find_package(Threads REQUIRED)
-# < new
 
 set(TURBO_INCLUDE_DIRS ${GMSH_INCLUDE_DIRS})
 set(TURBO_LIBRARIES ${GMSH_LIBRARIES})
-# < new
 list(APPEND TURBO_LIBRARIES "Threads::Threads")
-# < new
 
 # add sources macro
 macro(append_turbo_src DIRNAME FILES)
@@ -72,7 +66,10 @@ include(CTest)
 
 # subdirectories
 add_subdirectory(src)
-add_subdirectory(test/src)
+
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+	add_subdirectory(test/src)
+endif()
 
 # binary target
 add_executable (turbo "${PROJECT_SOURCE_DIR}/src/Main.cpp" ${TURBO_SRC})
@@ -91,6 +88,6 @@ target_link_libraries(libturbo ${TURBO_LIBRARIES})
 install(TARGETS turbo DESTINATION "${PROJECT_SOURCE_DIR}/bin")
 
 # documentation targets
-if(CMAKE_BUILD_TYPE MATCHES "^[Rr]elease")
-	add_subdirectory(doc)
-endif()
+#if(CMAKE_BUILD_TYPE MATCHES "Release")
+#	add_subdirectory(doc)
+#endif()

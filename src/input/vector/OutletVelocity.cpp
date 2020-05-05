@@ -11,6 +11,7 @@ License
 #include "OutletVelocity.h"
 
 #include "BladeVelocity.h"
+#include "Error.h"
 #include "HubRadius.h"
 #include "InitialDesign.h"
 #include "InletVelocity.h"
@@ -28,7 +29,7 @@ namespace input
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-OutletVelocity::OutletVelocity(const Vector& v)
+OutletVelocity::OutletVelocity(const Vector& v) noexcept(ndebug)
 :
 	RegBase {v}
 {}
@@ -40,7 +41,7 @@ OutletVelocity::OutletVelocity
 	const VortexDistributionExponent& n,
 	const Radius& r,
 	const HubRadius& r_h
-)
+) noexcept(ndebug)
 :
 	OutletVelocity
 	{
@@ -63,7 +64,7 @@ OutletVelocity::OutletVelocity
 	const Radius& r,
 	const HubRadius& r_h,
 	const BladeVelocity& U
-)
+) noexcept(ndebug)
 :
 	OutletVelocity
 	{

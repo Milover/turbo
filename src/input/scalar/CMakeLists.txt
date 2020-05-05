@@ -18,9 +18,11 @@ set(SRC
 	MaxProfileThickness.cpp
 	NumberOfBlades.cpp
 	NumberOfCamberPoints.cpp
+	Pitch.cpp
 	Radius.cpp
 	Rps.cpp
 	ShroudRadius.cpp
+	SmootherIter.cpp
 	Solidity.cpp
 	StaggerAngle.cpp
 	TotalPressureDifference.cpp

@@ -8,15 +8,11 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include <vector>
-
-#include "gmsh.h"
+#include <cassert>
 
 #include "Spline.h"
 
-#include "Curve.h"
-#include "General.h"
-#include "Point.h"
+#include "GmshSpline.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -27,50 +23,32 @@ namespace geometry
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-Integer Spline::construct
-(
-	Point start,
-	Point end,
-	const Spline::Pointvector& points
-) const noexcept
+void Spline::construct(const Pointvector& points) const noexcept
 {
-	std::vector<Integer> tags;
-
-	for (const auto& p : points)
+	auto returnTag
 	{
-		if (&p == &points.front())
-			tags.push_back
-			(
-				start.dimTag().second
-			);
-		else if (&p == &points.back())
-			tags.push_back
-			(
-				end.dimTag().second
-			);
-		else
-			tags.push_back
-			(
-				p.dimTag().second
-			);
-	}
+		interface::GmshSpline {}
+		(
+			tag_,
+			startRef(),
+			points,
+			endRef()
+		)
+	};
 
-	return gmsh::model::occ::addSpline(tags);
+	assert(returnTag == tag_);
 }
 
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-Spline::Spline(const Spline::Pointvector& points) noexcept
+Spline::Spline(const Coordvector& coords)
 :
-	Curve
+	Spline
 	{
-		construct
-		(
-			points.front(),
-			points.back(),
-			points
-		)
+		coords.front(),
+		coords,
+		coords.back()
 	}
 {}
 

@@ -24,7 +24,7 @@ namespace input
 
 // * * * * * * * * * * * * * Private Constructors  * * * * * * * * * * * * * //
 
-Registry::Registry(const Registry& r) noexcept
+Registry::Registry(const Registry& r)
 :
 	owner_
 	{
@@ -39,7 +39,7 @@ Registry::Registry(const Registry& r) noexcept
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-Registry::Registry() noexcept
+Registry::Registry()
 :
 	data_
 	{
@@ -50,12 +50,12 @@ Registry::Registry() noexcept
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-Registry& Registry::create() noexcept
+Registry& Registry::create()
 {
 	if (!slaves_)
 		slaves_.reset
 		(
-			new Ptrvector<Registry> {}
+			new Uptrvector<Registry> {}
 		);
 
 	slaves_->push_back

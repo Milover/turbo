@@ -11,6 +11,7 @@ License
 #include "RootOutletVelocity.h"
 
 #include "Density.h"
+#include "Error.h"
 #include "General.h"
 #include "HubRadius.h"
 #include "InitialDesign.h"
@@ -28,7 +29,7 @@ namespace input
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-RootOutletVelocity::RootOutletVelocity(const Vector& v)
+RootOutletVelocity::RootOutletVelocity(const Vector& v) noexcept(ndebug)
 :
 	RegBase {v}
 {}
@@ -41,7 +42,7 @@ RootOutletVelocity::RootOutletVelocity
 	const Rps& rps,
 	const HubRadius& r_h,
 	const Density& rho
-)
+) noexcept(ndebug)
 :
 	RootOutletVelocity
 	{

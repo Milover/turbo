@@ -12,6 +12,7 @@ License
 
 #include "Airfoil.h"
 
+#include "Geometry.h"
 #include "Profile.h"
 #include "ProfileGenerator.h"
 #include "TurboBase.h"
@@ -57,10 +58,14 @@ void Airfoil::construct()
 		U,
 		data_->cref<input::IncidenceAngle>()
 	};
-	input::Chord chord
+	input::Pitch pitch
 	{
 		data_->cref<input::NumberOfBlades>(),
-		data_->cref<input::Radius>(),
+		data_->cref<input::Radius>()
+	};
+	input::Chord chord
+	{
+		pitch,
 		data_->cref<input::Solidity>()
 	};
 
@@ -96,6 +101,7 @@ void Airfoil::construct()
 		std::move(camber),
 		std::move(chord),
 		std::move(dp),
+		std::move(pitch),
 		std::move(stagger),
 		std::move(U)
 	);
@@ -126,7 +132,23 @@ Airfoil::Airfoil
 }
 
 
-// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+Airfoil::Airfoil
+(
+	const input::Radius& r,
+	const input::Registry& reg,
+	geometry::Model&& mod
+)
+:
+	TurboBase
+	{
+		reg,
+		std::move(mod)
+	}
+{
+	data_->store(input::Radius {r});
+
+	construct();
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

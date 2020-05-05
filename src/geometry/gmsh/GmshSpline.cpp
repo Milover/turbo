@@ -8,16 +8,16 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include <utility>
+#include <cassert>
 #include <vector>
 
-#include "gmsh.h"
+#include <gmsh.h>
 
-#include "SurfaceFilling.h"
+#include "GmshSpline.h"
 
 #include "General.h"
-#include "Surface.h"
-#include "Wire.h"
+#include "GmshControl.h"
+#include "Point.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -25,53 +25,46 @@ namespace turbo
 {
 namespace geometry
 {
+namespace interface
+{
 
-// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
 
-Integer SurfaceFilling::construct
+std::size_t GmshSpline::operator()
 (
-	Wire&& wire,
-	const Surface::Pointvector& points
+	const std::size_t tag,
+	const Point& start,
+	const std::vector<Point>& points,
+	const Point& end
 ) const noexcept
 {
+	assert(GmshControl::initialized());
+
 	std::vector<Integer> tags;
+	tags.reserve(points.size() + 2);
+
+	// assemble tags
+	tags.push_back(start.tag());
 
 	for (auto& p : points)
-		tags.push_back
-		(
-			p.dimTag().second
-		);
+		tags.push_back(p.tag());
 
-	return gmsh::model::occ::addSurfaceFilling
+	tags.push_back(end.tag());
+
+	return static_cast<std::size_t>
 	(
-		wire.dimTag().second,
-		-1,		// don't assign tag
-		tags
+		gmsh::model::occ::addSpline
+		(
+			tags,
+			static_cast<Integer>(tag)
+		)
 	);
 }
 
 
-// * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
-
-SurfaceFilling::SurfaceFilling
-(
-	Wire&& wire,
-	const Surface::Pointvector& points
-) noexcept
-:
-	Surface
-	{
-		construct
-		(
-			std::move(wire),
-			points
-		)
-	}
-{}
-
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace interface
 } // End namespace geometry
 } // End namespace turbo
 

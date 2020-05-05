@@ -10,6 +10,7 @@ License
 
 #include "BladeVelocity.h"
 
+#include "Error.h"
 #include "InitialDesign.h"
 #include "Radius.h"
 #include "Rps.h"
@@ -24,7 +25,7 @@ namespace input
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-BladeVelocity::BladeVelocity(const Vector& v)
+BladeVelocity::BladeVelocity(const Vector& v) noexcept(ndebug)
 :
 	RegBase {v}
 {}
@@ -34,7 +35,7 @@ BladeVelocity::BladeVelocity
 (
 	const Rps& rps,
 	const Radius& r
-)
+) noexcept(ndebug)
 :
 	BladeVelocity
 	{

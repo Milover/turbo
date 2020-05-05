@@ -20,6 +20,7 @@ SourceFiles
 #ifndef INPUT_BLADE_VELOCITY_H
 #define INPUT_BLADE_VELOCITY_H
 
+#include "Error.h"
 #include "RegistryObject.h"
 #include "Radius.h"
 #include "Rps.h"
@@ -51,14 +52,14 @@ public:
 
 		//- Construct from a Vector,
 		//  no aditional checking required
-		explicit BladeVelocity(const Vector& v);
+		explicit BladeVelocity(const Vector& v) noexcept(ndebug);
 
 		//- Compute and construct
 		BladeVelocity
 		(
 			const Rps& rps,
 			const Radius& r
-		);
+		) noexcept(ndebug);
 
 };
 

@@ -20,6 +20,7 @@ SourceFiles
 #ifndef DESIGN_AIRFOIL_H
 #define DESIGN_AIRFOIL_H
 
+#include "Geometry.h"
 #include "Profile.h"
 #include "Registry.h"
 #include "TurboBase.h"
@@ -57,14 +58,29 @@ public:
 
 	// Constructors
 
-		//- Construct from a radius
+		//- Construct from a radius.
+		//	Assumes necessary input will be available
+		//	from InputRegistry.
 		explicit Airfoil(const input::Radius& r);
 
-		//- Construct from a radius and a registry
+		//- Construct from a radius and a registry.
+		//	Assumes necessary input will be available
+		//	from the supplied Registry.
 		Airfoil
 		(
 			const input::Radius& r,
 			const input::Registry& reg
+		);
+
+		//- Construct from a radius and a registry,
+		//	create a model as well.
+		//	Assumes necessary input will be available
+		//	from the supplied Registry.
+		Airfoil
+		(
+			const input::Radius& r,
+			const input::Registry& reg,
+			geometry::Model&& mod
 		);
 
 };

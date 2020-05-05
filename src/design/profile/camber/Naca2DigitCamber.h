@@ -27,6 +27,7 @@ SourceFiles
 #define DESIGN_NACA_2_DIGIT_CAMBER_H
 
 #include "CamberGeneratorBase.h"
+#include "Error.h"
 #include "General.h"
 #include "Variables.h"
 
@@ -64,7 +65,7 @@ protected:
 	// Member functions
 
 		//- Compute camber ordinate at a 'x'
-		Float computeY(const Float x) const override;
+		Float computeY(const Float x) const noexcept override;
 
 
 public:
@@ -83,7 +84,7 @@ public:
 	// Member functions
 
 		//- Get inlination angle at 'x' in radians
-		Float inclination(const Float x) const override;
+		Float inclination(const Float x) const noexcept(ndebug) override;
 
 };
 

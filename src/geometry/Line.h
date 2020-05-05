@@ -20,6 +20,9 @@ SourceFiles
 #ifndef GEOMETRY_LINE_H
 #define GEOMETRY_LINE_H
 
+#include <utility>
+#include <type_traits>
+
 #include "Curve.h"
 #include "General.h"
 #include "Point.h"
@@ -39,31 +42,24 @@ class Line final
 :
 	public Curve
 {
-protected:
+private:
 
 	// Member functions
 
-		//- Construct Line geometry
-		Integer construct
-		(
-			const Integer startTag,
-			const Integer endTag
-		) const noexcept;
+		//- Construct the geometry
+		void construct() const noexcept;
 
 
 public:
-	
+
 	// Constructors
-		
-		//- Construct from copies of two Points
-		Line
-		(
-			Point start,
-			Point end
-		) noexcept;
+
+		//- Construct from Coordinates
+		template<typename T1, typename T2>
+		Line(T1 start, T2 end);
 
 		//- Copy constructor
-		Line(const Line&) = default;
+		Line(const Line&) = delete;
 
 		//- Construct from a Line
 		Line(Line&&) = default;
@@ -78,10 +74,25 @@ public:
 		//- Disallow copy assignment
 		Line& operator=(const Line&) = delete;
 
-		//- Disallow move assignment
+		//- Disallow copy assignment
 		Line& operator=(Line&&) = delete;
 
 };
+
+
+// * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
+
+template<typename T1, typename T2>
+Line::Line(T1 end, T2 start)
+{
+	storeStartAndEnd
+	(
+		std::forward<T1>(start),
+		std::forward<T2>(end)
+	);
+
+	construct();
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -35,13 +35,13 @@ ConstantDistribution::ConstantDistribution()
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-Float ConstantDistribution::thickness(const Float x) const
+Float ConstantDistribution::thickness(const Float x) const noexcept(ndebug)
 {
 	if
 	(
 		!isInRange(x, 0.0, 1.0)
 	)
-		THROW_DOMAIN_ERROR("x out of range [0, 1]");
+		error(FUNC_INFO, x, " out of range [0, 1]");
 
 	return 0.5 * max_.value();
 }

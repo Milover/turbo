@@ -14,6 +14,7 @@ Description
 #ifndef DESIGN_DISTRIBUTION_GENERATORS_H
 #define DESIGN_DISTRIBUTION_GENERATORS_H
 
+#include "DistributionGeneratorBase.h"
 #include "ConstantDistribution.h"
 #include "Naca4DigitDistribution.h"
 

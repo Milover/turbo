@@ -71,12 +71,12 @@ protected:
 		template
 		<
 			typename U,
-			std::enable_if_t<std::is_same_v<T, removeCVRef_t<U>>, int> = 0
+			typename = std::enable_if_t<std::is_same_v<T, removeCVRef_t<U>>>
 		>
-		explicit RegistryObject(U&& u) noexcept(std::is_integral_v<T>);
+		explicit RegistryObject(U&& u) noexcept(ndebug);
 
 		//- Check input
-		virtual void check() const override;
+		virtual void check() const noexcept(ndebug) override;
 
 
 public:
@@ -100,15 +100,15 @@ public:
 	// Member functions
 
 		//- Get value
-		inline T value() const noexcept;
+		T value() const noexcept;
 
 		//- Set value
 		template
 		<
 			typename U,
-			std::enable_if_t<std::is_same_v<T, removeCVRef_t<U>>, int> = 0
+			typename = std::enable_if_t<std::is_same_v<T, removeCVRef_t<U>>>
 		>
-		void set(U&& u);
+		void set(U&& u) noexcept(ndebug);
 
 
 	// Member operators
@@ -163,10 +163,10 @@ read()
 		return T {};
 
 	if constexpr (isConvertible_v<typename T::type>)
-		THROW_ARGUMENT_ERROR(T::name + " undefined");
+		error(FUNC_INFO, T::name, " undefined");
 	else
 	{
-		THROW_ARGUMENT_ERROR("conversion for '" + T::name + "' unimplemented");
+		error(FUNC_INFO, "conversion for '", T::name, "' unimplemented");
 		__builtin_unreachable();
 	}
 }
@@ -175,12 +175,8 @@ read()
 // * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
 
 template<typename T>
-template
-<
-	typename U,
-	std::enable_if_t<std::is_same_v<T, removeCVRef_t<U>>, int>
->
-RegistryObject<T>::RegistryObject(U&& u) noexcept(std::is_integral_v<T>)
+template<typename U, typename>
+RegistryObject<T>::RegistryObject(U&& u) noexcept(ndebug)
 :
 	value_ {std::forward<U>(u)}
 {
@@ -191,17 +187,17 @@ RegistryObject<T>::RegistryObject(U&& u) noexcept(std::is_integral_v<T>)
 // * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * * //
 
 template<typename T>
-void RegistryObject<T>::check() const
+void RegistryObject<T>::check() const noexcept(ndebug)
 {
 	if constexpr (std::is_floating_point_v<T>)
 	{
 		if (std::isnan(this->value_))
-			THROW_ARGUMENT_ERROR("value is NaN");
+			error(FUNC_INFO, "value is NaN");
 	}
 	else if constexpr (std::is_same_v<Vector, T>)
 	{
 		if (isNan(this->value_))
-			THROW_ARGUMENT_ERROR("value is NaN");
+			error(FUNC_INFO, "value is NaN");
 	}
 }
 
@@ -216,12 +212,8 @@ T RegistryObject<T>::value() const noexcept
 
 
 template<typename T>
-template
-<
-	typename U,
-	std::enable_if_t<std::is_same_v<T, removeCVRef_t<U>>, int>
->
-void RegistryObject<T>::set(U&& u)
+template<typename U, typename>
+void RegistryObject<T>::set(U&& u) noexcept(ndebug)
 {
 	this->value_ = std::forward<U>(u);
 	this->check();

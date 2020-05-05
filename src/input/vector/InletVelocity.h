@@ -20,6 +20,7 @@ SourceFiles
 #ifndef INPUT_INLET_VELOCITY_H
 #define INPUT_INLET_VELOCITY_H
 
+#include "Error.h"
 #include "HubRadius.h"
 #include "RegistryObject.h"
 #include "ShroudRadius.h"
@@ -52,7 +53,7 @@ public:
 
 		//- Construct from a Vector,
 		//  no aditional checking required
-		explicit InletVelocity(const Vector& v);
+		explicit InletVelocity(const Vector& v) noexcept(ndebug);
 
 		//- Compute and construct
 		InletVelocity
@@ -60,7 +61,7 @@ public:
 			const VolumeFlowRate& Q,
 			const HubRadius& r_h,
 			const ShroudRadius& r_s
-		);
+		) noexcept(ndebug);
 
 };
 

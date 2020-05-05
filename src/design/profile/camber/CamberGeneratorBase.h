@@ -22,6 +22,7 @@ SourceFiles
 
 #include <vector>
 
+#include "Error.h"
 #include "General.h"
 #include "Variables.h"
 #include "Vector.h"
@@ -84,7 +85,7 @@ public:
 	// Constructors
 
 		//- Copy constructor
-		CamberGeneratorBase(const CamberGeneratorBase&) = default;
+		CamberGeneratorBase(const CamberGeneratorBase&) = delete;
 
 		//- Move constructor
 		CamberGeneratorBase(CamberGeneratorBase&&) = default;
@@ -100,7 +101,7 @@ public:
 		std::vector<Point> generate() const noexcept;
 
 		//- Get inclination angle at 'x' in radians
-		virtual Float inclination(const Float x) const = 0;
+		virtual Float inclination(const Float x) const noexcept(ndebug) = 0;
 
 
 	// Member operators
@@ -109,7 +110,7 @@ public:
 		CamberGeneratorBase& operator=
 		(
 			const CamberGeneratorBase&
-		) = default;
+		) = delete;
 
 		//- Move assignment operator
 		CamberGeneratorBase& operator=

@@ -13,6 +13,7 @@ License
 #include "General.h"
 #include "InitialDesign.h"
 #include "NumberOfBlades.h"
+#include "Pitch.h"
 #include "Radius.h"
 #include "Solidity.h"
 
@@ -28,6 +29,23 @@ namespace input
 Chord::Chord(const Float f)
 :
 	PVBase {f}
+{}
+
+
+Chord::Chord
+(
+	const Pitch& l,
+	const Solidity& sigma
+)
+:
+	Chord
+	{
+		compute::computeChord
+		(
+			l.value(),
+			sigma.value()
+		)
+	}
 {}
 
 

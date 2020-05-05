@@ -2,16 +2,22 @@
 #
 # See the LICENSE file for license information
 
+# add all subdirectories
+add_subdirectory(detail)
+add_subdirectory(gmsh)
+add_subdirectory(operators)
+
 # add sources
 set(SRC
+	Bezier.cpp
 	Curve.cpp
 	Line.cpp
+	Model.cpp
+	PlanarSurface.cpp
 	Point.cpp
-	Shape.cpp
 	Spline.cpp
 	Surface.cpp
-	SurfaceFilling.cpp
-	SurfaceSection.cpp
+	Volume.cpp
 	)
 
 # append to sources

@@ -11,7 +11,6 @@ set(SRC
 	#Blade.cpp
 	#BladeRow.cpp
 	#Machine.cpp
-	TurboBase.cpp
 	)
 
 # append to sources

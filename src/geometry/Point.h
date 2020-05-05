@@ -20,7 +20,9 @@ SourceFiles
 #ifndef GEOMETRY_POINT_H
 #define GEOMETRY_POINT_H
 
+#include "Entity.h"
 #include "General.h"
+#include "PlaceholderPoint.h"
 #include "Shape.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -31,31 +33,31 @@ namespace geometry
 {
 
 /*---------------------------------------------------------------------------*\
-						Class Line Declaration
+						Class Point Declaration
 \*---------------------------------------------------------------------------*/
 
 class Point final
 :
-	public Shape
+	public Shape<Entity0D>
 {
-protected:
+private:
+
+	// Private data
+
+		Coordinates coords_;
+
 
 	// Member functions
 
-		//- Construct Point geometry
-		int construct
-		(
-			const Float x,
-			const Float y,
-			const Float z
-		) const noexcept;
+		//- Construct the geometry
+		void construct() const noexcept;
 
 
 public:
 
 	// Constructors
-		
-		//- Construct from raw coordinates
+
+		//- Construct from raw floats
 		Point
 		(
 			const Float x,
@@ -63,11 +65,17 @@ public:
 			const Float z = 0.0
 		) noexcept;
 
-		//- Construct from point coordinates
-		Point(const Point::Coordinates& c) noexcept;
+		//- Construct from a placeholder point
+		Point(const detail::PlaceholderPoint& p) noexcept;
+
+		//- Construct from coordinates
+		Point(const Coordinates& c) noexcept;
+
+		//- Construct from coordinates
+		Point(Coordinates&& c) noexcept;
 
 		//- Copy constructor
-		Point(const Point&) = default;
+		Point(const Point&) = delete;
 
 		//- Copy constructor
 		Point(Point&&) = default;
@@ -80,10 +88,10 @@ public:
 	// Member functions
 
 		//- Get coordinates
-		Point::Coordinates coordinates() const noexcept;
+		Coordinates coordinates() const noexcept;
 
 		//- Return origin
-		static Point origin();
+		static Point origin() noexcept;
 
 
 	// Member operators

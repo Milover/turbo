@@ -30,7 +30,10 @@ namespace design
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void ProfileGenerator::createCamberGenerator(const input::CamberAngle& camber)
+void ProfileGenerator::createCamberGenerator
+(
+	const input::CamberAngle& camber
+)
 {
 	auto type
 	{
@@ -48,7 +51,7 @@ void ProfileGenerator::createCamberGenerator(const input::CamberAngle& camber)
 			new CircularArcCamber {camber}
 		);
 	else
-		THROW_RUNTIME_ERROR("unknown Camber: " + type);
+		error(FUNC_INFO, "unknown Camber: ", type);
 }
 
 
@@ -70,7 +73,7 @@ void ProfileGenerator::createDistributionGenerator()
 			new Naca4DigitDistribution {}
 		);
 	else
-		THROW_RUNTIME_ERROR("unknown Distribution: " + type);
+		error(FUNC_INFO, "unknown Distribution: ", type);
 }
 
 

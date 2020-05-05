@@ -37,7 +37,7 @@ void BladeRow::checkHubTipRatio() const
 	(
 		!isInRange(get("hubShroudRatio"), 0.0, 1.0)
 	)
-		THROW_RUNTIME_ERROR("value of keyword 'hubShroudRatio' out of range [0, 1]");
+		error(FUNC_INFO, "value of keyword 'hubShroudRatio' out of range [0, 1]");
 }
 
 
@@ -78,7 +78,7 @@ double BladeRow::computeSpan() const
 	(
 		isLessOrEqual(span, 0.0)
 	)
-		THROW_RUNTIME_ERROR("tip gap too large");
+		error(FUNC_INFO, "tip gap too large");
 
 	return span;
 }
@@ -99,7 +99,7 @@ void BladeRow::check() const
 {
 	for (const auto& [key, value] : this->inputMap_)
 		if (isLessOrEqual(value, 0.0))
-			THROW_RUNTIME_ERROR("value of keyword '" + key + "' <= 0");
+			error(FUNC_INFO, "value of keyword '", key, "' <= 0");
 	
 	checkHubTipRatio();
 }
