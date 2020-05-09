@@ -51,6 +51,7 @@ find_package(Threads REQUIRED)
 set(TURBO_INCLUDE_DIRS ${GMSH_INCLUDE_DIRS})
 set(TURBO_LIBRARIES ${GMSH_LIBRARIES})
 list(APPEND TURBO_LIBRARIES "Threads::Threads")
+list(APPEND TURBO_LIBRARIES "stdc++fs")
 
 # add sources macro
 macro(append_turbo_src DIRNAME FILES)

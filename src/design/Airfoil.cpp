@@ -12,9 +12,12 @@ License
 
 #include "Airfoil.h"
 
-#include "Geometry.h"
+#include "General.h"
+#include "GmshWrite.h"
+#include "Model.h"
 #include "Profile.h"
 #include "ProfileGenerator.h"
+#include "Registry.h"
 #include "TurboBase.h"
 #include "Variables.h"
 
@@ -30,17 +33,25 @@ namespace design
 void Airfoil::construct()
 {
 	// compute
+	input::Radius radius
+	{
+		stationNo_,
+		data_->cref<input::NumberOfStations>(),
+		data_->cref<input::HubRadius>(),
+		data_->cref<input::ShroudRadius>(),
+		data_->cref<input::TipClearance>()
+	};
 	input::BladeVelocity U
 	{
 		data_->cref<input::Rps>(),
-		data_->cref<input::Radius>()
+		radius
 	};
 	input::OutletVelocity c_2
 	{
 		data_->cref<input::InletVelocity>(),
 		data_->cref<input::RootOutletVelocity>(),
 		data_->cref<input::VortexDistributionExponent>(),
-		data_->cref<input::Radius>(),
+		radius,
 		data_->cref<input::HubRadius>(),
 		U
 	};
@@ -61,37 +72,13 @@ void Airfoil::construct()
 	input::Pitch pitch
 	{
 		data_->cref<input::NumberOfBlades>(),
-		data_->cref<input::Radius>()
+		radius
 	};
 	input::Chord chord
 	{
 		pitch,
 		data_->cref<input::Solidity>()
 	};
-
-	// because we need the basic geometry
-	// to compute the stagger
-	ProfileGenerator generator {camber};
-
-	input::StaggerAngle stagger
-	{
-		data_->cref<input::InletVelocity>(),
-		U,
-		input::InclinationAngle
-		{
-			generator.inclination(0.0)		// leading edge inclination
-		},
-		data_->cref<input::IncidenceAngle>()
-	};
-
-	// now we can build it properly
-	profile.build
-	(
-		generator,
-		chord,
-		data_->cref<input::Radius>(),
-		stagger
-	);
 
 	// store
 	input::storeAll
@@ -102,7 +89,7 @@ void Airfoil::construct()
 		std::move(chord),
 		std::move(dp),
 		std::move(pitch),
-		std::move(stagger),
+		std::move(radius),
 		std::move(U)
 	);
 }
@@ -110,23 +97,17 @@ void Airfoil::construct()
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-Airfoil::Airfoil(const input::Radius& r)
-{
-	data_->store(input::Radius {r});
-
-	construct();
-}
-
-
 Airfoil::Airfoil
 (
-	const input::Radius& r,
-	const input::Registry& reg
+	const Integer stationNo,
+	const Path& file
 )
 :
-	TurboBase {reg}
+	TurboBase {file},
+	stationNo_ {stationNo},
+	profile {new Profile {}}
 {
-	data_->store(input::Radius {r});
+	adjustFilename("airfoil", ".step");
 
 	construct();
 }
@@ -134,20 +115,52 @@ Airfoil::Airfoil
 
 Airfoil::Airfoil
 (
-	const input::Radius& r,
+	const Integer stationNo,
 	const input::Registry& reg,
-	geometry::Model&& mod
+	const Path& file
 )
 :
-	TurboBase
-	{
-		reg,
-		std::move(mod)
-	}
+	TurboBase {reg, file},
+	stationNo_ {stationNo},
+	profile {new Profile {}}
 {
-	data_->store(input::Radius {r});
+	adjustFilename("airfoil", ".step");
 
 	construct();
+}
+
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+void Airfoil::build()
+{
+	// we need the basic geometry to compute the stagger
+	ProfileGenerator generator {*data_};
+
+	data_->store
+	(
+		input::StaggerAngle
+		{
+			data_->cref<input::InletVelocity>(),
+			data_->cref<input::BladeVelocity>(),
+			input::InclinationAngle
+			{
+				generator.inclination(0.0)		// leading edge inclination
+			},
+			data_->cref<input::IncidenceAngle>()
+		}
+	);
+
+	// now we can build it properly
+	profile->build(generator, *data_);
+}
+
+
+void Airfoil::write() const		//	FIXME: placeholder implementation
+{
+	model_->activate();
+
+	interface::GmshWrite {}(file_);
 }
 
 

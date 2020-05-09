@@ -15,6 +15,7 @@ License
 #include "CamberGeneratorBase.h"
 #include "Error.h"
 #include "General.h"
+#include "Registry.h"
 #include "Utility.h"
 #include "Variables.h"
 
@@ -58,12 +59,12 @@ Float Naca2DigitCamber::computeY(const Float x) const noexcept
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-Naca2DigitCamber::Naca2DigitCamber(const input::CamberAngle& camber)
+Naca2DigitCamber::Naca2DigitCamber(const input::Registry& reg)
 :
-	CamberGeneratorBase {camber},
+	CamberGeneratorBase {reg},
 	pos_
 	{
-		input::read<input::MaxCamberPosition>()
+		reg.cref<input::MaxCamberPosition>()
 	},
 	max_ {computeMaxCamber()}
 {}

@@ -79,7 +79,7 @@ public:
 		template
 		<
 			typename Geometry,
-			typename = std::enable_if_t<isValid_v<Geometry>>;
+			typename = std::enable_if_t<isValid_v<Geometry>>
 		>
 		[[nodiscard]] auto operator()
 		(
@@ -99,7 +99,10 @@ auto Extrude::execute
 	const Vector& v
 ) const
 {
-	using GeometryType = typename removeCVRef_t<Ptr>::element_type;
+	using GeometryType = detail::GeometryHigherOrderType_t
+	<
+		typename removeCVRef_t<Ptr>::element_type
+	>;
 
 	auto tags
 	{
@@ -110,7 +113,7 @@ auto Extrude::execute
 
 	placeholder.tryStore(p);
 
-	return detail::GeometryBaseType_t<GeometryType> {placeholder};
+	return GeometryType {placeholder};
 }
 
 

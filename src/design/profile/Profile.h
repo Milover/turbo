@@ -20,13 +20,13 @@ SourceFiles
 #ifndef DESIGN_PROFILE_H
 #define DESIGN_PROFILE_H
 
-#include <vector>
-
 #include "Error.h"
 #include "General.h"
-#include "Geometry.h"
+#include "Line.h"
+#include "Point.h"
 #include "ProfileGenerator.h"
-#include "Variables.h"
+#include "Registry.h"
+#include "Spline.h"
 #include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -89,13 +89,11 @@ public:
 		void build
 		(
 			const ProfileGenerator& generator,
-			const input::Chord& chord,
-			const input::Radius& radius,
-			const input::StaggerAngle& stagger
+			const input::Registry& reg
 		);
 
 		//- Get the camber line
-		Vectorpair<Point> camberLine() const noexcept(ndebug);
+		std::vector<Point> camberLine() const noexcept(ndebug);
 
 		//- Get geometric center
 		Point centroid() const noexcept;

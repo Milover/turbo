@@ -7,6 +7,7 @@ set(SRC
 	CamberGeneratorBase.cpp
 	CircularArcCamber.cpp
 	Naca2DigitCamber.cpp
+	NoCamber.cpp
 	)
 
 # append to sources

@@ -7,10 +7,10 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::design::TurboBase
+	turbo::TurboBase
 
 Description
-	Abstract base class template for generic turbomachinery components.
+	Abstract base class various turbo classes.
 
 SourceFiles
 	TurboBase.cpp
@@ -21,6 +21,7 @@ SourceFiles
 #define TURBO_BASE_H
 
 #include <type_traits>
+#include <utility>
 
 #include "General.h"
 #include "Model.h"
@@ -30,8 +31,6 @@ SourceFiles
 
 namespace turbo
 {
-namespace design
-{
 
 /*---------------------------------------------------------------------------*\
 					Class TurboBase Declaration
@@ -39,34 +38,64 @@ namespace design
 
 class TurboBase
 {
+private:
+
+	template<typename T>
+	inline static constexpr bool isValid_v =
+		std::is_same_v<Sptr<geometry::Model>, removeCVRef_t<T>>
+	 || std::is_same_v<geometry::Model&&, T> 
+	 || std::is_same_v<geometry::Model, T>;
+
+
 protected:
 
 	// Protected data
 
 		bool ownsData_;
 		input::Registry* data_;
-		Uptr<geometry::Model> model_;
+		Sptr<geometry::Model> model_;
+
+		Path file_;
 
 
 	// Constructors
 
 		//- Default constructor,
-		//	creates an owned Registry and
-		//	creates a model
-		TurboBase();
+		//	creates an owned registry and creates a model
+		TurboBase(const Path& file = Path {});
 
-		//- Construct with (owner) Registry,
-		//	creates a non-owned, accessible registry and
-		//	doesn't create a model
-		TurboBase(const input::Registry& reg);
-
-		//- Construct with (owner) Registry,
+		//- Construct with (owner) registry,
 		//	creates a non-owned accessible registry and
-		//	take ownership of a model
+		//	creates an owned model.
 		TurboBase
 		(
 			const input::Registry& reg,
-			geometry::Model&& mod
+			const Path& file = Path {}
+		);
+
+		//- Construct with (owner) registry,
+		//	creates a non-owned accessible registry and
+		//	takes or shares ownership of a model
+		template
+		<
+			typename T,
+			typename = std::enable_if_t<isValid_v<T>>
+		>
+		TurboBase
+		(
+			const input::Registry& reg,
+			T&& model,
+			const Path& file = Path {}
+		);
+
+
+	// Member functions
+
+		//- Adjust filename
+		void adjustFilename
+		(
+			const String& prefix,
+			const String& extension
 		);
 
 
@@ -88,7 +117,10 @@ public:
 	// Member functions
 
 		//- Build geometry
-		//virtual void build() = 0;
+		virtual void build() = 0;
+
+		//- Get file
+		[[nodiscard]] Path file() const;
 
 		//- Finalize geometry
 		//virtual void finalize() = 0;
@@ -103,14 +135,14 @@ public:
 		std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, bool>
 		has(const String& key) const;
 
-		//- Build mesh
-		//virtual void mesh() = 0;
-
 		//- Parametrize
 		//virtual void parametrize() = 0;
 
 		//- Optimize
 		//virtual void optimize() = 0;
+
+		//- Write geometry to file
+		virtual void write() const = 0;
 
 
 	// Member operators
@@ -122,6 +154,40 @@ public:
 		TurboBase& operator=(TurboBase&&) = delete;
 
 };
+
+
+// * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
+
+template<typename T, typename>
+TurboBase::TurboBase
+(
+	const input::Registry& reg,
+	T&& model,
+	const Path& file
+)
+:
+	ownsData_ {false},
+	data_					// we don't own or manage but have access
+	{
+		&const_cast<input::Registry&>(reg).create()
+	}
+{
+	if constexpr
+	(
+		std::is_same_v<Sptr<geometry::Model>, removeCVRef_t<T>>
+	)
+	{
+		model_ = std::forward<T>(model);
+	}
+	else
+		model_.reset
+		(
+			new geometry::Model {std::forward<T>(model)}
+		);
+
+	if (std::filesystem::is_directory(file))
+		file_ = file / "";
+}
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
@@ -144,7 +210,6 @@ TurboBase::has(const String& key) const
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace design
 } // End namespace turbo
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

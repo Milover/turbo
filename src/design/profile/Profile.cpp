@@ -14,8 +14,11 @@ License
 
 #include "Error.h"
 #include "General.h"
-#include "Geometry.h"
+#include "Line.h"
+#include "Point.h"
 #include "ProfileGenerator.h"
+#include "Registry.h"
+#include "Spline.h"
 #include "Utility.h"
 #include "Variables.h"
 #include "Vector.h"
@@ -103,11 +106,22 @@ Profile::Constiterator Profile::begin() const
 void Profile::build
 (
 	const ProfileGenerator& generator,
-	const input::Chord& chord,
-	const input::Radius& radius,
-	const input::StaggerAngle& stagger
+	const input::Registry& reg
 )
 {
+	auto chord
+	{
+		reg.cref<input::Chord>()
+	};
+	auto radius
+	{
+		reg.cref<input::Radius>()
+	};
+	auto stagger
+	{
+		reg.cref<input::StaggerAngle>()
+	};
+
 	wrapped_ = false;
 
 	points_ = generator.generate();
@@ -121,7 +135,7 @@ void Profile::build
 }
 
 
-std::vector<Profile::Point> camberLine const noexcept(ndebug)
+std::vector<Profile::Point> Profile::camberLine() const noexcept(ndebug)
 {
 	if (empty())
 		error(FUNC_INFO, "profile not built");

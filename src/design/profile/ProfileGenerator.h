@@ -20,13 +20,11 @@ SourceFiles
 #ifndef DESIGN_PROFILE_GENERATOR_H
 #define DESIGN_PROFILE_GENERATOR_H
 
-#include <vector>
-
-#include "CamberGenerators.h"
-#include "DistributionGenerators.h"
+#include "CamberGeneratorBase.h"
+#include "DistributionGeneratorBase.h"
 #include "Error.h"
 #include "General.h"
-#include "Variables.h"
+#include "Registry.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -55,10 +53,7 @@ private:
 	// Member functions
 
 		//- Set camber type
-		void createCamberGenerator
-		(
-			const input::CamberAngle& camber
-		);
+		void createCamberGenerator(const input::Registry& reg);
 
 		//- Set distribution type
 		void createDistributionGenerator();
@@ -68,8 +63,8 @@ public:
 
 	// Constructors
 
-		//- Construct from camber angle
-		explicit ProfileGenerator(const input::CamberAngle& camber);
+		//- Construct from a registry
+		explicit ProfileGenerator(const input::Registry& reg);
 
 
 	// Member functions
@@ -82,7 +77,7 @@ public:
 		Float inclination(const Float x) const noexcept;
 
 		//- Reset
-		void reset(const input::CamberAngle& camber);
+		void reset(const input::Registry& reg);
 
 };
 

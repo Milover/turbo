@@ -31,14 +31,14 @@ void PlanarSurface::construct() noexcept
 		returnTag = interface::GmshPlanarSurface {}
 		(
 			tag_,
-			boundaryRef(),
-			holesRef()
+			boundaryCRef(),
+			holesCRef()
 		);
 	else
 		returnTag = interface::GmshPlanarSurface {}
 		(
 			tag_,
-			boundaryRef()
+			boundaryCRef()
 		);
 
 	assert(returnTag == tag_);

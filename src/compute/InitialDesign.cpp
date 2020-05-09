@@ -80,7 +80,7 @@ Float computeChord
 {
 	Float l					// pitch
 	{
-		computePitch(N_b, r);
+		computePitch(N_b, r)
 	};
 
 	return sigma * l;
@@ -95,7 +95,7 @@ Float computeFluidAngle
 {
 	Vector w {c - U};		// rel. fluid inlet/outlet velocity
 
-	return pi - angle(U, w);
+	return pi - angleBetween(U, w);
 }
 
 
@@ -151,6 +151,18 @@ Vector computeRootOutletVelocity
 }
 
 
+//- Compute blade span
+Float computeSpan
+(
+	const Float r_h,		// hub radius
+	const Float r_s,		// shroud radius
+	const Float z_tip		// tip gap (clearance)
+) noexcept
+{
+	return r_s - r_h - z_tip;
+}
+
+
 Float computeStaggerAngle 
 (
 	const Vector& c_1,		// abs. fluid inlet velocity
@@ -160,6 +172,25 @@ Float computeStaggerAngle
 ) noexcept
 {
 	return i + computeFluidAngle(c_1, U) - zeta;
+}
+
+
+//- Compute radius for an airfoil station
+Float computeStationRadius 
+(
+	const Integer i_s,		// station number (0, 1, 2...)
+	const Integer N_s,		// number of stations
+	const Float r_h,		// hub radius
+	const Float r_s,		// shroud radius
+	const Float z_tip		// tip gap (clearance)
+) noexcept
+{
+	Float l			// increment
+	{
+		computeSpan(r_h, r_s, z_tip) / static_cast<Float>(N_s + 1)
+	};
+
+	return r_h + l * static_cast<Float>(i_s + 1);
 }
 
 

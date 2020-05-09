@@ -83,14 +83,14 @@ public:
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
 template<typename T1, typename T2>
-Line::Line(T1 end, T2 start)
-{
-	storeStartAndEnd
-	(
+Line::Line(T1 start, T2 end)
+:
+	Curve
+	{
 		std::forward<T1>(start),
 		std::forward<T2>(end)
-	);
-
+	}
+{
 	construct();
 }
 

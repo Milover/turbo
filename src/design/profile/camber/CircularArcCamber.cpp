@@ -14,6 +14,7 @@ License
 
 #include "CamberGeneratorBase.h"
 #include "Error.h"
+#include "Registry.h"
 #include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -38,9 +39,9 @@ Float CircularArcCamber::computeY(const Float x) const noexcept
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-CircularArcCamber::CircularArcCamber(const input::CamberAngle& camber)
+CircularArcCamber::CircularArcCamber(const input::Registry& reg)
 :
-	CamberGeneratorBase {camber},
+	CamberGeneratorBase {reg},
 	yOffset_
 	{
 		-0.5 / std::tan(0.5 * camber_.value())

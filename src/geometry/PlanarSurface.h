@@ -60,6 +60,12 @@ public:
 		template<typename... Curves>
 		PlanarSurface(Curves&&... cs);
 
+		//- Construct from vectors of curves (curve sptrs) forming closed loops,
+		//	the first vector is the boundary, the rest are boundaries
+		//	of holes within the surface
+		template<typename Boundary, typename... Holes>
+		PlanarSurface(Boundary&& b, Holes&&... hs);
+
 		//- Copy constructor
 		PlanarSurface(const PlanarSurface&) = delete;
 
@@ -90,6 +96,19 @@ PlanarSurface::PlanarSurface(Curves&&... cs)
 	Surface
 	{
 		std::forward<Curves>(cs)...
+	}
+{
+	construct();
+}
+
+
+template<typename Boundary, typename... Holes>
+PlanarSurface::PlanarSurface(Boundary&& b, Holes&&... hs)
+:
+	Surface
+	{
+		std::forward<Boundary>(b),
+		std::forward<Holes>(hs)...
 	}
 {
 	construct();

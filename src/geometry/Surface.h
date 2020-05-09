@@ -76,9 +76,6 @@ protected:
 	inline static constexpr bool isValid_v = isCurveSptr_v<T>
 										  || std::is_base_of_v<Curve, T>;
 
-	template<typename T>
-	using enableIfValid_t = std::enable_if_t<isValid_v<T>>;
-
 
 	// Constructors
 
@@ -93,6 +90,25 @@ protected:
 			typename = std::enable_if_t<(isValid_v<Curves> && ...)>
 		>
 		Surface(Curves&&... cs);
+
+		//- Construct from vectors of curves (curve sptrs) forming closed loops,
+		//	the first vector is the boundary, the rest are boundaries
+		//	of holes within the surface
+		//	FIXME: should check wheather the curves form a loop
+		template
+		<
+			typename Boundary,
+			typename... Holes,
+			typename = std::enable_if_t
+			<
+				std::is_same_v
+				<
+					Sptrvector<Curve>,
+					removeCVRef_t<Boundary>
+				>
+			>
+		>
+		Surface(Boundary&& b, Holes&&... hs);
 
 
 public:
@@ -116,10 +132,21 @@ public:
 	// Member functions
 
 		//- Get the boundary curves
+		[[nodiscard]] const Sptrvector<Curve>& boundaryCRef() const noexcept;
+
+		//- Get the boundary curves
 		[[nodiscard]] Sptrvector<Curve>& boundaryRef() noexcept;
 
 		//- Get the corner points
+		[[nodiscard]] const Sptrvector<Point>&
+		cornersCRef() const noexcept(ndebug);
+
+		//- Get the corner points
 		[[nodiscard]] Sptrvector<Point>& cornersRef() noexcept(ndebug);
+
+		//- Get the hole curves
+		[[nodiscard]] const std::vector<Sptrvector<Curve>>&
+		holesCRef() const noexcept(ndebug);
 
 		//- Get the hole curves
 		[[nodiscard]] std::vector<Sptrvector<Curve>>&
@@ -184,6 +211,32 @@ Surface::Surface(Curves&&... cs)
 			makeSptr(std::forward<Curves>(cs))
 		), ...
 	);
+}
+
+
+template<typename Boundary, typename... Holes, typename>
+Surface::Surface(Boundary&& b, Holes&&... hs)
+:
+	boundary_
+	{
+		std::forward<Boundary>(b)
+	}
+{
+	if constexpr (sizeof...(hs) != 0)
+	{
+		static_assert
+		(
+			(std::is_same_v<Sptrvector<Curve>, removeCVRef_t<Holes>> && ...)
+		);
+
+		holes_.reset
+		(
+			new std::vector<Sptrvector<Curve>> {}
+		);
+		holes_->reserve(sizeof...(hs));
+
+		(holes_->emplace_back(std::forward<Holes>(hs)), ...);
+	}
 }
 
 

@@ -8,43 +8,37 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include <filesystem>
+
 #include "TurboBase.h"
 
 #include "General.h"
 #include "Model.h"
 #include "Registry.h"
+#include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace turbo
 {
-namespace design
-{
 
 // * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
 
-TurboBase::TurboBase()
+TurboBase::TurboBase(const Path& file)
 :
 	ownsData_ {true},
 	data_ {new input::Registry {}},		// we own and manage
 	model_ {new geometry::Model {}}
-{}
-
-
-TurboBase::TurboBase(const input::Registry& reg)
-:
-	ownsData_ {false},
-	data_					// we don't own or manage but have access
-	{
-		&const_cast<input::Registry&>(reg).create()
-	}
-{}
+{
+	if (std::filesystem::is_directory(file))
+		file_ = file / "";
+}
 
 
 TurboBase::TurboBase
 (
 	const input::Registry& reg,
-	geometry::Model&& mod
+	const Path& file
 )
 :
 	ownsData_ {false},
@@ -52,11 +46,24 @@ TurboBase::TurboBase
 	{
 		&const_cast<input::Registry&>(reg).create()
 	},
-	model_
-	{
-		new geometry::Model {std::move(mod)}
-	}
-{}
+	model_ {new geometry::Model {}}
+{
+	if (std::filesystem::is_directory(file))
+		file_ = file / "";
+}
+
+
+// * * * * * * * * * * * * Protected Member Functions* * * * * * * * * * * * //
+
+void TurboBase::adjustFilename
+(
+	const String& prefix,
+	const String& extension
+)
+{
+	addFilenamePrefix(file_, prefix);
+	file_.replace_extension(extension);
+}
 
 
 // * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
@@ -68,9 +75,16 @@ TurboBase::~TurboBase() noexcept
 }
 
 
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+Path TurboBase::file() const
+{
+	return file_;
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace design
 } // End namespace turbo
 
 // ************************************************************************* //

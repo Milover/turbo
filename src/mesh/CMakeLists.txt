@@ -4,10 +4,11 @@
 
 # add all subdirectories
 add_subdirectory(generators)
+add_subdirectory(fields)
 
 # add sources
 set(SRC
-	Mesh.cpp
+	ProfileMesh.cpp
 	)
 
 # append to sources

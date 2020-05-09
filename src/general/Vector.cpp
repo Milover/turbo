@@ -23,19 +23,6 @@ License
 namespace turbo
 {
 
-// * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
-
-constexpr Vector::Vector
-(
-	const Float x,
-	const Float y,
-	const Float z
-) noexcept
-:
-	data_ {x, y, z}
-{}
-
-
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 Vector::Iterator Vector::begin() noexcept
@@ -62,27 +49,15 @@ Vector::Constiterator Vector::end() const noexcept
 }
 
 
-constexpr Vector Vector::origin() noexcept
-{
-	return Vector {0.0, 0.0, 0.0};
-}
-
-
 Float& Vector::x() noexcept
 {
 	return data_[0];
 }
 
 
-Float& Vector::x() const noexcept
+const Float& Vector::x() const noexcept
 {
 	return data_[0];
-}
-
-
-constexpr Vector Vector::xAxis() noexcept
-{
-	return Vector {1.0, 0.0, 0.0};
 }
 
 
@@ -98,12 +73,6 @@ const Float& Vector::y() const noexcept
 }
 
 
-constexpr Vector Vector::yAxis() noexcept
-{
-	return Vector {0.0, 1.0, 0.0};
-}
-
-
 Float& Vector::z() noexcept
 {
 	return data_[2];
@@ -116,27 +85,21 @@ const Float& Vector::z() const noexcept
 }
 
 
-constexpr Vector Vector::zAxis() noexcept
-{
-	return Vector {0.0, 0.0, 1.0};
-}
-
-
 // * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
 
-Float& operator[](const Sizetype& i) noexcept
+Float& Vector::operator[](const Sizetype& i) noexcept
 {
 	return data_[i];
 }
 
 
-const Float& operator[](const Sizetype& i) const noexcept
+const Float& Vector::operator[](const Sizetype& i) const noexcept
 {
 	return data_[i];
 }
 
 
-Vector& operator+=(const Vector& v) noexcept
+Vector& Vector::operator+=(const Vector& v) noexcept
 {
 	data_[0] += v.data_[0];
 	data_[1] += v.data_[1];
@@ -146,7 +109,7 @@ Vector& operator+=(const Vector& v) noexcept
 }
 
 
-Vector& operator-=(const Vector& v) noexcept
+Vector& Vector::operator-=(const Vector& v) noexcept
 {
 	data_[0] -= v.data_[0];
 	data_[1] -= v.data_[1];
@@ -156,7 +119,7 @@ Vector& operator-=(const Vector& v) noexcept
 }
 
 
-Vector& operator*=(const Float f) noexcept
+Vector& Vector::operator*=(const Float f) noexcept
 {
 	data_[0] *= f;
 	data_[1] *= f;
@@ -166,7 +129,7 @@ Vector& operator*=(const Float f) noexcept
 }
 
 
-Vector& operator/=(const Float f) noexcept
+Vector& Vector::operator/=(const Float f) noexcept
 {
 	data_[0] /= f;
 	data_[1] /= f;
@@ -176,7 +139,7 @@ Vector& operator/=(const Float f) noexcept
 }
 
 
-bool operator==(const Vector& v) const noexcept
+bool Vector::operator==(const Vector& v) const noexcept
 {
 	return isEqual(data_[0], v.data_[0])
 		&& isEqual(data_[1], v.data_[1])
@@ -298,9 +261,5 @@ Vector unit(Vector v) noexcept
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace turbo
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

@@ -24,6 +24,7 @@ SourceFiles
 
 #include "Error.h"
 #include "General.h"
+#include "Registry.h"
 #include "Variables.h"
 #include "Vector.h"
 
@@ -70,8 +71,8 @@ protected:
 
 	// Constructors
 
-		//- Default constructor
-		explicit CamberGeneratorBase(const input::CamberAngle& camber);
+		//- Construct from a registry
+		explicit CamberGeneratorBase(const input::Registry& reg);
 
 
 	// Member functions

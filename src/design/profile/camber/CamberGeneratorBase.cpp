@@ -45,17 +45,20 @@ Float CamberGeneratorBase::computeX(const Integer count) const noexcept
 
 // * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
 
-CamberGeneratorBase::CamberGeneratorBase(const input::CamberAngle& camber)
+CamberGeneratorBase::CamberGeneratorBase(const input::Registry& reg)
 :
 	nPoints_
 	{
-		input::read<input::NumberOfCamberPoints>()
+		reg.cref<input::NumberOfCamberPoints>()
 	},
 	spacing_
 	{
-		input::read<input::CamberPointSpacing>()
+		reg.cref<input::CamberPointSpacing>()
 	},
-	camber_ {camber}
+	camber_
+	{
+		reg.cref<input::CamberAngle>()
+	}
 {
 	if (spacing_.value() == Spacing::LINEAR)
 		increment_ = 1.0 / static_cast<Float>(nPoints_.value() - 1);

@@ -43,6 +43,12 @@ class Registry
 {
 private:
 
+	template<typename T>
+	using enableIfRecursion_t = std::enable_if_t
+	<
+		std::is_base_of_v<RecursionFlag, T>
+	>;
+
 	using Data = HashMap<Uptr<RegistryObjectBase>>;
 
 
@@ -74,7 +80,7 @@ private:
 		<
 			typename T,
 			typename R,
-			typename = std::enable_if_t<std::is_base_of_v<RecursionFlag, R>>
+			typename = enableIfRecursion_t<R>
 		>
 		T* obtainStored() const;
 
@@ -87,7 +93,7 @@ private:
 		<
 			typename T,
 			typename R,
-			typename = std::enable_if_t<std::is_base_of_v<RecursionFlag, R>>
+			typename = enableIfRecursion_t<R>
 		>
 		auto&& obtain() const;
 
@@ -113,32 +119,51 @@ public:
 		Registry& create();
 
 		//- Recursively get a const reference to a registry object
-		template<typename T, typename R = Recurse>
-		std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, const T&>
-		cref() const;
+		template
+		<
+			typename T,
+			typename R = Recurse,
+			typename = enableIfRecursion_t<R>
+		>
+		[[nodiscard]] const T& cref() const;
 
 		//- Recursively get a registry object
-		template<typename T, typename R = Recurse>
-		std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, T>
-		get() const;
+		template
+		<
+			typename T,
+			typename R = Recurse,
+			typename = enableIfRecursion_t<R>
+		>
+		[[nodiscard]] T get() const;
 
 		//- Check if a registry object exists (locally or globally)
-		template<typename T, typename R = Recurse>
-		std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, bool>
-		has() const;
+		template
+		<
+			typename T,
+			typename R = Recurse,
+			typename = enableIfRecursion_t<R>
+		>
+		[[nodiscard]] bool has() const;
 
 		//- Check if a registry object (key) exists (locally or globally)
-		template<typename R = Recurse>
-		std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, bool>
-		has(const String& key) const;
+		template
+		<
+			typename R = Recurse,
+			typename = enableIfRecursion_t<R>
+		>
+		[[nodiscard]] bool has(const String& key) const;
 
 		//- Get owner
-		Registry* owner() const noexcept;
+		[[nodiscard]] Registry* owner() const noexcept;
 
 		//- Recursively get a reference to a registry object
-		template<typename T, typename R = Recurse>
-		std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, T&>
-		ref();
+		template
+		<
+			typename T,
+			typename R = Recurse,
+			typename = enableIfRecursion_t<R>
+		>
+		[[nodiscard]] T& ref();
 
 		//- Store (insert or assign) a registry object (locally)
 		template<typename T>
@@ -217,33 +242,29 @@ auto&& Registry::obtain() const
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-template<typename T, typename R>
-std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, const T&>
-Registry::cref() const
+template<typename T, typename R, typename>
+const T& Registry::cref() const
 {
 	return this->obtain<T, R>();
 }
 
 
-template<typename T, typename R>
-std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, T>
-Registry::get() const
+template<typename T, typename R, typename>
+T Registry::get() const
 {
 	return this->obtain<T, R>();
 }
 
 
-template<typename T, typename R>
-std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, bool>
-Registry::has() const
+template<typename T, typename R, typename>
+bool Registry::has() const
 {
 	return has<R>(T::name);
 }
 
 
-template<typename R>
-std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, bool>
-Registry::has(const String& key) const
+template<typename R, typename>
+bool Registry::has(const String& key) const
 {
 	auto search {data_->find(key)};
 
@@ -263,9 +284,8 @@ Registry::has(const String& key) const
 }
 
 
-template<typename T, typename R>
-std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, T&>
-Registry::ref()
+template<typename T, typename R, typename>
+T& Registry::ref()
 {
 	return this->obtain<T, R>();
 }

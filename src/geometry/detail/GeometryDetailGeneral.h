@@ -36,9 +36,9 @@ namespace geometry
 namespace detail
 {
 
-// * * * * * * * * * * * * * * * Type Traits * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * GeometryBaseType  * * * * * * * * * * * * * * //
 
-//- Returns the base class of a geometry type,
+//- Returns the base class of a geometry type
 template<typename T, Integer dimension = T::dim>
 struct GeometryBaseType;
 
@@ -82,6 +82,104 @@ struct GeometryBaseType<T, Entity3D::dim>
 template<typename T>
 using GeometryBaseType_t = typename GeometryBaseType<T>::type;
 
+
+// * * * * * * * * * * * * * GeometryLowerOrderType  * * * * * * * * * * * * //
+
+//- Returns the base class of a lower order geometry type,
+//	Points return themselves
+template<typename T, Integer dimension = T::dim>
+struct GeometryLowerOrderType;
+
+
+template<typename T>
+struct GeometryLowerOrderType<T, Entity0D::dim>
+{
+	static_assert(isEntity_v<T>);
+
+	using type = Point;
+};
+
+
+template<typename T>
+struct GeometryLowerOrderType<T, Entity1D::dim>
+{
+	static_assert(isEntity_v<T>);
+
+	using type = Point;
+};
+
+
+template<typename T>
+struct GeometryLowerOrderType<T, Entity2D::dim>
+{
+	static_assert(isEntity_v<T>);
+
+	using type = Curve;
+};
+
+
+template<typename T>
+struct GeometryLowerOrderType<T, Entity3D::dim>
+{
+	static_assert(isEntity_v<T>);
+
+	using type = Surface;
+};
+
+
+template<typename T>
+using GeometryLowerOrderType_t = typename GeometryLowerOrderType<T>::type;
+
+
+// * * * * * * * * * * * * GeometryHigherOrderType * * * * * * * * * * * * * //
+
+//- Returns the base class of a higher order geometry type,
+//	Volumes return themselves
+template<typename T, Integer dimension = T::dim>
+struct GeometryHigherOrderType;
+
+
+template<typename T>
+struct GeometryHigherOrderType<T, Entity0D::dim>
+{
+	static_assert(isEntity_v<T>);
+
+	using type = Curve;
+};
+
+
+template<typename T>
+struct GeometryHigherOrderType<T, Entity1D::dim>
+{
+	static_assert(isEntity_v<T>);
+
+	using type = Surface;
+};
+
+
+template<typename T>
+struct GeometryHigherOrderType<T, Entity2D::dim>
+{
+	static_assert(isEntity_v<T>);
+
+	using type = Volume;
+};
+
+
+template<typename T>
+struct GeometryHigherOrderType<T, Entity3D::dim>
+{
+	static_assert(isEntity_v<T>);
+
+	using type = Volume;
+};
+
+
+template<typename T>
+using GeometryHigherOrderType_t = typename GeometryHigherOrderType<T>::type;
+
+
+// * * * * * * * * * * * * GeometryPlaceholderType * * * * * * * * * * * * * //
 
 //- Returns the placeholder class of a geometry type,
 template<typename T, Integer dimension = T::dim>

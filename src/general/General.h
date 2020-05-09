@@ -15,6 +15,7 @@ Description
 #define GENERAL_H
 
 #include <array>
+#include <filesystem>
 #include <map>
 #include <memory>
 #include <string>
@@ -22,6 +23,8 @@ Description
 #include <unordered_map>
 #include <utility>
 #include <vector>
+
+#include "Debug.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -33,16 +36,19 @@ namespace turbo
 using Integer = int;
 
 
-using Float = double;
-
-
-using String = std::string;
-
-
 using Intvector = std::vector<Integer>;
 
 
+using Float = double;
+
+
 using Floatvector = std::vector<Float>;
+
+
+using Path = std::filesystem::path;
+
+
+using String = std::string;
 
 
 template<typename T, typename U = T>

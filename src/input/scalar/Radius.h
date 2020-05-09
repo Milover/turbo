@@ -21,7 +21,11 @@ SourceFiles
 #define INPUT_RADIUS_H
 
 #include "General.h"
+#include "HubRadius.h"
+#include "NumberOfStations.h"
 #include "PositiveValue.h"
+#include "ShroudRadius.h"
+#include "TipClearance.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,6 +54,16 @@ public:
 		//- Construct from a Float,
 		//  no aditional checking required
 		explicit Radius(const Float f);
+
+		//- Compute and construct
+		Radius
+		(
+			const Integer i_s,				// station number (0, 1, 2...)
+			const NumberOfStations& N_s,
+			const HubRadius& r_h,
+			const ShroudRadius& r_s,
+			const TipClearance& z_tip
+		);
 
 };
 

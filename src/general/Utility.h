@@ -31,6 +31,8 @@ namespace turbo
 
 static constexpr Float pi {M_PI};
 
+static constexpr char filenameSeparator {'_'};
+
 
 // * * * * * * * * * * * * * Arithmetic Functions  * * * * * * * * * * * * * //
 
@@ -159,6 +161,21 @@ inline void trimWhiteLR(String& s)
 {
 	trimWhiteL(s);
 	trimWhiteR(s);
+}
+
+
+//- Add a prefix to a filename in path
+inline void addFilenamePrefix
+(
+	Path& path,
+	const String& prefix
+)
+{
+	auto filename {path.filename().string()};
+
+	filename = prefix + filenameSeparator + filename;
+
+	path.replace_filename(filename);
 }
 
 

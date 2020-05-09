@@ -26,6 +26,7 @@ SourceFiles
 
 #include "CamberGeneratorBase.h"
 #include "Error.h"
+#include "Registry.h"
 #include "General.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -67,8 +68,8 @@ public:
 
 	// Constructors
 
-		//- Construct from camber
-		explicit CircularArcCamber(const input::CamberAngle& camber);
+		//- Construct from a registry
+		explicit CircularArcCamber(const input::Registry& reg);
 
 
 	// Member functions

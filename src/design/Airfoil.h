@@ -20,7 +20,10 @@ SourceFiles
 #ifndef DESIGN_AIRFOIL_H
 #define DESIGN_AIRFOIL_H
 
-#include "Geometry.h"
+#include <utility>
+
+#include "General.h"
+#include "Model.h"
 #include "Profile.h"
 #include "Registry.h"
 #include "TurboBase.h"
@@ -43,6 +46,11 @@ class Airfoil final
 {
 private:
 
+	// Private data
+
+		const Integer stationNo_;
+
+
 	// Member functions
 
 		//- Construct the component
@@ -53,37 +61,79 @@ public:
 
 	// Public data
 
-		Profile profile;
+		const Sptr<Profile> profile;
 
 
 	// Constructors
 
-		//- Construct from a radius.
-		//	Assumes necessary input will be available
-		//	from InputRegistry.
-		explicit Airfoil(const input::Radius& r);
-
-		//- Construct from a radius and a registry.
-		//	Assumes necessary input will be available
-		//	from the supplied Registry.
-		Airfoil
+		//- Default construct from a station number,
+		//	creates an owned registry and creates a model
+		explicit Airfoil
 		(
-			const input::Radius& r,
-			const input::Registry& reg
+			const Integer stationNo = 0,
+			const Path& file = Path {}
 		);
 
-		//- Construct from a radius and a registry,
-		//	create a model as well.
-		//	Assumes necessary input will be available
-		//	from the supplied Registry.
+		//- Construct from a station number with (owner) registry,
+		//	creates a non-owned accessible registry and
+		//	creates an owned model.
 		Airfoil
 		(
-			const input::Radius& r,
+			const Integer stationNo,
 			const input::Registry& reg,
-			geometry::Model&& mod
+			const Path& file = Path {}
 		);
+
+		//- Construct from a station number with (owner) registry,
+		//	creates a non-owned accessible registry and
+		//	takes or shares ownership of a model
+		template<typename T>
+		Airfoil
+		(
+			const Integer stationNo,
+			const input::Registry& reg,
+			T&& model,
+			const Path& file = Path {}
+		);
+
+
+	// Member functions
+
+		//- Build geometry
+		void build() override;
+
+		//- Write the mesh in .step format
+		//	NOTE: activates the (local) model
+		//	FIXME: placeholder implementation
+		void write() const override;
 
 };
+
+
+// * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
+
+template<typename T>
+Airfoil::Airfoil
+(
+	const Integer stationNo,
+	const input::Registry& reg,
+	T&& model,
+	const Path& file
+)
+:
+	TurboBase
+	{
+		reg,
+		std::forward<T>(model),
+		file
+	},
+	stationNo_ {stationNo},
+	profile {new Profile {}}
+{
+	adjustFilename("airfoil", ".step");
+
+	construct();
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

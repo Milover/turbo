@@ -10,16 +10,18 @@ License
 
 #include <cmath>
 #include <utility>
-#include <memory>
 
 #include "ProfileGenerator.h"
 
-#include "CamberGenerators.h"
-#include "DistributionGenerators.h"
+#include "CircularArcCamber.h"
+#include "ConstantDistribution.h"
 #include "Error.h"
 #include "General.h"
 #include "InputRegistry.h"
-#include "Variables.h"
+#include "Naca2DigitCamber.h"
+#include "Naca4DigitDistribution.h"
+#include "NoCamber.h"
+#include "Registry.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -30,58 +32,82 @@ namespace design
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void ProfileGenerator::createCamberGenerator
-(
-	const input::CamberAngle& camber
-)
+void ProfileGenerator::createCamberGenerator(const input::Registry& reg)
 {
-	auto type
-	{
-		input::InputRegistry::get("Camber")
-	};
-
-	if (type == Naca2DigitCamber::name)
+	if
+	(
+		!input::InputRegistry::has("Camber")
+	)
 		cGen_.reset
 		(
-			new Naca2DigitCamber {camber}
-		);
-	else if (type == CircularArcCamber::name)
-		cGen_.reset
-		(
-			new CircularArcCamber {camber}
+			new CircularArcCamber {reg}
 		);
 	else
-		error(FUNC_INFO, "unknown Camber: ", type);
+	{
+		auto type
+		{
+			input::InputRegistry::get("Camber")
+		};
+
+		if (type == Naca2DigitCamber::name)
+			cGen_.reset
+			(
+				new Naca2DigitCamber {reg}
+			);
+		else if (type == CircularArcCamber::name)
+			cGen_.reset
+			(
+				new CircularArcCamber {reg}
+			);
+		else if (type == NoCamber::name)
+			cGen_.reset
+			(
+				new NoCamber {reg}
+			);
+		else
+			error(FUNC_INFO, "unknown Camber: ", type);
+	}
 }
 
 
 void ProfileGenerator::createDistributionGenerator()
 {
-	auto type
-	{
-		input::InputRegistry::get("Distribution")
-	};
-
-	if (type == ConstantDistribution::name)
-		dGen_.reset
-		(
-			new ConstantDistribution {}
-		);
-	else if (type == Naca4DigitDistribution::name)
+	if
+	(
+		!input::InputRegistry::has("Distribution")
+	)
 		dGen_.reset
 		(
 			new Naca4DigitDistribution {}
 		);
 	else
-		error(FUNC_INFO, "unknown Distribution: ", type);
+	{
+		auto type
+		{
+			input::InputRegistry::get("Distribution")
+		};
+
+		if (type == ConstantDistribution::name)
+			dGen_.reset
+			(
+				new ConstantDistribution {}
+			);
+		else if (type == Naca4DigitDistribution::name)
+			dGen_.reset
+			(
+				new Naca4DigitDistribution {}
+			);
+		else
+			error(FUNC_INFO, "unknown Distribution: ", type);
+	}
 }
 
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-ProfileGenerator::ProfileGenerator(const input::CamberAngle& camber)
+ProfileGenerator::ProfileGenerator(const input::Registry& reg)
 {
-	reset(camber);
+	reset(reg);
 }
 
 
@@ -141,9 +167,9 @@ Float ProfileGenerator::inclination(const Float x) const noexcept
 }
 
 
-void ProfileGenerator::reset(const input::CamberAngle& camber)
+void ProfileGenerator::reset(const input::Registry& reg)
 {
-	createCamberGenerator(camber);
+	createCamberGenerator(reg);
 	createDistributionGenerator();
 }
 

@@ -6,8 +6,7 @@
 
 # add sources
 set(SRC
-	MeshGeneratorBase.cpp
-	ProfileHexMeshGenerator.cpp
+	ProfileTetMeshGenerator.cpp
 	)
 
 # append to sources

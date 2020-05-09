@@ -135,6 +135,45 @@ public:
 };
 
 
+// * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
+
+constexpr Vector::Vector
+(
+	const Float x,
+	const Float y,
+	const Float z
+) noexcept
+:
+	data_ {x, y, z}
+{}
+
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+constexpr Vector Vector::origin() noexcept
+{
+	return Vector {0.0, 0.0, 0.0};
+}
+
+
+constexpr Vector Vector::xAxis() noexcept
+{
+	return Vector {1.0, 0.0, 0.0};
+}
+
+
+constexpr Vector Vector::yAxis() noexcept
+{
+	return Vector {0.0, 1.0, 0.0};
+}
+
+
+constexpr Vector Vector::zAxis() noexcept
+{
+	return Vector {0.0, 0.0, 1.0};
+}
+
+
 // * * * * * * * * * * * * * * Global Operators  * * * * * * * * * * * * * * //
 
 //- Addition

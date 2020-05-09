@@ -51,9 +51,24 @@ Surface::Surface(const detail::PlaceholderSurface& s)
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
+const Sptrvector<Curve>& Surface::boundaryCRef() const noexcept
+{
+	return boundary_;
+}
+
+
 Sptrvector<Curve>& Surface::boundaryRef() noexcept
 {
 	return boundary_;
+}
+
+
+const Sptrvector<Point>& Surface::cornersCRef() const noexcept(ndebug)
+{
+	if (!corners_)
+		error(FUNC_INFO, "corners have not been assigned");
+
+	return *corners_;
 }
 
 
@@ -63,6 +78,16 @@ Sptrvector<Point>& Surface::cornersRef() noexcept(ndebug)
 		error(FUNC_INFO, "corners have not been assigned");
 
 	return *corners_;
+}
+
+
+const std::vector<Sptrvector<Curve>>&
+Surface::holesCRef() const noexcept(ndebug)
+{
+	if (!holes_)
+		error(FUNC_INFO, "surface doesn't have holes");
+
+	return *holes_;
 }
 
 
@@ -77,13 +102,13 @@ std::vector<Sptrvector<Curve>>& Surface::holesRef() noexcept(ndebug)
 
 bool Surface::hasCorners() const noexcept
 {
-	return bool(corners_);
+	return static_cast<bool>(corners_);
 }
 
 
 bool Surface::hasHoles() const noexcept
 {
-	return bool(holes_);
+	return static_cast<bool>(holes_);
 }
 
 

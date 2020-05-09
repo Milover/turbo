@@ -75,6 +75,7 @@ protected:
 		isPointSptr_v<T>
 	 || std::is_same_v<Coordinates, removeCVRef_t<T>>
 	 || std::is_same_v<Point, T>
+	 || std::is_same_v<Point&&, T>
 	>;
 
 
@@ -177,6 +178,7 @@ void Curve::storeEnd(T end)
 	if constexpr
 	(
 		std::is_same_v<Point, T>
+	 || std::is_same_v<Point&&, T>
 	 || std::is_same_v<Coordinates, removeCVRef_t<T>>
 	)
 	{
@@ -198,6 +200,7 @@ void Curve::storeStart(T start)
 	if constexpr
 	(
 		std::is_same_v<Point, T>
+	 || std::is_same_v<Point&&, T>
 	 || std::is_same_v<Coordinates, removeCVRef_t<T>>
 	)
 	{

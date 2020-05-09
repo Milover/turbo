@@ -104,6 +104,15 @@ Vector computeRootOutletVelocity
 ) noexcept;
 
 
+//- Compute blade span
+Float computeSpan
+(
+	const Float r_h,		// hub radius
+	const Float r_s,		// shroud radius
+	const Float z_tip = 0.0	// tip gap (clearance)
+) noexcept;
+
+
 //- Compute chord at specified radius
 Float computeStaggerAngle
 (
@@ -111,6 +120,17 @@ Float computeStaggerAngle
 	const Vector& U,  		// blade velocity
 	const Float zeta,		// leading edge inclination
 	const Float i = 0.0		// incidence angle
+) noexcept;
+
+
+//- Compute radius for an airfoil station
+Float computeStationRadius 
+(
+	const Integer i_s,		// station number (0, 1, 2...)
+	const Integer N_s,		// number of stations
+	const Float r_h,		// hub radius
+	const Float r_s,		// shroud radius
+	const Float z_tip = 0	// tip gap (clearance)
 ) noexcept;
 
 

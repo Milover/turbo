@@ -29,6 +29,7 @@ SourceFiles
 #include "CamberGeneratorBase.h"
 #include "Error.h"
 #include "General.h"
+#include "Registry.h"
 #include "Variables.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -77,8 +78,8 @@ public:
 
 	// Constructors
 
-		//- Construct from camber
-		explicit Naca2DigitCamber(const input::CamberAngle& camber);
+		//- Construct from a registry
+		explicit Naca2DigitCamber(const input::Registry& reg);
 
 
 	// Member functions

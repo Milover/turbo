@@ -187,54 +187,6 @@ inline static constexpr bool isEntity_v = is0D_v<T>
 									   || is3D_v<T>;
 
 
-//- Return an entity of order lowered by 1.
-//	0-order entities return themselves.
-template
-<
-	typename T,
-	typename = std::enable_if_t<isEntity_v<T>>
->
-struct LowerOrderEntity
-{
-	using type = Entity<T::dim - 1>;
-};
-
-
-template<>
-struct LowerOrderEntity<Entity0D>
-{
-	using type = Entity0D;
-};
-
-
-template<typename T>
-using LowerOrderEntity_t = typename LowerOrderEntity<T>::type;
-
-
-//- Return an entity of order higher by 1.
-//	3-order entities return themselves.
-template
-<
-	typename T,
-	typename = std::enable_if_t<isEntity_v<T>>
->
-struct HigherOrderEntity
-{
-	using type = Entity<T::dim + 1>;
-};
-
-
-template<>
-struct HigherOrderEntity<Entity3D>
-{
-	using type = Entity3D;
-};
-
-
-template<typename T>
-using HigherOrderEntity_t = typename HigherOrderEntity<T>::type;
-
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace geometry

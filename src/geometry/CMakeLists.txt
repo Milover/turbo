@@ -4,7 +4,6 @@
 
 # add all subdirectories
 add_subdirectory(detail)
-add_subdirectory(gmsh)
 add_subdirectory(operators)
 
 # add sources

@@ -155,13 +155,13 @@ Bezier::Bezier
 	const Coordvector& coords,
 	T2 end
 )
-{
-	storeStartAndEnd
-	(
+:
+	Curve
+	{
 		std::forward<T1>(start),
 		std::forward<T2>(end)
-	);
-
+	}
+{
 	// sanity check
 	assert(startRef().coordinates() == coords.front());
 	assert(endRef().coordinates() == coords.back());

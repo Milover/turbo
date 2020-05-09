@@ -20,9 +20,13 @@ SourceFiles
 #ifndef MESH_MESH_GENERATOR_BASE_H
 #define MESH_MESH_GENERATOR_BASE_H
 
+#include <vector>
+
 #include "General.h"
-#include "Geometry.h"
+#include "Registry.h"
 #include "Variables.h"
+#include "Vector.h"
+#include "Volume.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -42,6 +46,7 @@ protected:
 
 	using Point = Vector;
 	using Pointvector = std::vector<Point>;
+	using BaseType = MeshGeneratorBase<T>;
 
 
 	// Protected data
@@ -49,35 +54,13 @@ protected:
 		input::Chord chord_;
 		input::NumberOfCamberPoints discretization_;
 		input::Pitch pitch_;
+		input::SectionExtensionFactor extension_;
 
 
 	// Constructors
 
 		//- Construct from data
-		MeshGeneratorBase
-		(
-			const input::Chord& chord,
-			const input::NumberOfCamberPoints& discretization,
-			const input::Pitch& pitch
-		) noexcept;
-
-
-	// Member functions
-
-		//- Construct mesh boundary curves.
-		//	Ordering should be: inlet, top, outlet, bot.
-		//	Curve orientation should be in the streamwise direction
-		//	from inlet to outlet. The inlet/outlet curve direction
-		//	should be in the positive y direction (perpendicular
-		//	to the streamwise direction)
-		virtual Sptrvector<geometry::Curve>
-		constructBoundary(const T&) const = 0;
-
-		//- Construct section surface
-		virtual Sptr<geometry::Surface> constructSection
-		(
-			const Sptrvector<geometry::Curve>& curves
-		) const = 0;
+		MeshGeneratorBase(const input::Registry& reg);
 
 
 public:
@@ -98,19 +81,11 @@ public:
 	// Member functions
 
 		//- Generate the mesh
-		virtual Uptr<geometry::Volume> generate(const T& t) const = 0;
-
-		//- Set chord
-		void setChord(const input::Chord& chord) noexcept;
-
-		//- Set pitch
-		void setPitch(const input::Pitch& pitch) noexcept;
-
-		//- Set pitch
-		void setDiscretization
+		virtual Uptr<geometry::Volume> generate
 		(
-			const input::NumberOfCamberPoints& discretization
-		) noexcept;
+			const input::Registry& reg,
+			const T&
+		) const = 0;
 
 
 	// Member operators
@@ -122,6 +97,26 @@ public:
 		MeshGeneratorBase& operator=(MeshGeneratorBase&&) = default;
 
 };
+
+
+// * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
+
+template<typename T>
+MeshGeneratorBase<T>::MeshGeneratorBase(const input::Registry& reg)
+:
+	chord_
+	{
+		reg.cref<input::Chord>()
+	},
+	discretization_
+	{
+		reg.cref<input::NumberOfCamberPoints>()
+	},
+	pitch_
+	{
+		reg.cref<input::Pitch>()
+	}
+{}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
