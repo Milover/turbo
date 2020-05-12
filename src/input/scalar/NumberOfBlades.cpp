@@ -27,6 +27,14 @@ NumberOfBlades::NumberOfBlades(const Integer i)
 {}
 
 
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+String NumberOfBlades::getName() const
+{
+	return name;
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace input

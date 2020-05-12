@@ -25,6 +25,7 @@ SourceFiles
 #include "General.h"
 #include "Model.h"
 #include "Profile.h"
+#include "ProfileMesh.h"
 #include "Registry.h"
 #include "TurboBase.h"
 #include "Variables.h"
@@ -61,7 +62,7 @@ public:
 
 	// Public data
 
-		const Sptr<Profile> profile;
+		Profile profile;
 
 
 	// Constructors
@@ -100,7 +101,13 @@ public:
 	// Member functions
 
 		//- Build geometry
-		void build() override;
+		void build();
+
+		//- Run simulation, return the simulation directory
+		[[nodiscard]] Path simulate
+		(
+			Sptr<mesh::ProfileMesh> mesh = Sptr<mesh::ProfileMesh> {}
+		);
 
 		//- Write the mesh in .step format
 		//	NOTE: activates the (local) model
@@ -127,10 +134,9 @@ Airfoil::Airfoil
 		std::forward<T>(model),
 		file
 	},
-	stationNo_ {stationNo},
-	profile {new Profile {}}
+	stationNo_ {stationNo}
 {
-	adjustFilename("airfoil", ".step");
+	setFile("airfoil", ".step");
 
 	construct();
 }

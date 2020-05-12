@@ -84,6 +84,14 @@ OutletVelocity::OutletVelocity
 {}
 
 
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+String OutletVelocity::getName() const
+{
+	return name;
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace input

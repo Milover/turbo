@@ -65,6 +65,12 @@ public:
 			const TipClearance& z_tip
 		);
 
+
+	// Member functions
+
+		//- Get object name
+		String getName() const override;
+
 };
 
 

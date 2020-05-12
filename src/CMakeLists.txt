@@ -10,6 +10,7 @@ add_subdirectory(geometry)
 add_subdirectory(input)
 add_subdirectory(interface)
 add_subdirectory(mesh)
+add_subdirectory(simulation)
 
 # add sources
 set(SRC

@@ -27,6 +27,14 @@ MeshCellSize::MeshCellSize(const Float f)
 {}
 
 
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+String MeshCellSize::getName() const
+{
+	return name;
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace input

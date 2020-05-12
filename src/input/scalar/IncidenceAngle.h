@@ -56,6 +56,12 @@ public:
 		//  no aditional checking required
 		explicit IncidenceAngle(const Float f);
 
+
+	// Member functions
+
+		//- Get object name
+		String getName() const override;
+
 };
 
 

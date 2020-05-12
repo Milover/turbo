@@ -51,6 +51,12 @@ public:
 		//  no aditional checking required
 		explicit InclinationAngle(const Float f);
 
+
+	// Member functions
+
+		//- Get object name
+		String getName() const override;
+
 };
 
 

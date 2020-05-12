@@ -67,6 +67,12 @@ public:
 			const YPlus& y_plus
 		);
 
+
+	// Member functions
+
+		//- Get object name
+		String getName() const override;
+
 };
 
 

@@ -68,7 +68,6 @@ BoundaryLayerField::BoundaryLayerField(const input::Registry& reg)
 //		rate,
 //		reg.cref<input::BLNumberOfLayers>()
 //	};
-
 	interface::GmshSetOptionNumber {}
 	(
 		"Mesh.BoundaryLayerFanPoints",

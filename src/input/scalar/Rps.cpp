@@ -27,6 +27,14 @@ Rps::Rps(const Float f)
 {}
 
 
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+String Rps::getName() const
+{
+	return name;
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace input

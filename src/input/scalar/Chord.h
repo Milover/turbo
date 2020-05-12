@@ -70,6 +70,12 @@ public:
 			const Solidity& sigma
 		);
 
+
+	// Member functions
+
+		//- Get object name
+		String getName() const override;
+
 };
 
 

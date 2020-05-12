@@ -9,6 +9,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include <type_traits>
+#include <optional>
 #include <utility>
 
 #include "InputRegistry.h"
@@ -50,6 +51,17 @@ bool InputRegistry::has(const String& key)
 		return false;
 
 	return true;
+}
+
+
+Optional<String> InputRegistry::tryGet(const String& key)
+{
+	auto search {InputRegistry::data_.find(key)};
+
+	if (search == InputRegistry::data_.end())
+		return std::nullopt;
+
+	return search->second;
 }
 
 

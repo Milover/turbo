@@ -65,6 +65,9 @@ Float computeBLThickness
 	const Float k_bl	// bl growth rate
 ) noexcept
 {
+	if (h_bl > G)
+		return h_bl;
+
 	Integer n_bl		// number of boundary layer cells
 	{
 		static_cast<Integer>
@@ -86,11 +89,51 @@ Float computeMeshCellSize
 	const Float A		// (mesh) surface area
 ) noexcept
 {
-	// 2.0 because we're using tets exclusively
-	return 2.0 * std::sqrt
+	// we approximate with equilateral triangles
+	return std::sqrt
 	(
-		A / static_cast<Float>(N)
+		2.0 / std::sqrt(3.0) * A / static_cast<Float>(N)
 	);
+}
+
+
+Float computeTurbulenceKineticEnergy
+(
+	const Vector& v,	// (inlet) velocity
+	const Float I		// turbulence intensity
+) noexcept
+{
+	return 1.5 * std::pow((mag(v) * I), 2);
+}
+
+
+Float computeTurbulenceDissipationRate
+(
+	const Float k,		// turbulence kinetic energy
+	const Float L		// turbulence reference length scale
+) noexcept
+{
+	return std::pow(k, 1.5) * std::pow(0.09, 0.75) / L;
+}
+
+
+Float computeTurbulenceSpecificDissipationRate
+(
+	const Float k,		// turbulence kinetic energy
+	const Float L		// turbulence reference length scale
+) noexcept
+{
+	return std::sqrt(k) * std::pow(0.09, -0.25) / L;
+}
+
+
+Float computeTurbulenceViscosity
+(
+	const Float k,		// turbulence kinetic energy
+	const Float L		// turbulence reference length scale
+) noexcept
+{
+	return std::sqrt(k) * std::pow(0.09, 0.25) * L;
 }
 
 

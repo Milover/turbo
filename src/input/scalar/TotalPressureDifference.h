@@ -67,6 +67,12 @@ public:
 			const Density& rho
 		);
 
+
+	// Member functions
+
+		//- Get object name
+		String getName() const override;
+
 };
 
 

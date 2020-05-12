@@ -33,6 +33,14 @@ NumberOfCamberPoints::NumberOfCamberPoints(const Integer i)
 {}
 
 
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+String NumberOfCamberPoints::getName() const
+{
+	return name;
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace input

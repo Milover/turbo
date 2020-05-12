@@ -72,6 +72,12 @@ public:
 			const BLGrowthRate& k_bl
 		);
 
+
+	// Member functions
+
+		//- Get object name
+		String getName() const override;
+
 };
 
 

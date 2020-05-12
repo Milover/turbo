@@ -1,0 +1,40 @@
+#!/bin/sh
+
+# Run from this directory
+cd ${0%/*} || exit 1
+
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+# get app and nproc
+application=$(getApplication)
+
+# exit on error
+set -e
+
+# reset
+cp -r 0.orig 0
+
+# create mesh
+runApplication gmshToFoam ./*msh > log.turbo
+
+# create patches
+runApplication createPatch -overwrite >> log.turbo
+
+# create sets
+runApplication setSet -latestTime -noVTK -batch ./system/setSet.batch >> log.turbo
+
+# prep mesh
+runApplication decomposePar -force -latestTime >> log.turbo
+runParallel renumberMesh -overwrite -latestTime >> log.turbo
+runParallel checkMesh -latestTime -allTopology -allGeometry >> log.turbo
+
+touch case.foam
+
+# initialize
+runParallel potentialFoam >> log.turbo
+
+# run
+runParallel $application >> log.turbo
+
+# reconstruct
+runApplication reconstructPar -latestTime >> log.turbo

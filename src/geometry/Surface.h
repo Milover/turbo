@@ -73,8 +73,9 @@ private:
 protected:
 
 	template<typename T>
-	inline static constexpr bool isValid_v = isCurveSptr_v<T>
-										  || std::is_base_of_v<Curve, T>;
+	inline static constexpr bool isValid_v =
+		isCurveSptr_v<T>
+	 || std::is_base_of_v<Curve, removeCVRef_t<T>>;
 
 
 	// Constructors

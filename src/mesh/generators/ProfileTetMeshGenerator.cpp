@@ -24,6 +24,7 @@ License
 #include "GmshGenerate.h"
 #include "GmshRecombine.h"
 #include "GmshTransfinite.h"
+#include "Group.h"
 #include "Line.h"
 #include "PlanarSurface.h"
 #include "Profile.h"
@@ -33,8 +34,6 @@ License
 #include "Utility.h"
 #include "Vector.h"
 #include "Volume.h"
-
-#include <gmsh.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -187,38 +186,42 @@ ProfileTetMeshGenerator::ProfileTetMeshGenerator(const input::Registry& reg)
 :
 	BaseType {reg}
 {
-	// approx. section area
-	Float area
-	{
-		pitch_.value() * (1.0 + 2.0 * extension_.value()) * chord_.value()
-	};
-
-	// approx. avg. cell size
-	reg.store
-	(
-		input::MeshCellSize
-		{
-			compute::computeMeshCellSize
-			(
-				reg.cref<input::MeshSize>().value(),
-				area
-			)
-		}
-	);
+//	NOTE: this makes meshing unintuitive and difficult,
+//		  so we're specifying the 'MeshCellSize' directly
+//	// approx. section area
+//	Float area
+//	{
+//		pitch_.value() * (1.0 + 2.0 * extension_.value()) * chord_.value()
+//	};
+//
+//	// approx. avg. cell size
+//	reg.store
+//	(
+//		input::MeshCellSize
+//		{
+//			compute::computeMeshCellSize
+//			(
+//				reg.cref<input::MeshSize>().value(),
+//				area
+//			)
+//		}
+//	);
 }
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-Uptr<geometry::Volume> ProfileTetMeshGenerator::generate
+Uptr<ProfileTetMeshGenerator::Region> ProfileTetMeshGenerator::generate
 (
 	const input::Registry& reg,
 	const design::Profile& profile
 ) const
 {
+	// make 1D
 	auto boundary {constructBoundary(profile)};
 	auto contour {constructContour(profile)};
 
+	// make 2D
 	Sptr<geometry::Surface> surface
 	{
 		new geometry::PlanarSurface {boundary, contour}
@@ -259,7 +262,8 @@ Uptr<geometry::Volume> ProfileTetMeshGenerator::generate
 	if (!bgField.set() || !blField.set())
 		return nullptr;
 
-	Uptr<geometry::Volume> mesh
+	// make 3D
+	Sptr<geometry::Volume> volume
 	{
 		new geometry::Volume
 		{
@@ -267,11 +271,36 @@ Uptr<geometry::Volume> ProfileTetMeshGenerator::generate
 		}
 	};
 
+	// generate mesh
 	interface::GmshGenerate {}();
 
-	// create physical groups (patches)
+	// define groups
+	auto& surfaces {volume->boundaryRef()};
 
-	return mesh;
+	Sptrvector<Patch> patches {};
+	patches.reserve(8);		// we know the ordering and the ammount
+
+	auto store = [&](auto& patchName, auto&&... surfs) -> void
+	{
+		patches.emplace_back
+		(
+			new Patch {patchName, std::forward<decltype(surfs)>(surfs)...}
+		);
+	};
+
+	store("per_top",		surfaces[0]);
+	store("outlet",			surfaces[1]);
+	store("per_bot",		surfaces[2]);
+	store("inlet",			surfaces[3]);
+	store("profile_bot",	surfaces[4]);
+	store("profile_top",	surfaces[5]);
+	store("profile_te",		surfaces[6]);
+	store("empty",			surfaces[7], surfaces[8]);
+
+	Uptr<Region> region {new Region {"region", std::move(volume)}};
+	region->storeSubgroups(std::move(patches));
+
+	return region;
 }
 
 

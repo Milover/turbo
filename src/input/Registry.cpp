@@ -9,10 +9,12 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include <memory>
+#include <ostream>
 
 #include "Registry.h"
 
 #include "General.h"
+#include "RegistryObject.h"
 #include "RegistryObjectBase.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -69,6 +71,19 @@ Registry& Registry::create()
 Registry* Registry::owner() const noexcept
 {
 	return this->owner_;
+}
+
+
+void Registry::printAll
+(
+	std::ostream& os,
+	const String::size_type width,
+	const String& delimiter,
+	const String& terminator
+) const
+{
+	for (auto& [name, obj] : *data_)
+		obj->print(os, width, delimiter, terminator);
 }
 
 

@@ -28,11 +28,14 @@ namespace mesh
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-void ProfileMesh::checkGeometry() const noexcept(ndebug)
+void ProfileMesh::checkGeometry
+(
+	const design::Profile& profile
+) const noexcept(ndebug)
 {
-	if (geometry_->empty())
+	if (profile.empty())
 		error(FUNC_INFO, "profile not built");
-	else if (geometry_->wrapped())
+	else if (profile.wrapped())
 		error(FUNC_INFO, "profile is wrapped");
 }
 
@@ -67,24 +70,19 @@ void ProfileMesh::createMeshGenerator()
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-ProfileMesh::ProfileMesh
-(
-	const Sptr<design::Profile>& profile,
-	const Path& file
-)
+ProfileMesh::ProfileMesh(const Path& file)
 :
-	BaseType {profile, file}
+	BaseType {file}
 {}
 
 
 ProfileMesh::ProfileMesh
 (
-	const Sptr<design::Profile>& profile,
 	const input::Registry& reg,
 	const Path& file
 )
 :
-	BaseType {profile, reg, file}
+	BaseType {reg, file}
 {}
 
 

@@ -64,6 +64,12 @@ public:
 		//- Construct from a Integer,
 		explicit NumberOfStations(const Integer i);
 
+
+	// Member functions
+
+		//- Get object name
+		String getName() const override;
+
 };
 
 

@@ -59,6 +59,12 @@ public:
 		//  no aditional checking required
 		explicit SectionExtensionFactor(const Float f);
 
+
+	// Member functions
+
+		//- Get object name
+		String getName() const override;
+
 };
 
 

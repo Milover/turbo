@@ -86,6 +86,9 @@ public:
 		>
 		static store(T&& input);
 
+		//- Try to get a value for coresponding key
+		static Optional<String> tryGet(const String& key);
+
 
 	// Member operators
 

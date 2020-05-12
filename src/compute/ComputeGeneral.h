@@ -51,11 +51,44 @@ Float computeBLThickness
 ) noexcept;
 
 
-//- Compute avg. mesh cell size
+//- Compute avg. (tet) mesh cell size
+//	FIXME: this works horribly
 Float computeMeshCellSize
 (
 	const Integer N,	// mesh size (cell count)
 	const Float A		// (mesh) surface area
+) noexcept;
+
+
+//- Compute (initial) inlet turbulence kinetic energy
+Float computeTurbulenceKineticEnergy
+(
+	const Vector& v,	// (inlet) velocity
+	const Float I		// turbulence intensity
+) noexcept;
+
+
+//- Compute (initial) inlet turbulence dissipation rate
+Float computeTurbulenceDissipationRate
+(
+	const Float k,		// turbulence kinetic energy
+	const Float L		// turbulence reference length scale
+) noexcept;
+
+
+//- Compute (initial) inlet turbulence specific dissipation rate
+Float computeTurbulenceSpecificDissipationRate
+(
+	const Float k,		// turbulence kinetic energy
+	const Float L		// turbulence reference length scale
+) noexcept;
+
+
+//- Compute initial turbulence viscosity, just an approximation
+Float computeTurbulenceViscosity
+(
+	const Float k,		// turbulence kinetic energy
+	const Float L		// turbulence reference length scale
 ) noexcept;
 
 

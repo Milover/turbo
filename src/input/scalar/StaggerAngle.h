@@ -72,6 +72,12 @@ public:
 			const InclinationAngle& zeta
 		);
 
+
+	// Member functions
+
+		//- Get object name
+		String getName() const override;
+
 };
 
 

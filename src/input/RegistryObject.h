@@ -23,6 +23,9 @@ Description
 #define INPUT_REGISTRY_OBJECT_H
 
 #include <cmath>
+#include <iomanip>
+#include <ostream>
+#include <sstream>
 #include <type_traits>
 #include <utility>
 
@@ -99,8 +102,16 @@ public:
 
 	// Member functions
 
-		//- Get value
-		T value() const noexcept;
+		//- Print formated output ('name[delimiter]value[terminator]'),
+		//	optionally set the delimiter, terminator and
+		//	total output field width (pads with whitespace)
+		void print
+		(
+			std::ostream& os,
+			const String::size_type width = 0,
+			const String& delimiter = " ",
+			const String& terminator = ";"
+		) const override;
 
 		//- Set value
 		template
@@ -109,6 +120,9 @@ public:
 			typename = std::enable_if_t<std::is_same_v<T, removeCVRef_t<U>>>
 		>
 		void set(U&& u) noexcept(ndebug);
+
+		//- Get value
+		T value() const noexcept;
 
 
 	// Member operators
@@ -136,7 +150,7 @@ typename T::type convert(const String& value)
 //- Create a RegistryObject by reading the InputRegistry if possible
 //  otherwise default construct if possible
 template<typename T>
-std::enable_if_t<std::is_base_of_v<RegistryObjectBase, T>, T>
+std::enable_if_t<std::is_base_of_v<RegistryObjectBase, removeCVRef_t<T>>, T>
 read()
 {
 	// read if special construction is implemented locally
@@ -205,9 +219,36 @@ void RegistryObject<T>::check() const noexcept(ndebug)
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 template<typename T>
-T RegistryObject<T>::value() const noexcept
+void RegistryObject<T>::print
+(
+	std::ostream& os,
+	const String::size_type width,
+	const String& delimiter,
+	const String& terminator
+) const
 {
-	return this->value_;
+	std::stringstream ss;
+	if constexpr (std::is_enum_v<T>)
+	{
+		ss << static_cast<std::underlying_type_t<T>>(this->value());
+	}
+	else
+		ss << this->value();
+
+	auto padding
+	{
+		width
+	  - this->getName().size()
+	  - delimiter.size()
+	  + ss.str().size()
+	  + terminator.size()
+	};
+
+	os << this->getName()
+	   << delimiter
+	   << std::setw(padding)
+	   << ss.str()
+	   << terminator;
 }
 
 
@@ -217,6 +258,13 @@ void RegistryObject<T>::set(U&& u) noexcept(ndebug)
 {
 	this->value_ = std::forward<U>(u);
 	this->check();
+}
+
+
+template<typename T>
+T RegistryObject<T>::value() const noexcept
+{
+	return this->value_;
 }
 
 

@@ -16,9 +16,11 @@ set(SRC
 	GmshLine.cpp
 	GmshPlanarSurface.cpp
 	GmshPoint.cpp
+	GmshPhysicalGroup.cpp
 	GmshRecombine.cpp
 	GmshRemove.cpp
 	GmshRemoveField.cpp
+	GmshRemovePhysicalGroup.cpp
 	GmshSetBGMesh.cpp
 	GmshSetBLMesh.cpp
 	GmshSetFieldNumber.cpp

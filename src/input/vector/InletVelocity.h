@@ -63,6 +63,12 @@ public:
 			const ShroudRadius& r_s
 		) noexcept(ndebug);
 
+
+	// Member functions
+
+		//- Get object name
+		String getName() const override;
+
 };
 
 

@@ -48,7 +48,10 @@ protected:
 	// Member functions
 
 		//- Check geometry
-		void checkGeometry() const noexcept(ndebug) override;
+		void checkGeometry
+		(
+			const design::Profile& profile
+		) const noexcept(ndebug) override;
 
 		//- Create the mesh generator
 		void createMeshGenerator() override;
@@ -58,31 +61,25 @@ public:
 
 	// Constructors
 
-		//- Default construct from geometry,
+		//- Default constructor,
 		//	creates an owned registry and creates a model
-		ProfileMesh
-		(
-			const Sptr<design::Profile>& profile,
-			const Path& file = Path {}
-		);
+		ProfileMesh(const Path& file = Path {});
 
-		//- Construct from geometry with (owner) registry,
+		//- Construct with (owner) registry,
 		//	creates a non-owned accessible registry and
 		//	creates an owned model.
 		ProfileMesh
 		(
-			const Sptr<design::Profile>& profile,
 			const input::Registry& reg,
 			const Path& file = Path {}
 		);
 
-		//- Construct from a profile with (owner) registry,
+		//- Construct with (owner) registry,
 		//	creates a non-owned accessible registry and
 		//	takes or shares ownership of a model
 		template<typename T>
 		ProfileMesh
 		(
-			const Sptr<design::Profile>& profile,
 			const input::Registry& reg,
 			T&& model,
 			const Path& file = Path {}
@@ -96,7 +93,6 @@ public:
 template<typename T>
 ProfileMesh::ProfileMesh
 (
-	const Sptr<design::Profile>& profile,
 	const input::Registry& reg,
 	T&& model,
 	const Path& file
@@ -104,7 +100,6 @@ ProfileMesh::ProfileMesh
 :
 	BaseType
 	{
-		profile,
 		reg,
 		std::forward<T>(model),
 		file

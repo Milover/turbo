@@ -11,6 +11,7 @@ License
 #include <array>
 #include <cmath>
 #include <numeric>
+#include <ostream>
 #include <utility>
 
 #include "Vector.h"
@@ -195,6 +196,17 @@ bool operator!=(const Vector& lhs, const Vector& rhs) noexcept
 	return !(lhs == rhs);
 }
 
+
+std::ostream& operator<<(std::ostream& os, const Vector& v)
+{
+	// so we don't mess up any formatting
+	std::stringstream ss;
+	ss << "(" << v.x() << " " << v.y() << " " << v.z() << ")";
+
+	os << ss.str();
+
+	return os;
+}
 
 
 // * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * * //

@@ -21,6 +21,7 @@ Sourcefiles
 #define INPUT_CAMBER_ANGLE_H
 
 #include "BladeVelocity.h"
+#include "DeviationAngle.h"
 #include "General.h"
 #include "IncidenceAngle.h"
 #include "InletVelocity.h"
@@ -61,16 +62,15 @@ public:
 			const InletVelocity& c_1,
 			const OutletVelocity& c_2,
 			const BladeVelocity& U,
-			const IncidenceAngle& i
+			const IncidenceAngle& i,
+			const DeviationAngle& delta
 		);
 
-		//- Compute assuming zero incidence and construct
-		CamberAngle
-		(
-			const InletVelocity& c_1,
-			const OutletVelocity& c_2,
-			const BladeVelocity& U
-		);
+
+	// Member functions
+
+		//- Get object name
+		String getName() const override;
 
 };
 

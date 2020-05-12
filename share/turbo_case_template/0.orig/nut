@@ -1,0 +1,56 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v1906                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0";
+    object      nut;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include		"../turbo_values";
+
+dimensions      [0 2 -1 0 0 0 0];
+
+internalField   uniform $TurbulenceViscosity;
+
+boundaryField
+{
+    inlet
+    {
+        type            calculated;
+        value           $internalField;
+    }
+
+    outlet
+    {
+        type            calculated;
+        value           $internalField;
+    }
+
+    ".*wall.*"
+    {
+        type            nutUBlendedWallFunction;
+		value			$internalField;
+    }
+
+    ".*periodic.*"
+    {
+        type            cyclicAMI;
+    }
+
+    topAndBot
+    {
+        type            empty;
+    }
+}
+
+
+// ************************************************************************* //

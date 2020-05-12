@@ -21,6 +21,7 @@ SourceFiles
 #define INPUT_REGISTRY_H
 
 #include <functional>
+#include <ostream>
 #include <utility>
 #include <type_traits>
 
@@ -168,6 +169,15 @@ public:
 		//- Store (insert or assign) a registry object (locally)
 		template<typename T>
 		[[maybe_unused]] Pair<Data::iterator, bool> store(T&& t) const;
+
+		//- Print all stored data (formatted)
+		void printAll
+		(
+			std::ostream& os,
+			const String::size_type width = 0,
+			const String& delimiter = " ",
+			const String& terminator = ";"
+		) const;
 
 
 	// Member operators

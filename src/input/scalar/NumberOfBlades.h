@@ -51,6 +51,12 @@ public:
 		//  no aditional checking required
 		explicit NumberOfBlades(const Integer i);
 
+
+	// Member functions
+
+		//- Get object name
+		String getName() const override;
+
 };
 
 

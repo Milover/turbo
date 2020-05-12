@@ -21,6 +21,7 @@ SourceFiles
 #define TURBO_BASE_H
 
 #include <type_traits>
+#include <ostream>
 #include <utility>
 
 #include "General.h"
@@ -45,6 +46,12 @@ private:
 		std::is_same_v<Sptr<geometry::Model>, removeCVRef_t<T>>
 	 || std::is_same_v<geometry::Model&&, T> 
 	 || std::is_same_v<geometry::Model, T>;
+
+
+	// Member functions
+
+		//- Set file
+		void setFile(const Path& file);
 
 
 protected:
@@ -92,7 +99,7 @@ protected:
 	// Member functions
 
 		//- Adjust filename
-		void adjustFilename
+		void setFile
 		(
 			const String& prefix,
 			const String& extension
@@ -116,8 +123,13 @@ public:
 
 	// Member functions
 
-		//- Build geometry
-		virtual void build() = 0;
+		//- Change directory to 'directory'
+		void changeDirectory(const Path& directory);
+
+		//- Change current directory to parent directory.
+		//	NOTE: only does relative moves, so if file_ is the
+		//		  program cwd, does nothing
+		void changeDirectoryParent();
 
 		//- Get file
 		[[nodiscard]] Path file() const;
@@ -143,6 +155,15 @@ public:
 
 		//- Write geometry to file
 		virtual void write() const = 0;
+
+		//- Print all data from local registry (formatted)
+		void printAll
+		(
+			std::ostream& os,
+			const String::size_type width = 0,
+			const String& delimiter = " ",
+			const String& terminator = ";"
+		) const;
 
 
 	// Member operators
@@ -185,8 +206,7 @@ TurboBase::TurboBase
 			new geometry::Model {std::forward<T>(model)}
 		);
 
-	if (std::filesystem::is_directory(file))
-		file_ = file / "";
+	setFile(file);
 }
 
 

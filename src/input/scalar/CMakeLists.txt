@@ -15,10 +15,12 @@ set(SRC
 	CamberPointSpacing.cpp
 	Chord.cpp
 	Density.cpp
+	DeviationAngle.cpp
 	DynamicViscosity.cpp
 	HubRadius.cpp
 	IncidenceAngle.cpp
 	InclinationAngle.cpp
+	KinematicViscosity.cpp
 	MaxCamber.cpp
 	MaxCamberPosition.cpp
 	MaxProfileThickness.cpp
@@ -38,6 +40,13 @@ set(SRC
 	StaggerAngle.cpp
 	TipClearance.cpp
 	TotalPressureDifference.cpp
+	TurbulenceKineticEnergy.cpp
+	TurbulenceIntensity.cpp
+	TurbulenceDissipationRate.cpp
+	TurbulenceReferenceLengthScale.cpp
+	TurbulenceReferenceLengthScaleRatio.cpp
+	TurbulenceSpecificDissipationRate.cpp
+	TurbulenceViscosity.cpp
 	VolumeFlowRate.cpp
 	VortexDistributionExponent.cpp
 	YPlus.cpp

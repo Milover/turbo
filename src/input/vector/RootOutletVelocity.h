@@ -70,6 +70,12 @@ public:
 			const Density& rho
 		) noexcept(ndebug);
 
+
+	// Member functions
+
+		//- Get object name
+		String getName() const override;
+
 };
 
 

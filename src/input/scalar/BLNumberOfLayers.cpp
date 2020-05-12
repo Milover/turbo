@@ -33,6 +33,14 @@ BLNumberOfLayers::BLNumberOfLayers(const Integer i)
 {}
 
 
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+String BLNumberOfLayers::getName() const
+{
+	return name;
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace input

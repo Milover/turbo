@@ -27,10 +27,12 @@ Description
 #include "CamberPointSpacing.h"
 #include "Chord.h"
 #include "Density.h"
+#include "DeviationAngle.h"
 #include "DynamicViscosity.h"
 #include "HubRadius.h"
 #include "IncidenceAngle.h"
 #include "InclinationAngle.h"
+#include "KinematicViscosity.h"
 #include "MaxProfileThickness.h"
 #include "MaxCamber.h"
 #include "MaxCamberPosition.h"
@@ -50,6 +52,13 @@ Description
 #include "StaggerAngle.h"
 #include "TipClearance.h"
 #include "TotalPressureDifference.h"
+#include "TurbulenceKineticEnergy.h"
+#include "TurbulenceIntensity.h"
+#include "TurbulenceDissipationRate.h"
+#include "TurbulenceReferenceLengthScale.h"
+#include "TurbulenceReferenceLengthScaleRatio.h"
+#include "TurbulenceSpecificDissipationRate.h"
+#include "TurbulenceViscosity.h"
 #include "VolumeFlowRate.h"
 #include "VortexDistributionExponent.h"
 #include "YPlus.h"
@@ -57,8 +66,11 @@ Description
 // vectors
 #include "BladeVelocity.h"
 #include "InletVelocity.h"
+#include "InletRelativeVelocity.h"
 #include "OutletVelocity.h"
 #include "RootOutletVelocity.h"
+#include "TranslationPerBot.h"
+#include "TranslationPerTop.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

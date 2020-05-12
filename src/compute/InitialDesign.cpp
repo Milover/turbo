@@ -31,10 +31,11 @@ Vector computeBladeVelocity
 	const Float r			// radius
 ) noexcept
 {
+	// we're always rotating counterclockwise
 	return Vector
 	{
 		0.0,
-		pi * N * r
+		-pi * N * r
 	};
 }
 
@@ -216,10 +217,7 @@ Vector computeVortexDistributionVelocity
 {
 	Float k
 	{
-		std::pow
-		(
-			r / r_h, n
-		)
+		std::pow(r / r_h, n)
 	};
 
 	return Vector

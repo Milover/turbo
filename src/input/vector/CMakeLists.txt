@@ -8,8 +8,11 @@
 set(SRC
 	BladeVelocity.cpp
 	InletVelocity.cpp
+	InletRelativeVelocity.cpp
 	OutletVelocity.cpp
 	RootOutletVelocity.cpp
+	TranslationPerBot.cpp
+	TranslationPerTop.cpp
 	)
 
 # append to sources

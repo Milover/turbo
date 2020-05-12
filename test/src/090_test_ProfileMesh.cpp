@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 	#include "TestInclude.h"
 	#include "TestGmshInclude.h"
 
-	control.set("General.Verbosity", 10);
+	//control.set("General.Verbosity", 10);
 
 	input::InputRegistry::store					// TODO: should mass test this
 	(
@@ -55,19 +55,20 @@ int main(int argc, char* argv[])
 			{"Solidity",				"1.0"},		// default
 			// mesh
 			{"ProfileMeshGenerator",	"ProfileTetMeshGenerator"},	// default
-			{"MeshSize",				"40000"},	// default
-			//{"BLNumberOfLayers",		"5"},		// default
+			//{"MeshSize",				"20000"},	// disabled
+			{"MeshCellSize",			"0.005"},
+			//{"BLNumberOfLayers",		"5"},		// disabled
 			{"BLGrowthRate",			"1.2"},		// default
-			{"BLTransitionRatio",		"0.75"},	// default
+			{"BLTransitionRatio",		"0.4"},	// default
 			{"ProfileBumpFactor",		"0.25"},	// default
 			// precomputed values because 'Airfoil' is not present
 			{"InletVelocity",			"16.7502 0.0 0.0"},
 			{"BladeVelocity",			"0.0 315.0 0.0"},
 			{"CamberAngle",				std::to_string(0.15 * M_PI)},
 			{"Chord",					"0.5"},
-			{"Pitch",					"0.5"},
+			{"Pitch",					"0.4"},
 			{"Radius",					"1.0"},
-			{"StaggerAngle",			std::to_string(0.4 * M_PI)}
+			{"StaggerAngle",			std::to_string(0.417 * M_PI)}
 		}
 	);
 
@@ -76,27 +77,15 @@ int main(int argc, char* argv[])
 	input::Registry reg {};
 
 	// build profile
-	Sptr<design::Profile> profile
-	{
-		new design::Profile {}
-	};
-	profile->build
-	(
-		design::ProfileGenerator {reg},
-		reg
-	);
+	design::ProfileGenerator pg {reg};
+	design::Profile profile {};
+	profile.build(pg, reg);
 
 	updateAndWait(1);
 
 	// build mesh
-
-	mesh::ProfileMesh mesh
-	{
-		profile,
-		reg,
-		std::move(model)
-	};
-	mesh.build();
+	mesh::ProfileMesh mesh {reg, std::move(model)};
+	mesh.build(profile);
 
 	updateAndWait(1);
 

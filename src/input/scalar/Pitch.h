@@ -60,6 +60,12 @@ public:
 			const Radius& r
 		);
 
+
+	// Member functions
+
+		//- Get object name
+		String getName() const override;
+
 };
 
 

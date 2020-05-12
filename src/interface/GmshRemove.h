@@ -61,7 +61,7 @@ public:
 };
 
 
-// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
 
 template<typename Geometry, typename>
 void GmshRemove::operator()(const Geometry* g) const noexcept

@@ -61,6 +61,12 @@ public:
 		//  no aditional checking required
 		explicit VortexDistributionExponent(const Float f);
 
+
+	// Member functions
+
+		//- Get object name
+		String getName() const override;
+
 };
 
 

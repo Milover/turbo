@@ -70,6 +70,12 @@ public:
 		//- Convert String keyword to Type,
 		Type convert(String& s) const;
 
+
+	// Member functions
+
+		//- Get object name
+		String getName() const override;
+
 };
 
 

@@ -37,7 +37,8 @@ CamberAngle::CamberAngle
 	const InletVelocity& c_1,
 	const OutletVelocity& c_2,
 	const BladeVelocity& U,
-	const IncidenceAngle& i
+	const IncidenceAngle& i,
+	const DeviationAngle& delta
 )
 :
 	CamberAngle
@@ -47,29 +48,19 @@ CamberAngle::CamberAngle
 			c_1.value(),
 			c_2.value(),
 			U.value(),
-			i.value()
+			i.value(),
+			delta.value()
 		)
 	}
 {}
 
 
-CamberAngle::CamberAngle
-(
-	const InletVelocity& c_1,
-	const OutletVelocity& c_2,
-	const BladeVelocity& U
-)
-:
-	CamberAngle
-	{
-		compute::computeCamberAngle
-		(
-			c_1.value(),
-			c_2.value(),
-			U.value()
-		)
-	}
-{}
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+String CamberAngle::getName() const
+{
+	return name;
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

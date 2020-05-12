@@ -58,6 +58,12 @@ public:
 		//  no aditional checking required
 		explicit MeshSize(const Integer i);
 
+
+	// Member functions
+
+		//- Get object name
+		String getName() const override;
+
 };
 
 

@@ -47,7 +47,7 @@ namespace geometry
 template
 <
 	typename Entity,
-	typename Remover = interface::GmshRemove
+	typename Deleter = interface::GmshRemove
 >
 class Shape
 :
@@ -56,7 +56,7 @@ class Shape
 {
 protected:
 
-	using ShapeBase = Shape<Entity, Remover>;
+	using ShapeBase = Shape<Entity, Deleter>;
 
 	static_assert
 	(
@@ -68,9 +68,9 @@ protected:
 
 	static_assert
 	(
-		std::is_nothrow_default_constructible_v<Remover>
-	 && std::is_nothrow_destructible_v<Remover>
-	 && std::is_nothrow_invocable_v<Remover, Entity*>
+		std::is_nothrow_default_constructible_v<Deleter>
+	 && std::is_nothrow_destructible_v<Deleter>
+	 && std::is_nothrow_invocable_v<Deleter, Entity*>
 	);
 
 
@@ -116,9 +116,9 @@ public:
 template
 <
 	typename Entity,
-	typename Remover
+	typename Deleter
 >
-Shape<Entity, Remover>::Shape(const std::size_t tag) noexcept
+Shape<Entity, Deleter>::Shape(const std::size_t tag) noexcept
 :
 	Entity {tag}
 {}
@@ -129,13 +129,13 @@ Shape<Entity, Remover>::Shape(const std::size_t tag) noexcept
 template
 <
 	typename Entity,
-	typename Remover
+	typename Deleter
 >
-Shape<Entity, Remover>::~Shape() noexcept
+Shape<Entity, Deleter>::~Shape() noexcept
 {
 	if (this->tag_ != 0)
 	{
-		Remover {}(this);
+		Deleter {}(this);
 		this->sync_ = false;
 	}
 }

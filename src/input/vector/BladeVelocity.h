@@ -61,6 +61,12 @@ public:
 			const Radius& r
 		) noexcept(ndebug);
 
+
+	// Member functions
+
+		//- Get object name
+		String getName() const override;
+
 };
 
 

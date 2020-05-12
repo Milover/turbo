@@ -26,6 +26,8 @@ SourceFiles
 
 #include <type_traits>
 
+#include "General.h"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace turbo
@@ -65,7 +67,10 @@ public:
 // * * * * * * * * * * * * * * * Type Traits * * * * * * * * * * * * * * * * //
 
 template<typename T>
-inline constexpr bool isPlaceholder_v = std::is_base_of_v<PlaceholderShape, T>;
+inline constexpr bool isPlaceholder_v = std::is_base_of_v
+<
+	PlaceholderShape, removeCVRef_t<T>
+>;
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -23,7 +23,9 @@ SourceFiles
 #include <vector>
 
 #include "General.h"
+#include "Group.h"
 #include "Registry.h"
+#include "Surface.h"
 #include "Variables.h"
 #include "Vector.h"
 #include "Volume.h"
@@ -46,6 +48,8 @@ protected:
 
 	using Point = Vector;
 	using Pointvector = std::vector<Point>;
+	using Patch = Group<geometry::Surface>;
+	using Region = Group<geometry::Volume>;
 	using BaseType = MeshGeneratorBase<T>;
 
 
@@ -81,7 +85,7 @@ public:
 	// Member functions
 
 		//- Generate the mesh
-		virtual Uptr<geometry::Volume> generate
+		virtual Uptr<Region> generate
 		(
 			const input::Registry& reg,
 			const T&

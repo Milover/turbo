@@ -21,6 +21,7 @@ SourceFiles
 #define VECTOR_H
 
 #include <array>
+#include <ostream>
 
 #include "General.h"
 
@@ -202,6 +203,9 @@ Vector operator/(Vector lhs, const Float& rhs) noexcept;
 
 //- Inequality operator
 bool operator!=(const Vector& lhs, const Vector& rhs) noexcept;
+
+//- Stream output operator, formatted output '(x, y, z)'
+std::ostream& operator<<(std::ostream& os, const Vector& v);
 
 
 // * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * * //

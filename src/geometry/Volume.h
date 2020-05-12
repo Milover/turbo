@@ -65,8 +65,9 @@ private:
 protected:
 
 	template<typename T>
-	inline static constexpr bool isValid_v = isSurfaceSptr_v<T>
-										  || std::is_base_of_v<Surface, T>;
+	inline static constexpr bool isValid_v =
+		isSurfaceSptr_v<T>
+	 || std::is_base_of_v<Surface, removeCVRef_t<T>>;
 
 	template<typename T>
 	using enableIfValid_t = std::enable_if_t<isValid_v<T>>;

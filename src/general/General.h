@@ -18,6 +18,7 @@ Description
 #include <filesystem>
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
 #include <type_traits>
 #include <unordered_map>
@@ -49,6 +50,11 @@ using Path = std::filesystem::path;
 
 
 using String = std::string;
+
+
+
+template<typename T>
+using Optional = std::optional<T>;
 
 
 template<typename T, typename U = T>

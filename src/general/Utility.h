@@ -179,6 +179,31 @@ inline void addFilenamePrefix
 }
 
 
+//- Mass print to a stream
+template<typename... T>
+inline void massPrint
+(
+	std::ostream& os,
+	const String::size_type width,
+	const String& delimiter,
+	const String& terminator,
+	T&&... t
+)
+{
+	static_assert(sizeof...(t) > 0);
+
+	if constexpr
+	(
+		(std::is_pointer_v<removeCVRef_t<T>> && ...)
+	)
+	{
+		(t->print(os, width, delimiter, terminator), ...);
+	}
+	else
+		(t.print(os, width, delimiter, terminator), ...);
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace turbo

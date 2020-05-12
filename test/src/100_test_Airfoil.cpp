@@ -12,13 +12,26 @@ Description
 	TODO: some numeric (comparison) tests would be nice,
 		  mostly visuals checks for now
 
+	NOTE: reference work:
+
+		  Buchwald, P. & Vogt, D. M. & Grillat, J. & Laufer, W. &
+		  Schmitz, M. B. & Lucius, A. & Schneider, M. (2017).
+		  Aeroacoustic Analysis of Low-Speed Axial Fans with Different
+		  Rotational Speeds in the Design Point.
+		  Journal of Engineering for Gas Turbines and Power,
+		  doi: 10.1115/1.4038122
+
 \*---------------------------------------------------------------------------*/
+
+#include <filesystem>
+#include <fstream>
 
 #include "Airfoil.h"
 #include "General.h"
 #include "GmshControl.h"
 #include "InputRegistry.h"
-#include "Variables.h"
+#include "Registry.h"
+#include "Simulator.h"
 
 #include "Test.h"
 
@@ -31,31 +44,50 @@ int main(int argc, char* argv[])
 	#include "TestInclude.h"
 	#include "TestGmshInclude.h"
 
+	//control.set("General.Verbosity", 10);
+
 	input::InputRegistry::store					// TODO: should mass test this
 	(
 		HashMap<String>
 		{
 			// machine
 			{"Density",						"1.2"},
+			{"DynamicViscosity",			"1.8206e-5"},
 			{"Rps",							"116.666"},
 			{"TotalPressureDifference",		"400"},
 			{"VolumeFlowRate",				"0.222"},
+			{"TurbulenceReferenceLengthScaleRatio",	"0.1"},		// default
+			{"TurbulenceIntensity",			"0.05"},			// default
 			// blade/blade row
 			{"HubRadius",					"0.0375"},
-			{"IncidenceAngle",				"0.0"},		// default
+			{"IncidenceAngle",				"0"},				// default
 			{"NumberOfBlades",				"6"},
+			{"NumberOfStations",			"1"},				// default
 			{"ShroudRadius",				"0.075"},
-			{"Solidity",					"1.0"},		// default
-			{"VortexDistributionExponent",	"-1.0"},	// default
+			{"TipClearance",				"0"},				// default
+			{"Solidity",					"1.0"},				// default
+			{"VortexDistributionExponent",	"-1.0"},			// default
 			// airfoil
-			{"Distribution",				"Naca4DigitDistribution"},
+			{"Distribution",	"Naca4DigitDistribution"},		// default
+			{"DeviationAngle",				"0"},				// default
 			{"MaxProfileThickness",			"0.1"},
-			{"Camber",						"CircularArcCamber"},
-			{"CamberPointSpacing",			"Cosine"},	// default
-			{"NumberOfCamberPoints",		"150"},		// default
+			{"Camber",				"CircularArcCamber"},		// default
+			{"CamberPointSpacing",			"Cosine"},			// default
+			{"NumberOfCamberPoints",		"150"},				// default
+			// mesh
+			{"ProfileMeshGenerator","ProfileTetMeshGenerator"},	// default
+			//{"MeshSize",					"20000"},			// disabled
+			{"MeshCellSize",				"5e-4"},
+			//{"BLNumberOfLayers",			"5"},				// disabled
+			{"BLGrowthRate",				"1.2"},				// default
+			{"BLTransitionRatio",			"0.75"},			// default
+			{"ProfileBumpFactor",			"0.25"},			// default
+			{"YPlus",						"1"},
 			// precomputed values, because 'Blade' is not present
-			{"InletVelocity",				"16.7502 0.0 0.0"},
-			{"RootOutletVelocity",			"16.7502 0.0 24.2523"}
+			{"KinematicViscosity",			"1.5172e-5"},
+			{"InletVelocity",				"16.7502 0 0"},
+			{"RootOutletVelocity",			"16.7502 24.2523 0"},
+			{"TurbulenceKineticEnergy",		"1.0521"}
 		}
 	);
 
@@ -63,22 +95,31 @@ int main(int argc, char* argv[])
 	// can read the values from the InputRegistry
 	input::Registry reg {};
 
+	// Make a working directory
+	Path workDir {std::filesystem::current_path() / "airfoil_0"};
+	std::filesystem::create_directory(workDir);
+
 	// make the 'Airfoil'
-	design::Airfoil airfoil {0, reg, std::move(model)};
+	design::Airfoil airfoil
+	{
+		0,
+		reg, std::move(model),
+		workDir
+	};
 	airfoil.build();
 
 	// show all geometry 
 	auto points
 	{
-		airfoil.profile->getPoints()
+		airfoil.profile.getPoints()
 	};
 	auto contour
 	{
-		airfoil.profile->getContour()
+		airfoil.profile.getContour()
 	};
 	auto trailingEdge
 	{
-		airfoil.profile->getTrailingEdge()
+		airfoil.profile.getTrailingEdge()
 	};
 
 	updateAndWait(1);
@@ -99,19 +140,19 @@ int main(int argc, char* argv[])
 	test::compareTest
 	(
 		pass,
-		!airfoil.profile->wrapped(),
+		!airfoil.profile.wrapped(),
 		output,
 		"Checking if not wrapped"
 	);
 
 	// wrap
-	airfoil.profile->wrap();
+	airfoil.profile.wrap();
 
 	// should be wrapped
 	test::compareTest
 	(
 		pass,
-		airfoil.profile->wrapped(),
+		airfoil.profile.wrapped(),
 		output,
 		"Checking if wrapped"
 	);
@@ -119,15 +160,15 @@ int main(int argc, char* argv[])
 	// show all the geometry 
 	auto wrappedPoints
 	{
-		airfoil.profile->getPoints()
+		airfoil.profile.getPoints()
 	};
 	auto wrappedContour
 	{
-		airfoil.profile->getContour()
+		airfoil.profile.getContour()
 	};
 	auto wrappedTrailingEdge
 	{
-		airfoil.profile->getTrailingEdge()
+		airfoil.profile.getTrailingEdge()
 	};
 	updateAndWait(1);
 
@@ -143,14 +184,44 @@ int main(int argc, char* argv[])
 	);
 	updateAndWait(1);
 
+	// reset and test simulation
+	airfoil.build();
+
+	// make a new mesh
+	auto caseDir {airfoil.simulate()};
+
+	// check if the case dir was properly built
+	test::compareTest
+	(
+		pass,
+		(
+			caseDir == (workDir / "case_0")
+		),
+		output,
+		"Checking case directory"
+	);
+
+	// write out all values from the airfoil registry
+	std::ofstream ofs {workDir / "airfoil_registry"};
+	airfoil.printAll(ofs, 40, " ", ";\n");
+	ofs.flush();
+
+	control.update();
+	control.run();
+
+	// cleanup
+	auto r_2 {std::filesystem::remove_all(workDir)};
+	auto r_1 {std::filesystem::remove_all(simulation::Simulator::caseTemplate)};
+
+	// we should have cleaned something up
+	pass = pass && r_1 > 0 && r_2 > 0;
+
 	// test pass or fail
 	if (pass)
 		test::echo(0);
 	else
 		test::echo(1);
 
-	control.update();
-	control.run();
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

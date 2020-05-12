@@ -88,7 +88,7 @@ public:
 	// Member functions
 
 		//- Generate a structured 3D (H) hex mesh for an airfoil profile
-		[[nodiscard]] Uptr<geometry::Volume> generate
+		[[nodiscard]] Uptr<Region> generate
 		(
 			const input::Registry& reg,
 			const design::Profile& profile

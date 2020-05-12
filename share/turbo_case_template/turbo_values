@@ -1,0 +1,25 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       IOobject;
+    object      turbo_values;
+}
+
+TranslationPerBot                  (10 0 0);
+TranslationPerTop                  (10 0 0);
+
+KinematicViscosity                  1e-4;
+
+InletRelativeVelocity               (10 0 0);
+TotalPressureDifference             1e5;
+
+TurbulenceIntensity                 0.00839;
+TurbulenceReferenceLengthScale      0.00839;
+
+TurbulenceKineticEnergy             0.09375;
+TurbulenceDissipationRate           0.00839;
+TurbulenceSpecificDissipationRate   11.18034;
+TurbulenceViscosity                 0.00839;
+
+#inputMode		merge

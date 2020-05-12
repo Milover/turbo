@@ -161,7 +161,10 @@ using Entity3D = Entity<3>;
 
 
 template<typename T, Integer dimension>
-inline static constexpr bool isND_v = std::is_base_of_v<Entity<dimension>, T>;
+inline static constexpr bool isND_v = std::is_base_of_v
+<
+	Entity<dimension>, removeCVRef_t<T>
+>;
 
 
 template<typename T>

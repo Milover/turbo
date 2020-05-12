@@ -17,7 +17,10 @@ Description
 #ifndef INPUT_REGISTRY_OBJECT_BASE_H
 #define INPUT_REGISTRY_OBJECT_BASE_H
 
+#include <ostream>
+
 #include "Error.h"
+#include "General.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -59,6 +62,22 @@ public:
 
 	//- Destructor
 	virtual ~RegistryObjectBase() = default;
+
+	// Member functions
+
+		//- Get object name
+		virtual String getName() const = 0;
+
+		//- Print formated output ('name[delimiter]value[terminator]'),
+		//	optionally set the delimiter, terminator and
+		//	total output field width (pads with whitespace)
+		virtual void print
+		(
+			std::ostream& os,
+			const String::size_type width = 0,
+			const String& delimiter = " ",
+			const String& terminator = ";"
+		) const = 0;
 
 
 	// Member operators
