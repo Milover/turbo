@@ -45,6 +45,9 @@ int main(int argc, char* argv[])
 	geometry::Point::Coordinates c1 {0.0, 0.0};
 	geometry::Point::Coordinates c2 {1.0, 0.0};
 
+	Sptr<geometry::Point> sp1 {new geometry::Point {c1}};
+	Sptr<geometry::Point> sp2 {new geometry::Point {c2}};
+
 	// Test Line construction
 	std::vector<Uptr<geometry::Curve>> curves;
 
@@ -77,8 +80,6 @@ int main(int argc, char* argv[])
 			}
 		}
 	);
-	Sptr<geometry::Point> sp1 {new geometry::Point {c1}};
-	Sptr<geometry::Point> sp2 {new geometry::Point {c2}};
 	curves.push_back
 	(
 		Uptr<geometry::Line>				// Sptr<Point>&
@@ -153,6 +154,18 @@ int main(int argc, char* argv[])
 		geometry::Point::count() == 12,
 		output,
 		"Checking number of created points"
+	);
+
+	curves.clear();
+	updateAndWait(1);
+
+	// only the 2 point-ptrs should be left
+	test::compareTest
+	(
+		pass,
+		test::getNumberOfEntities() == 2,
+		output,
+		"Checking cleared state"
 	);
 
 	// test pass or fail

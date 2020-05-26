@@ -194,11 +194,19 @@ Vector operator-(Vector v) noexcept;
 
 
 //- Multiplication by scalar
-Vector operator*(Vector lhs, const Float& rhs) noexcept;
+Vector operator*(Vector lhs, const Float rhs) noexcept;
+
+
+//- Multiplication by scalar
+Vector operator*(const Float lhs, Vector rhs) noexcept;
 
 
 //- Division by scalar
-Vector operator/(Vector lhs, const Float& rhs) noexcept;
+Vector operator/(Vector lhs, const Float rhs) noexcept;
+
+
+//- Division by scalar
+Vector operator/(const Float lhs, Vector rhs) noexcept;
 
 
 //- Inequality operator

@@ -9,7 +9,6 @@ set(SRC
 	StringConverter.cpp
 	TurboBase.cpp
 	turbo.cpp
-	Vector.cpp
 	)
 
 # append to sources

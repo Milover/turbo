@@ -23,7 +23,6 @@ SourceFiles
 #include <utility>
 
 #include "General.h"
-#include "Model.h"
 #include "Profile.h"
 #include "ProfileMesh.h"
 #include "Registry.h"
@@ -47,15 +46,19 @@ class Airfoil final
 {
 private:
 
-	// Private data
+	// Public data
 
-		const Integer stationNo_;
+		std::size_t simId_ {0};
 
 
 	// Member functions
 
 		//- Construct the component
-		void construct();
+		void construct
+		(
+			const input::Radius& radius,
+			const input::DeviationAngle& delta
+		);
 
 
 public:
@@ -71,8 +74,10 @@ public:
 		//	creates an owned registry and creates a model
 		explicit Airfoil
 		(
-			const Integer stationNo = 0,
-			const Path& file = Path {}
+			const input::Radius& radius,
+			const input::DeviationAngle& delta = input::DeviationAngle {},
+			const Path& parentCwd = std::filesystem::current_path(),
+			const std::size_t id = 0
 		);
 
 		//- Construct from a station number with (owner) registry,
@@ -80,9 +85,11 @@ public:
 		//	creates an owned model.
 		Airfoil
 		(
-			const Integer stationNo,
+			const input::Radius& radius,
 			const input::Registry& reg,
-			const Path& file = Path {}
+			const input::DeviationAngle& delta = input::DeviationAngle {},
+			const Path& parentCwd = std::filesystem::current_path(),
+			const std::size_t id = 0
 		);
 
 		//- Construct from a station number with (owner) registry,
@@ -91,10 +98,12 @@ public:
 		template<typename T>
 		Airfoil
 		(
-			const Integer stationNo,
+			const input::Radius& radius,
 			const input::Registry& reg,
 			T&& model,
-			const Path& file = Path {}
+			const input::DeviationAngle& delta = input::DeviationAngle {},
+			const Path& parentCwd = std::filesystem::current_path(),
+			const std::size_t id = 0
 		);
 
 
@@ -104,15 +113,10 @@ public:
 		void build();
 
 		//- Run simulation, return the simulation directory
-		[[nodiscard]] Path simulate
+		Path simulate
 		(
 			Sptr<mesh::ProfileMesh> mesh = Sptr<mesh::ProfileMesh> {}
 		);
-
-		//- Write the mesh in .step format
-		//	NOTE: activates the (local) model
-		//	FIXME: placeholder implementation
-		void write() const override;
 
 };
 
@@ -122,23 +126,24 @@ public:
 template<typename T>
 Airfoil::Airfoil
 (
-	const Integer stationNo,
+	const input::Radius& radius,
 	const input::Registry& reg,
 	T&& model,
-	const Path& file
+	const input::DeviationAngle& delta,
+	const Path& parentCwd,
+	const std::size_t id
 )
 :
 	TurboBase
 	{
+		"airfoil.step",
 		reg,
 		std::forward<T>(model),
-		file
-	},
-	stationNo_ {stationNo}
+		parentCwd,
+		id
+	}
 {
-	setFile("airfoil", ".step");
-
-	construct();
+	construct(radius, delta);
 }
 
 

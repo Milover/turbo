@@ -20,6 +20,7 @@ SourceFiles
 #ifndef DESIGN_PROFILE_H
 #define DESIGN_PROFILE_H
 
+#include "Curve.h"
 #include "Error.h"
 #include "General.h"
 #include "Line.h"
@@ -42,17 +43,24 @@ namespace design
 
 class Profile
 {
-private:
+public:
 
-	using Point			= Vector;
-	using Iterator		= Vectorpair<Point>::iterator;
-	using Constiterator	= Vectorpair<Point>::const_iterator;
-	using Sizetype		= Vectorpair<Point>::size_type;
+	using Point				= Vector;
+	using Data				= Vectorpair<Point>;
+	using Iterator			= Data::iterator;
+	using Constiterator		= Data::const_iterator;
+	using Sizetype			= Data::size_type;
+	using Reference			= Data::reference;
+	using Constreference	= Data::const_reference;
+
+
+private:
 
 
 	// Private data
 
-		Vectorpair<Point> points_;
+		// [top, bot]
+		Data points_;
 
 		bool wrapped_ {false};
 
@@ -78,6 +86,12 @@ private:
 public:
 	
 	// Member functions
+
+		//- Get TE point pair
+		Reference back();
+
+		//- Get TE point pair
+		Constreference back() const;
 
 		//- Get iterator to beginning
 		Iterator begin();
@@ -107,8 +121,21 @@ public:
 		//- Get const iterator to end
 		Constiterator end() const;
 
-		//- Get contour. Outputs to current model.
+		//- Get LE point pair
+		Reference front();
+
+		//- Get LE point pair
+		Constreference front() const;
+
+		//- Get contour in the form of a single spline
+		//	made from top/bot curves ordered as 'getOrderedPoints()'.
+		//	Outputs to current model.
 		geometry::Spline getContour() const noexcept(ndebug);
+
+		//- Get full contour, ordered [top, bot, tedge].
+		//	Curves form a topologically connected loop.
+		//	Outputs to current model.
+		Sptrvector<geometry::Curve> getFullContour() const noexcept(ndebug);
 
 		//- Get geometry points ordered from top (upper) TE to
 		//	bot (lower) TE. Outputs to current model.
@@ -132,7 +159,7 @@ public:
 		std::vector<Point> orderedPoints() const noexcept;
 
 		//- Get raw data (raw points)
-		Vectorpair<Point> points() const noexcept;
+		Data points() const noexcept;
 
 		//- Get size
 		Sizetype size() const noexcept;
@@ -144,7 +171,7 @@ public:
 		//	respect to the profile contour.
 		Vector teDirection() const noexcept(ndebug);
 
-		//- Get TE point
+		//- Get TE point (midpoint between top/bot TE)
 		Point tePoint() const noexcept(ndebug);
 
 		//- Wrap to cylinder
@@ -152,6 +179,15 @@ public:
 
 		//- Return wrapped state
 		bool wrapped() const noexcept;
+
+
+	// Member operators
+
+		//- Access operator
+		Reference operator[](Sizetype pos);
+
+		//- Access operator
+		Constreference operator[](Sizetype pos) const;
 
 };
 

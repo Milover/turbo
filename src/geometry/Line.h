@@ -56,7 +56,7 @@ public:
 
 		//- Construct from Coordinates
 		template<typename T1, typename T2>
-		Line(T1 start, T2 end);
+		Line(T1&& start, T2&& end);
 
 		//- Copy constructor
 		Line(const Line&) = delete;
@@ -83,7 +83,7 @@ public:
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
 template<typename T1, typename T2>
-Line::Line(T1 start, T2 end)
+Line::Line(T1&& start, T2&& end)
 :
 	Curve
 	{

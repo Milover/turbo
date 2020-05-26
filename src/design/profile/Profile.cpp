@@ -8,10 +8,12 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include <algorithm>
 #include <vector>
 
 #include "Profile.h"
 
+#include "Curve.h"
 #include "Error.h"
 #include "General.h"
 #include "Line.h"
@@ -90,6 +92,18 @@ void Profile::translate(const Vector& v) noexcept
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+Profile::Reference Profile::back()
+{
+	return points_.back();
+}
+
+
+Profile::Constreference Profile::back() const
+{
+	return points_.back();
+}
+
 
 Profile::Iterator Profile::begin()
 {
@@ -184,12 +198,68 @@ Profile::Constiterator Profile::end() const
 }
 
 
+Profile::Reference Profile::front()
+{
+	return points_.front();
+}
+
+
+Profile::Constreference Profile::front() const
+{
+	return points_.front();
+}
+
+
 geometry::Spline Profile::getContour() const noexcept(ndebug)
 {
 	if (empty())
 		error(FUNC_INFO, "profile not built");
 
 	return geometry::Spline {orderedPoints()};
+}
+
+
+Sptrvector<geometry::Curve> Profile::getFullContour() const noexcept(ndebug)
+{
+	if (empty())
+		error(FUNC_INFO, "profile not built");
+
+	Sptrvector<geometry::Curve> curves;
+
+	std::vector<Point> tmpTop;
+	std::vector<Point> tmpBot;
+	tmpTop.reserve(points_.size());
+	tmpBot.reserve(points_.size());
+
+	for (auto& [top, bot] : points_)
+	{
+		tmpTop.emplace_back(top);
+		tmpBot.emplace_back(bot);
+	}
+	std::reverse(tmpTop.begin(), tmpTop.end());
+
+	curves.emplace_back
+	(
+		new geometry::Spline {tmpTop}
+	);
+	curves.emplace_back
+	(
+		new geometry::Spline
+		{
+			curves.front()->endPtr(),
+			tmpBot
+		}
+	);
+	curves.emplace_back
+	(
+		new geometry::Line
+		{
+			curves.back()->endPtr(),
+			curves.front()->startPtr()
+		}
+	);
+
+	return curves;
 }
 
 
@@ -277,7 +347,7 @@ std::vector<Profile::Point> Profile::orderedPoints() const noexcept
 }
 
 
-Vectorpair<Profile::Point> Profile::points() const noexcept
+Profile::Data Profile::points() const noexcept
 {
 	return points_;
 }
@@ -350,6 +420,20 @@ void Profile::wrap() noexcept
 bool Profile::wrapped() const noexcept
 {
 	return wrapped_;
+}
+
+
+// * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
+
+Profile::Reference Profile::operator[](Sizetype pos)
+{
+	return points_[pos];
+}
+
+
+Profile::Constreference Profile::operator[](Sizetype pos) const
+{
+	return points_[pos];
 }
 
 

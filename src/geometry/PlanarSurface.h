@@ -12,8 +12,6 @@ Class
 Description
 	PlanarSurface class
 
-	NOTE: construction with holes unimplemented!
-
 SourceFiles
 	PlanarSurface.cpp
 
@@ -26,7 +24,6 @@ SourceFiles
 
 #include "Curve.h"
 #include "General.h"
-#include "Point.h"
 #include "Surface.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

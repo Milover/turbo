@@ -12,7 +12,12 @@ Class
 Description
 	A base class for volume geometry classes.
 
-	NOTE: currently only supports construction from placeholder volumes.
+	NOTE:
+		construction with holes not implemented
+
+	WARNING:
+		Same deal as with creating surfaces but with curves instead of points.
+		See 'Surface.h' for more info.
 
 SourceFiles
 	Volume.cpp
@@ -29,6 +34,8 @@ SourceFiles
 #include "PlaceholderVolume.h"
 #include "Shape.h"
 #include "Surface.h"
+
+#include <gmsh.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -62,6 +69,12 @@ private:
 		Sptrvector<Surface> boundary_;
 
 
+	// Member functions
+
+		//- Construct volume geometry
+		void construct() const noexcept;
+
+
 protected:
 
 	template<typename T>
@@ -83,6 +96,14 @@ public:
 
 	// Constructors
 
+		//- Construct from surfaces
+		template
+		<
+			typename... Surfaces,
+			typename = std::enable_if_t<(isValid_v<Surfaces> && ...)>
+		>
+		Volume(Surfaces&&... ss);
+
 		//- Construct from a placeholder volume
 		Volume(const detail::PlaceholderVolume& v);
 
@@ -94,10 +115,13 @@ public:
 
 
 	//- Destructor
-	virtual ~Volume() = default;
+	virtual ~Volume() noexcept;
 
 
 	// Member functions
+
+		//- Get the boundary surfaces
+		[[nodiscard]] const Sptrvector<Surface>& boundaryCRef() const noexcept;
 
 		//- Get the boundary surfaces
 		[[nodiscard]] Sptrvector<Surface>& boundaryRef() noexcept;
@@ -112,6 +136,44 @@ public:
 		Volume& operator=(Volume&&) = delete;
 
 };
+
+
+// * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * * //
+
+template<typename... Surfaces, typename>
+Volume::Volume(Surfaces&&... ss)
+{
+	// FIXME: sanity check missing (check if surfaces form a closed loop)
+
+	auto&& makeSptr = [](auto&& surface)
+	{
+		using SurfaceType = decltype(surface);
+
+		if constexpr (isSurfaceSptr_v<SurfaceType>)
+		{
+			return surface;
+		}
+		else
+			return Sptr<Surface>
+			{
+				new removeCVRef_t<SurfaceType>
+				{
+					std::forward<SurfaceType>(surface)
+				}
+			};
+	};
+
+	boundary_.reserve(sizeof...(ss));
+
+	(
+		boundary_.emplace_back
+		(
+			makeSptr(std::forward<Surfaces>(ss))
+		), ...
+	);
+
+	construct();
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

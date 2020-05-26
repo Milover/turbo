@@ -10,7 +10,14 @@ License
 
 #include "VortexDistributionExponent.h"
 
+#include "Density.h"
 #include "General.h"
+#include "InitialDesign.h"
+#include "HubRadius.h"
+#include "RootOutletVelocity.h"
+#include "Rps.h"
+#include "ShroudRadius.h"
+#include "StaticPressureDifference.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -21,15 +28,34 @@ namespace input
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-VortexDistributionExponent::VortexDistributionExponent() noexcept
-:
-	LVBase {-1.0}
-{}
-
-
 VortexDistributionExponent::VortexDistributionExponent(const Float f)
 :
 	LVBase {f}
+{}
+
+
+VortexDistributionExponent::VortexDistributionExponent
+(
+	const RootOutletVelocity& c_2_h,
+	const StaticPressureDifference& dp,
+	const Rps& rps,
+	const HubRadius& r_h,
+	const ShroudRadius& r_s,
+	const Density& rho
+)
+:
+	VortexDistributionExponent
+	{
+		compute::computeVortexDistributionExponent
+		(
+			c_2_h.value(),
+			dp.value(),
+			rps.value(),
+			r_h.value(),
+			r_s.value(),
+			rho.value()
+		)
+	}
 {}
 
 

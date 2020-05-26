@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
 	input::storeAll
 	(
 		master,
-		input::TotalPressureDifference	{500.0},
+		input::StaticPressureDifference	{500.0},
 		input::VolumeFlowRate			{1.0}
 	);
 	input::storeAll
@@ -87,11 +87,11 @@ int main(int argc, char* argv[])
 		(
 			// test the keyword version
 			master.has(input::Rps::name)
-		 && master.has(input::TotalPressureDifference::name)
+		 && master.has(input::StaticPressureDifference::name)
 		 && master.has(input::VolumeFlowRate::name)
 			// test the typed version
 		 && master.has<input::Rps>()
-		 && master.has<input::TotalPressureDifference>()
+		 && master.has<input::StaticPressureDifference>()
 		 && master.has<input::VolumeFlowRate>()
 		),
 		output,
@@ -123,11 +123,11 @@ int main(int argc, char* argv[])
 		(
 			// test the keyword version
 			slave.has(input::Rps::name)
-		 && slave.has(input::TotalPressureDifference::name)
+		 && slave.has(input::StaticPressureDifference::name)
 		 && slave.has(input::VolumeFlowRate::name)
 			// test the typed version
 		 && slave.has<input::Rps>()
-		 && slave.has<input::TotalPressureDifference>()
+		 && slave.has<input::StaticPressureDifference>()
 		 && slave.has<input::VolumeFlowRate>()
 		),
 		output,
@@ -221,7 +221,7 @@ int main(int argc, char* argv[])
 			)
 		 && isEqual
 			(
-				slave.cref<input::TotalPressureDifference>().value(),	500.0
+				slave.cref<input::StaticPressureDifference>().value(),	500.0
 			)
 		 && isEqual
 			(

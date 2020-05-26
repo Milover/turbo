@@ -10,6 +10,7 @@ add_subdirectory(operators)
 set(SRC
 	Bezier.cpp
 	Curve.cpp
+	FilledSurface.cpp
 	Line.cpp
 	Model.cpp
 	PlanarSurface.cpp

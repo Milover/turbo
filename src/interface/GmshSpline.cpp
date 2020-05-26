@@ -42,12 +42,12 @@ std::size_t GmshSpline::operator()
 	tags.reserve(points.size() + 2);
 
 	// assemble tags
-	tags.push_back(start.tag());
+	tags.emplace_back(start.tag());
 
 	for (auto& p : points)
-		tags.push_back(p.tag());
+		tags.emplace_back(p.tag());
 
-	tags.push_back(end.tag());
+	tags.emplace_back(end.tag());
 
 	return static_cast<std::size_t>
 	(

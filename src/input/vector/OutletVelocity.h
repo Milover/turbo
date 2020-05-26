@@ -39,6 +39,7 @@ namespace input
 
 // Forward declarations
 class RootOutletVelocity;
+class VortexDistributionExponent;
 
 /*---------------------------------------------------------------------------*\
 					Class OutletVelocity Declaration
@@ -68,17 +69,6 @@ public:
 			const VortexDistributionExponent& n,
 			const Radius& r,
 			const HubRadius& r_h
-		) noexcept(ndebug);
-
-		//- Compute by applying deHaller criterion and construct
-		OutletVelocity
-		(
-			const InletVelocity& c_1,
-			const RootOutletVelocity& c_2_h,
-			const VortexDistributionExponent& n,
-			const Radius& r,
-			const HubRadius& r_h,
-			const BladeVelocity& U
 		) noexcept(ndebug);
 
 

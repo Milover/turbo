@@ -65,7 +65,7 @@ public:
 		template<typename T>
 		Bezier
 		(
-			T start,
+			T&& start,
 			const Coordvector& coords
 		);
 
@@ -77,7 +77,7 @@ public:
 		Bezier
 		(
 			const Coordvector& coords,
-			T end
+			T&& end
 		);
 
 		//- Construct from a vector of coordinates,
@@ -87,9 +87,9 @@ public:
 		template<typename T1, typename T2>
 		Bezier
 		(
-			T1 start,
+			T1&& start,
 			const Coordvector& coords,
-			T2 end
+			T2&& end
 		);
 
 		//- Copy constructor
@@ -119,7 +119,7 @@ public:
 template<typename T>
 Bezier::Bezier
 (
-	T start,
+	T&& start,
 	const Coordvector& coords
 )
 :
@@ -136,7 +136,7 @@ template<typename T>
 Bezier::Bezier
 (
 	const Coordvector& coords,
-	T end
+	T&& end
 )
 :
 	Bezier
@@ -151,9 +151,9 @@ Bezier::Bezier
 template<typename T1, typename T2>
 Bezier::Bezier
 (
-	T1 start,
+	T1&& start,
 	const Coordvector& coords,
-	T2 end
+	T2&& end
 )
 :
 	Curve

@@ -14,9 +14,6 @@ License
 
 #include "Error.h"
 #include "General.h"
-#include "GmshWrite.h"
-#include "InputRegistry.h"
-#include "Model.h"
 #include "Profile.h"
 #include "ProfileGenerator.h"
 #include "ProfileMesh.h"
@@ -34,17 +31,13 @@ namespace design
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
 
-void Airfoil::construct()
+void Airfoil::construct
+(
+	const input::Radius& radius,
+	const input::DeviationAngle& delta
+)
 {
 	// general
-	input::Radius radius
-	{
-		stationNo_,
-		data_->cref<input::NumberOfStations>(),
-		data_->cref<input::HubRadius>(),
-		data_->cref<input::ShroudRadius>(),
-		data_->cref<input::TipClearance>()
-	};
 	input::BladeVelocity U
 	{
 		data_->cref<input::Rps>(),
@@ -57,14 +50,12 @@ void Airfoil::construct()
 	};
 	input::OutletVelocity c_2
 	{
-		data_->cref<input::InletVelocity>(),
 		data_->cref<input::RootOutletVelocity>(),
 		data_->cref<input::VortexDistributionExponent>(),
 		radius,
-		data_->cref<input::HubRadius>(),
-		U
+		data_->cref<input::HubRadius>()
 	};
-	input::TotalPressureDifference dp
+	input::StaticPressureDifference dp
 	{
 		data_->cref<input::InletVelocity>(),
 		c_2,
@@ -77,7 +68,7 @@ void Airfoil::construct()
 		c_2,
 		U,
 		data_->cref<input::IncidenceAngle>(),
-		data_->cref<input::DeviationAngle>()
+		delta
 	};
 	input::Pitch pitch
 	{
@@ -91,7 +82,7 @@ void Airfoil::construct()
 	};
 
 	// turbulence
-	input::TurbulenceReferenceLengthScale L
+	input::TurbulenceReferenceLengthScale L_turb
 	{
 		chord,
 		data_->cref<input::TurbulenceReferenceLengthScaleRatio>()
@@ -99,22 +90,18 @@ void Airfoil::construct()
 	input::TurbulenceDissipationRate epsilon
 	{
 		data_->cref<input::TurbulenceKineticEnergy>(),
-		L
+		L_turb
 	};
 	input::TurbulenceSpecificDissipationRate omega
 	{
 		data_->cref<input::TurbulenceKineticEnergy>(),
-		L
+		L_turb
 	};
 	input::TurbulenceViscosity nut
 	{
 		data_->cref<input::TurbulenceKineticEnergy>(),
-		L
+		L_turb
 	};
-
-	// periodic patch translations
-	input::TranslationPerBot trBot {pitch};
-	input::TranslationPerTop trTop {pitch};
 
 	// store
 	input::storeAll
@@ -123,15 +110,14 @@ void Airfoil::construct()
 		std::move(c_2),
 		std::move(camber),
 		std::move(chord),
+		delta,
 		std::move(dp),
 		std::move(epsilon),
-		std::move(L),
+		std::move(L_turb),
 		std::move(nut),
 		std::move(omega),
 		std::move(pitch),
-		std::move(radius),
-		std::move(trBot),
-		std::move(trTop),
+		radius,
 		std::move(U),
 		std::move(w_1)
 	);
@@ -142,32 +128,30 @@ void Airfoil::construct()
 
 Airfoil::Airfoil
 (
-	const Integer stationNo,
-	const Path& file
+	const input::Radius& radius,
+	const input::DeviationAngle& delta,
+	const Path& parentCwd,
+	const std::size_t id
 )
 :
-	TurboBase {file},
-	stationNo_ {stationNo}
+	TurboBase {"airfoil.step", parentCwd, id}
 {
-	setFile("airfoil", ".step");
-
-	construct();
+	construct(radius, delta);
 }
 
 
 Airfoil::Airfoil
 (
-	const Integer stationNo,
+	const input::Radius& radius,
 	const input::Registry& reg,
-	const Path& file
+	const input::DeviationAngle& delta,
+	const Path& parentCwd,
+	const std::size_t id
 )
 :
-	TurboBase {reg, file},
-	stationNo_ {stationNo}
+	TurboBase {"airfoil.step", reg, parentCwd, id}
 {
-	setFile("airfoil", ".step");
-
-	construct();
+	construct(radius, delta);
 }
 
 
@@ -199,44 +183,53 @@ void Airfoil::build()
 
 Path Airfoil::simulate(Sptr<mesh::ProfileMesh> mesh)
 {
-	Path caseDir
-	{
-		simulation::Simulator::createCase(file_.parent_path())
-	};
+	// compute and store monitoring plane positions and
+	// periodic patch translation vectors
+	input::storeAll
+	(
+		*data_,
+		input::LEMonitoringPlane
+		{
+			profile.lePoint(),
+			data_->cref<input::Chord>(),
+			data_->cref<input::MonitoringPlaneOffset>()
+		},
+		input::TEMonitoringPlane
+		{
+			profile.lePoint(),
+			data_->cref<input::Chord>(),
+			data_->cref<input::MonitoringPlaneOffset>()
+		},
+		input::TranslationPerBot
+		{
+			data_->cref<input::Pitch>()
+		},
+		input::TranslationPerTop
+		{
+			data_->cref<input::Pitch>()
+		}
+	);
+
+	simulation::Simulator sim {*data_, simId_, cwd_};
 
 	// make the mesh if we're running just the single sim
 	if (!mesh)
 		mesh.reset
 		(
-			new mesh::ProfileMesh {*data_, model_, caseDir}
+			new mesh::ProfileMesh {*data_, model_, sim.caseDirectory}
 		);
-	// change the mesh output directory if we're designing
+	// change the mesh working directory if we're designing
 	else
-		mesh->changeDirectory(caseDir);
+		mesh->setCwd(sim.caseDirectory);
 
 	mesh->build(profile);
 	mesh->write();
 
-	Uptr<simulation::Simulator> sim
-	(
-		new simulation::Simulator
-		{
-			*data_,
-			caseDir,
-			mesh->file()
-		}
-	);
-	sim->simulate();
+	sim.simulate();
 
-	return caseDir;
-}
+	++simId_;
 
-
-void Airfoil::write() const		//	FIXME: placeholder implementation
-{
-	model_->activate();
-
-	interface::GmshWrite {}(file_);
+	return sim.caseDirectory;
 }
 
 

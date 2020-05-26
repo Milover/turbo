@@ -26,7 +26,7 @@ SourceFiles
 #include "InletVelocity.h"
 #include "RegistryObject.h"
 #include "Rps.h"
-#include "TotalPressureDifference.h"
+#include "StaticPressureDifference.h"
 #include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -37,7 +37,7 @@ namespace input
 {
 
 // Forward declarations
-class TotalPressureDifference;
+class StaticPressureDifference;
 
 /*---------------------------------------------------------------------------*\
 					Class RootOutletVelocity Declaration
@@ -60,11 +60,11 @@ public:
 		//  no aditional checking required
 		explicit RootOutletVelocity(const Vector& v) noexcept(ndebug);
 
-		//- Compute and construct
+		//- Compute by applying the de Haller criterion and construct
 		RootOutletVelocity
 		(
 			const InletVelocity& c_1,
-			const TotalPressureDifference& dp,
+			const StaticPressureDifference& dp,
 			const Rps& rps,
 			const HubRadius& r_h,
 			const Density& rho

@@ -105,6 +105,7 @@ int main(int argc, char* argv[])
 	#include "TestGmshInclude.h"
 
 	std::vector<Sptr<geometry::Point>> corners;
+
 	corners.emplace_back
 	(
 		new geometry::Point {Coordinates {0.0, 0.0}}
@@ -118,18 +119,6 @@ int main(int argc, char* argv[])
 		new geometry::Point {Coordinates {1.0, 1.0}}
 	);
 
-	// Test Line construction
-	std::vector<Uptr<geometry::Surface>> surfaces;
-
-	surfaces.emplace_back							// Curves&&...
-	(
-		new geometry::PlanarSurface
-		{
-			makeLine(corners[0], corners[1]),
-			makeSpline(corners[1], corners[2]),
-			makeBezier(corners[2], corners[0])
-		}
-	);
 	Sptr<geometry::Curve> lineSptr
 	{
 		new geometry::Line
@@ -151,6 +140,19 @@ int main(int argc, char* argv[])
 			makeBezier(corners[2], corners[0])
 		}
 	};
+
+	// Test Line construction
+	std::vector<Uptr<geometry::Surface>> surfaces;
+
+	surfaces.emplace_back							// Curves&&...
+	(
+		new geometry::PlanarSurface
+		{
+			makeLine(corners[0], corners[1]),
+			makeSpline(corners[1], corners[2]),
+			makeBezier(corners[2], corners[0])
+		}
+	);
 	surfaces.emplace_back							// const Sptr<Curves>&...
 	(
 		new geometry::PlanarSurface
@@ -256,6 +258,19 @@ int main(int argc, char* argv[])
 		geometry::Curve::count() == 9,
 		output,
 		"Checking number of created curves"
+	);
+
+	surfaces.clear();
+	corners.clear();
+	updateAndWait(1);
+
+	// only the 3 curve-ptrs and 3 point-ptrs should be left
+	test::compareTest
+	(
+		pass,
+		test::getNumberOfEntities() == 6,
+		output,
+		"Checking cleared state"
 	);
 
 	// test pass or fail

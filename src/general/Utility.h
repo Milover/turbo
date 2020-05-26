@@ -95,8 +95,8 @@ isInRange
 	Integer ulp = 2
 ) noexcept
 {
-	return isGreaterOrEqual(x, min, ulp) &&
-		   isLessOrEqual(x, max, ulp);
+	return isGreaterOrEqual(x, min, ulp)
+		&& isLessOrEqual(x, max, ulp);
 }
 
 
@@ -164,20 +164,35 @@ inline void trimWhiteLR(String& s)
 }
 
 
-//- Add a prefix to a filename in path
-inline void addFilenamePrefix
+//- Add a suffix to a filename, retains the extension
+template<typename T>
+inline Path addFilenameSuffix
 (
-	Path& path,
-	const String& prefix
+	const Path& path,
+	T&& suffix
 )
 {
-	auto filename {path.filename().string()};
+	auto tmp {path};
+	auto filename {path.stem().string()};
+	auto extension {path.filename().extension().string()};
 
-	filename = prefix + filenameSeparator + filename;
+	if constexpr (std::is_integral_v<removeCVRef_t<T>>)
+	{
+		filename = filename
+				 + filenameSeparator
+				 + std::to_string(std::forward<T>(suffix));
+	}
+	else
+	{
+		filename = filename + filenameSeparator + suffix;
+	}
+	tmp.replace_filename(filename + extension);
 
-	path.replace_filename(filename);
+	return tmp;
 }
 
+
+// * * * * * * * * * * * * * * Output Functions  * * * * * * * * * * * * * * //
 
 //- Mass print to a stream
 template<typename... T>

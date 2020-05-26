@@ -25,7 +25,6 @@ SourceFiles
 
 #include "Error.h"
 #include "General.h"
-#include "GmshWrite.h"
 #include "Group.h"
 #include "MeshGeneratorBase.h"
 #include "Registry.h"
@@ -74,7 +73,10 @@ protected:
 
 		//- Default constructor
 		//	creates an owned registry and creates a model
-		MeshBase(const Path& file = Path {});
+		MeshBase
+		(
+			const Path& parentCwd = std::filesystem::current_path()
+		);
 
 		//- Construct with (owner) registry,
 		//	creates a non-owned accessible registry and
@@ -82,7 +84,7 @@ protected:
 		MeshBase
 		(
 			const input::Registry& reg,
-			const Path& file = Path {}
+			const Path& parentCwd = std::filesystem::current_path()
 		);
 
 		//- Construct with (owner) registry,
@@ -93,7 +95,7 @@ protected:
 		(
 			const input::Registry& reg,
 			U&& model,
-			const Path& file = Path {}
+			const Path& parentCwd = std::filesystem::current_path()
 		);
 
 
@@ -132,10 +134,6 @@ public:
 		//	NOTE: activates the (local) model
 		void reset();
 
-		//- Write the mesh in .msh format
-		//	NOTE: activates the (local) model
-		void write() const override;
-
 
 	// Member operators
 
@@ -151,28 +149,34 @@ public:
 // * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * * //
 
 template<typename Geometry>
-MeshBase<Geometry>::MeshBase
-(
-	const Path& file
-)
+MeshBase<Geometry>::MeshBase(const Path& parentCwd)
 :
-	TurboBase {file}
-{
-	this->setFile("mesh", ".msh");
-}
+	TurboBase
+	{
+		"mesh.msh",
+		parentCwd,
+		0,				// throwaway id
+		Cwd::NO_CREATE
+	}
+{}
 
 
 template<typename Geometry>
 MeshBase<Geometry>::MeshBase
 (
 	const input::Registry& reg,
-	const Path& file
+	const Path& parentCwd
 )
 :
-	TurboBase {reg, file}
-{
-	this->setFile("mesh", ".msh");
-}
+	TurboBase
+	{
+		"mesh.msh",
+		reg,
+		parentCwd,
+		0,				// throwaway id
+		Cwd::NO_CREATE
+	}
+{}
 
 
 template<typename Geometry>
@@ -181,18 +185,19 @@ MeshBase<Geometry>::MeshBase
 (
 	const input::Registry& reg,
 	U&& model,
-	const Path& file
+	const Path& parentCwd
 )
 :
 	TurboBase
 	{
+		"mesh.msh",
 		reg,
 		std::forward<U>(model),
-		file
+		parentCwd,
+		0,				// throwaway id
+		Cwd::NO_CREATE
 	}
-{
-	this->setFile("mesh", ".msh");
-}
+{}
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
@@ -232,17 +237,6 @@ Uptr<typename MeshBase<Geometry>::Region>&
 MeshBase<Geometry>::meshRef() noexcept
 {
 	return this->mesh_;
-}
-
-
-template<typename Geometry>
-void MeshBase<Geometry>::write() const
-{
-	assert(this->mesh_);
-
-	this->model_->activate();
-
-	interface::GmshWrite {}(this->file_);
 }
 
 

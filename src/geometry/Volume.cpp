@@ -11,6 +11,7 @@ License
 #include "Volume.h"
 
 #include "General.h"
+#include "GmshVolume.h"
 #include "PlaceholderSurface.h"
 #include "Shape.h"
 #include "Surface.h"
@@ -21,6 +22,22 @@ namespace turbo
 {
 namespace geometry
 {
+
+// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
+
+void Volume::construct() const noexcept
+{
+	std::size_t returnTag;
+
+	returnTag = interface::GmshVolume {}
+	(
+		tag_,
+		boundaryCRef()
+	);
+
+	assert(returnTag == tag_);
+}
+
 
 // * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * * //
 
@@ -45,7 +62,21 @@ Volume::Volume(const detail::PlaceholderVolume& v)
 }
 
 
+// * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
+
+Volume::~Volume() noexcept
+{
+	remove();
+}
+
+
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+const Sptrvector<Surface>& Volume::boundaryCRef() const noexcept
+{
+	return boundary_;
+}
+
 
 Sptrvector<Surface>& Volume::boundaryRef() noexcept
 {

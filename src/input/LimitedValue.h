@@ -141,7 +141,7 @@ void LimitedValue<T, Low, High>::check() const noexcept(ndebug)
 			error
 			(
 				FUNC_INFO,
-				"value not in range [", Low, ", ", High, "]"
+				"value of not in range [", Low, ", ", High, "]"
 			);
 	}
 }

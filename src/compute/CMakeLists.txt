@@ -2,8 +2,6 @@
 #
 # See the LICENSE file for license information
 
-# add all subdirectories
-
 # add sources
 set(SRC
 	ComputeGeneral.cpp

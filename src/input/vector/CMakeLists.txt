@@ -9,10 +9,12 @@ set(SRC
 	BladeVelocity.cpp
 	InletVelocity.cpp
 	InletRelativeVelocity.cpp
+	LEMonitoringPlane.cpp
 	OutletVelocity.cpp
 	RootOutletVelocity.cpp
 	TranslationPerBot.cpp
 	TranslationPerTop.cpp
+	TEMonitoringPlane.cpp
 	)
 
 # append to sources

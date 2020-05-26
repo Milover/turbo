@@ -63,7 +63,10 @@ public:
 
 		//- Default constructor,
 		//	creates an owned registry and creates a model
-		ProfileMesh(const Path& file = Path {});
+		ProfileMesh
+		(
+			const Path& parentCwd = std::filesystem::current_path()
+		);
 
 		//- Construct with (owner) registry,
 		//	creates a non-owned accessible registry and
@@ -71,7 +74,7 @@ public:
 		ProfileMesh
 		(
 			const input::Registry& reg,
-			const Path& file = Path {}
+			const Path& parentCwd = std::filesystem::current_path()
 		);
 
 		//- Construct with (owner) registry,
@@ -82,7 +85,7 @@ public:
 		(
 			const input::Registry& reg,
 			T&& model,
-			const Path& file = Path {}
+			const Path& parentCwd = std::filesystem::current_path()
 		);
 
 };
@@ -95,14 +98,14 @@ ProfileMesh::ProfileMesh
 (
 	const input::Registry& reg,
 	T&& model,
-	const Path& file
+	const Path& parentCwd
 )
 :
 	BaseType
 	{
 		reg,
 		std::forward<T>(model),
-		file
+		parentCwd
 	}
 {}
 

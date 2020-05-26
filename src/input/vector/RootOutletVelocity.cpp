@@ -17,7 +17,7 @@ License
 #include "InitialDesign.h"
 #include "InletVelocity.h"
 #include "Rps.h"
-#include "TotalPressureDifference.h"
+#include "StaticPressureDifference.h"
 #include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -38,7 +38,7 @@ RootOutletVelocity::RootOutletVelocity(const Vector& v) noexcept(ndebug)
 RootOutletVelocity::RootOutletVelocity
 (
 	const InletVelocity& c_1,
-	const TotalPressureDifference& dp,
+	const StaticPressureDifference& dp,
 	const Rps& rps,
 	const HubRadius& r_h,
 	const Density& rho
@@ -46,13 +46,19 @@ RootOutletVelocity::RootOutletVelocity
 :
 	RootOutletVelocity
 	{
-		compute::computeRootOutletVelocity
+		compute::deHaller
 		(
 			c_1.value(),
-			dp.value(),
+			compute::computeRootOutletVelocity
+			(
+				c_1.value(),
+				dp.value(),
+				rps.value(),
+				r_h.value(),
+				rho.value()
+			),
 			rps.value(),
-			r_h.value(),
-			rho.value()
+			r_h.value()
 		)
 	}
 {}

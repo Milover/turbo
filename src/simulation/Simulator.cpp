@@ -17,8 +17,10 @@ License
 #include "Simulator.h"
 
 #include "Error.h"
+#include "FoamCaseContents.h"
 #include "General.h"
 #include "Registry.h"
+#include "TurboCaseTemplate.h"
 #include "Utility.h"
 #include "Variables.h"
 
@@ -31,26 +33,87 @@ namespace simulation
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
+Path Simulator::createCase(const Path& parentCwd)
+{
+	if (!std::filesystem::is_directory(parentCwd))
+		error(FUNC_INFO, parentCwd, " is not a directory");
+
+	String caseName
+	{
+		"case_" + std::to_string(simId)
+	};
+	Path caseDir {parentCwd / caseName};
+
+	if (std::filesystem::exists(caseDir))
+		error(FUNC_INFO, "case directory: ", caseDir, " already exists");
+
+	// create a case template if necessary
+	Simulator::createCaseTemplate();
+
+	std::filesystem::copy
+	(
+		std::filesystem::current_path() / foam::turboCaseTemplatePath,
+		caseDir,
+		std::filesystem::copy_options::recursive
+	);
+
+	return caseDir;
+}
+
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
 Simulator::Simulator
 (
 	const input::Registry& reg,
-	const Path& caseDir,
-	const Path& mshfile
+	const std::size_t id,
+	const Path& parentCwd
 )
 :
 	data_
 	{
 		&const_cast<input::Registry&>(reg)
 	},
-	caseDirectory {caseDir},
-	meshfile {mshfile}
+	simId {id},
+	caseDirectory {createCase(parentCwd)}
+{}
+
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+void Simulator::createCaseTemplate()
+{
+	Path cwd {std::filesystem::current_path()};
+
+	// don't create if we already have one
+	Path localCaseTemplate {cwd / foam::turboCaseTemplatePath};
+	if
+	(
+		std::filesystem::is_directory(localCaseTemplate)
+	)
+		return;
+
+	for (const auto& [name, contents] : foam::turboCaseTemplateArray)
+	{
+		// directories will have empty contents
+		if (contents.empty())
+		{
+			std::filesystem::create_directory(cwd / name);
+		}
+		else
+		{
+			std::ofstream ofs {cwd / name};
+
+			ofs << contents;
+		}
+	}
+}
+
+
+void Simulator::simulate()
 {
 	// check if a foam version exists and is loaded into env
 	char* foam {std::getenv("WM_PROJECT")};
-
 	if (!foam)
 		error
 		(
@@ -63,130 +126,42 @@ Simulator::Simulator
 	if (!std::filesystem::exists(caseDirectory))
 		error(FUNC_INFO, "case directory: ", caseDirectory, " doesn't exist");
 
-	// check if we have a mesh
-	if (!std::filesystem::exists(caseDirectory / meshfile.filename()))
-		error
-		(
-			FUNC_INFO,
-			"mesh file: ", caseDirectory / meshfile.filename(), " doesn't exist"
-		);
-
-	++Simulator::simId_;
-}
-
-
-// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
-
-Path Simulator::createCase(const Path& location)
-{
-	if (!std::filesystem::is_directory(location))
-		error(FUNC_INFO, "location: ", location, " is not a directory");
-
-	String caseName
-	{
-		"case_" + std::to_string(Simulator::simId_)
-	};
-	Path caseDir {location / caseName};
-
-	if (std::filesystem::exists(caseDir))
-		error(FUNC_INFO, "case directory: ", caseDir, " already exists");
-
-	Simulator::createCaseTemplate();
-
-	std::filesystem::copy
-	(
-		std::filesystem::current_path() / caseTemplate,
-		caseDir,
-		std::filesystem::copy_options::recursive
-	);
-
-	return caseDir;
-}
-
-
-void Simulator::createCaseTemplate()
-{
-	// check if turbo is loaded
-	char* turboSrc {std::getenv("TURBO_SRC_DIR")};
-	if (!turboSrc)
-		error
-		(
-			FUNC_INFO,
-			"Environment variable \"TURBO_SRC_DIR\" undefined.\n",
-			"Load 'turbo' into the environment to access function."
-		);
-
-	// check if we have a global template
-	Path globalCaseTemplate {Path {turboSrc} / "share" / caseTemplate};
-	if
-	(
-		!std::filesystem::is_directory(globalCaseTemplate)
-	)
-		error
-		(
-			FUNC_INFO,
-			"global case template: ", globalCaseTemplate, " doesn't exist"
-		);
-
-	// don't copy if we already have one
-	Path localCaseTemplate {std::filesystem::current_path() / caseTemplate};
-	if
-	(
-		!std::filesystem::is_directory(localCaseTemplate)
-	)
-	std::filesystem::copy
-	(
-		globalCaseTemplate,
-		localCaseTemplate,
-		std::filesystem::copy_options::recursive
-	);
-}
-
-
-void Simulator::simulate()
-{
-	writeTurboValues();
-
-	auto sysCmd = [](auto&& cmd) -> void
-	{
-		using Cmd = decltype(cmd);
-
-		auto cmdExit {std::system(std::forward<Cmd>(cmd))};
-
-		if (cmdExit != EXIT_SUCCESS)
-			error
-			(
-				FUNC_INFO, "command: ", cmd, " exited with ", EXIT_FAILURE
-			);
-	};
-
 	// check if run script is present
+	auto turboRun {caseDirectory / foam::turboRunPath.filename()};
 	if
 	(
-		!std::filesystem::is_regular_file(caseDirectory / turboRun)
+		!std::filesystem::exists(turboRun)
+	 || !std::filesystem::is_regular_file(turboRun)
 	)
-		error(FUNC_INFO, "script ", caseDirectory / turboRun, " not present");
+		error(FUNC_INFO, "script ", turboRun, " not present");
 
 	// make executable
 	std::filesystem::permissions
 	(
-		caseDirectory / turboRun,
+		turboRun,
 		std::filesystem::perms::all,
 		std::filesystem::perm_options::add
 	);
 
+	writeTurboValues();
+
 	// run sim
-	sysCmd
-	(
-		std::filesystem::absolute(caseDirectory / turboRun).c_str()
-	);
+	auto cmd {turboRun.c_str()};
+	if (std::system(cmd) != EXIT_SUCCESS)
+		error
+		(
+			FUNC_INFO, "command: ", cmd, " exited with ", EXIT_FAILURE
+		);
 }
 
 
 void Simulator::writeTurboValues() const
 {
-	Path includeFile {caseDirectory / turboValues};
-	std::ofstream file {includeFile, std::ios_base::out};
+	std::ofstream file
+	{
+		caseDirectory / turboValues,
+		std::ios_base::out
+	};
 
 	file <<
 R"(FoamFile
@@ -198,27 +173,10 @@ R"(FoamFile
 }
 
 )";
-	massPrint
-	(
-		file, 40, " ", ";\n",
-		data_->cref<input::TranslationPerBot>(),
-		data_->cref<input::TranslationPerTop>(),
-		data_->cref<input::KinematicViscosity>(),
-		data_->cref<input::InletRelativeVelocity>(),
-		data_->cref<input::TotalPressureDifference>(),
-		data_->cref<input::TurbulenceIntensity>(),
-		data_->cref<input::TurbulenceReferenceLengthScale>(),
-		data_->cref<input::TurbulenceKineticEnergy>(),
-		data_->cref<input::TurbulenceDissipationRate>(),
-		data_->cref<input::TurbulenceSpecificDissipationRate>(),
-		data_->cref<input::TurbulenceViscosity>()
-	);
+	// fuck it, print everything
+	data_->printAll(file, 40);
 
-
-	file <<
-R"(
-#inputMode merge
-)";
+	file << "\n#inputMode merge\n";
 }
 
 

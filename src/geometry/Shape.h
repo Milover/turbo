@@ -83,6 +83,15 @@ protected:
 		Shape(const std::size_t) noexcept;
 
 
+	// Member functions
+
+		//- Remove geometry
+		//	WARNING:
+		//		we have to call this manually in destructors of
+		//		derived base classes (eg. Point, Curve...)
+		void remove() noexcept;
+
+
 public:
 
 	using Coordinates = Vector;
@@ -111,6 +120,7 @@ public:
 
 };
 
+
 // * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
 
 template
@@ -124,6 +134,25 @@ Shape<Entity, Deleter>::Shape(const std::size_t tag) noexcept
 {}
 
 
+// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
+
+template
+<
+	typename Entity,
+	typename Deleter
+>
+void Shape<Entity, Deleter>::remove() noexcept
+{
+	if (this->tag_ != 0)
+	{
+		Deleter {}(this);
+		this->sync_ = false;
+
+		this->tag_ = 0;
+	}
+}
+
+
 // * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
 
 template
@@ -133,11 +162,7 @@ template
 >
 Shape<Entity, Deleter>::~Shape() noexcept
 {
-	if (this->tag_ != 0)
-	{
-		Deleter {}(this);
-		this->sync_ = false;
-	}
+	this->remove();
 }
 
 

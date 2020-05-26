@@ -48,6 +48,7 @@ GmshControl::GmshControl
 		gmsh::option::setNumber("Geometry.Surfaces",					1);
 		gmsh::option::setNumber("Geometry.SurfaceNumbers",				1);
 		gmsh::option::setNumber("Geometry.SurfaceType",					2);
+		gmsh::option::setNumber("Geometry.Volumes",						1);
 	}
 
 	gmsh::option::setNumber("General.MouseInvertZoom",					1);

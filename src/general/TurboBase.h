@@ -20,6 +20,7 @@ SourceFiles
 #ifndef TURBO_BASE_H
 #define TURBO_BASE_H
 
+#include <filesystem>
 #include <type_traits>
 #include <ostream>
 #include <utility>
@@ -39,6 +40,15 @@ namespace turbo
 
 class TurboBase
 {
+public:
+
+	enum class Cwd
+	{
+		CREATE,
+		NO_CREATE
+	};
+
+
 private:
 
 	template<typename T>
@@ -50,8 +60,12 @@ private:
 
 	// Member functions
 
-		//- Set file
-		void setFile(const Path& file);
+		//- Handle cwd creation
+		void handleCwd
+		(
+			const Path& parentCwd,
+			const Cwd cwd
+		);
 
 
 protected:
@@ -62,22 +76,32 @@ protected:
 		input::Registry* data_;
 		Sptr<geometry::Model> model_;
 
-		Path file_;
+		Path cwd_;
+		const std::size_t id_;
 
 
 	// Constructors
 
 		//- Default constructor,
 		//	creates an owned registry and creates a model
-		TurboBase(const Path& file = Path {});
+		TurboBase
+		(
+			const Path& file,
+			const Path& parentCwd = std::filesystem::current_path(),
+			const std::size_t id = 0,
+			const Cwd cwd = Cwd::CREATE
+		);
 
 		//- Construct with (owner) registry,
 		//	creates a non-owned accessible registry and
 		//	creates an owned model.
 		TurboBase
 		(
+			const Path& file,
 			const input::Registry& reg,
-			const Path& file = Path {}
+			const Path& parentCwd = std::filesystem::current_path(),
+			const std::size_t id = 0,
+			const Cwd cwd = Cwd::CREATE
 		);
 
 		//- Construct with (owner) registry,
@@ -90,23 +114,21 @@ protected:
 		>
 		TurboBase
 		(
+			const Path& file,
 			const input::Registry& reg,
 			T&& model,
-			const Path& file = Path {}
-		);
-
-
-	// Member functions
-
-		//- Adjust filename
-		void setFile
-		(
-			const String& prefix,
-			const String& extension
+			const Path& parentCwd = std::filesystem::current_path(),
+			const std::size_t id = 0,
+			const Cwd cwd = Cwd::CREATE
 		);
 
 
 public:
+
+	// Public data
+
+		const Path filename;
+
 
 	// Constructors
 
@@ -123,19 +145,11 @@ public:
 
 	// Member functions
 
-		//- Change directory to 'directory'
-		void changeDirectory(const Path& directory);
+		//- Activate local model
+		void activate() const;
 
-		//- Change current directory to parent directory.
-		//	NOTE: only does relative moves, so if file_ is the
-		//		  program cwd, does nothing
-		void changeDirectoryParent();
-
-		//- Get file
-		[[nodiscard]] Path file() const;
-
-		//- Finalize geometry
-		//virtual void finalize() = 0;
+		//- Get the working directory
+		[[nodiscard]] Path cwd() const;
 
 		//- Access data
 		template<typename T, typename R = NoRecurse>
@@ -147,14 +161,8 @@ public:
 		std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, bool>
 		has(const String& key) const;
 
-		//- Parametrize
-		//virtual void parametrize() = 0;
-
-		//- Optimize
-		//virtual void optimize() = 0;
-
-		//- Write geometry to file
-		virtual void write() const = 0;
+		//- Get id
+		std::size_t id() const noexcept;
 
 		//- Print all data from local registry (formatted)
 		void printAll
@@ -162,8 +170,15 @@ public:
 			std::ostream& os,
 			const String::size_type width = 0,
 			const String& delimiter = " ",
-			const String& terminator = ";"
+			const String& terminator = ";\n"
 		) const;
+
+		//- Set the working directory,
+		//	NOTE: no checking whatsoever
+		void setCwd(const Path& cwd);
+
+		//- Write geometry to file
+		virtual void write() const;
 
 
 	// Member operators
@@ -182,15 +197,23 @@ public:
 template<typename T, typename>
 TurboBase::TurboBase
 (
+	const Path& file,
 	const input::Registry& reg,
 	T&& model,
-	const Path& file
+	const Path& parentCwd,
+	const std::size_t id,
+	const Cwd cwd
 )
 :
 	ownsData_ {false},
 	data_					// we don't own or manage but have access
 	{
 		&const_cast<input::Registry&>(reg).create()
+	},
+	id_ {id},
+	filename
+	{
+		addFilenameSuffix(file, id)
 	}
 {
 	if constexpr
@@ -206,7 +229,7 @@ TurboBase::TurboBase
 			new geometry::Model {std::forward<T>(model)}
 		);
 
-	setFile(file);
+	handleCwd(parentCwd, cwd);
 }
 
 

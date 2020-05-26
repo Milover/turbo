@@ -48,6 +48,14 @@ Curve::Curve(const detail::PlaceholderCurve& c)
 }
 
 
+// * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
+
+Curve::~Curve() noexcept
+{
+	remove();
+}
+
+
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 Sptr<Point> Curve::endPtr() const noexcept

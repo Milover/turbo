@@ -78,6 +78,14 @@ Point::Point(Coordinates&& c) noexcept
 }
 
 
+// * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
+
+Point::~Point() noexcept
+{
+	remove();
+}
+
+
 // * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * * //
 
 Point::Coordinates Point::coordinates() const noexcept

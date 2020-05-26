@@ -106,7 +106,7 @@ auto Extrude::execute
 
 	auto tags
 	{
-		interface::GmshExtrude {} (p.get(), v)
+		interface::GmshExtrude {}(p.get(), v)
 	};
 
 	detail::GeometryPlaceholderType_t<GeometryType> placeholder {tags[pos_]};

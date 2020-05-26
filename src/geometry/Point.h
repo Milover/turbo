@@ -82,7 +82,7 @@ public:
 
 
 	//- Destructor
-	~Point() = default;
+	~Point() noexcept;
 
 
 	// Member functions

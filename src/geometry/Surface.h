@@ -12,7 +12,21 @@ Class
 Description
 	A base class for surface geometry classes.
 
-	NOTE: construction with holes unimplemented!
+	WARNING:
+		We don't check whether the supplied curves form a loop.
+		We also do not check whether the assumed loop is made of curves
+		with topologically identical end points i.e. whether two neighbouring
+		curves within the loop join at a single topological point.
+
+		This is an issue because gmsh will create an additional wire
+		if the surface is created from curves with arbitrary end points
+		and fuck up our tag count i.e. crash. It will also crash if
+		the curves don't actually form a loop.
+
+		The real kicker is that the created wire isn't part of the surface
+		boundary.
+
+		Godspeed.
 
 SourceFiles
 	Surface.cpp
@@ -127,7 +141,7 @@ public:
 
 
 	//- Destructor
-	virtual ~Surface() = default;
+	virtual ~Surface() noexcept;
 
 
 	// Member functions
@@ -188,26 +202,26 @@ Surface::Surface(Curves&&... cs)
 
 	auto&& makeSptr = [](auto&& curve)
 	{
-		using curveType = decltype(curve);
+		using CurveType = decltype(curve);
 
-		if constexpr (isCurveSptr_v<curveType>)
+		if constexpr (isCurveSptr_v<CurveType>)
 		{
 			return curve;
 		}
 		else
 			return Sptr<Curve>
 			{
-				new removeCVRef_t<curveType>
+				new removeCVRef_t<CurveType>
 				{
-					std::forward<curveType>(curve)
+					std::forward<CurveType>(curve)
 				}
 			};
 	};
 
-	boundary_.reserve(sizeof...(Curves));
+	boundary_.reserve(sizeof...(cs));
 
 	(
-		boundary_.push_back
+		boundary_.emplace_back
 		(
 			makeSptr(std::forward<Curves>(cs))
 		), ...

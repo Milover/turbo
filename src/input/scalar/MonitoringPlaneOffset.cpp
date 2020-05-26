@@ -8,27 +8,42 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "SurfaceSection.h"
+#include "MonitoringPlaneOffset.h"
 
 #include "General.h"
-#include "Surface.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace turbo
 {
-namespace geometry
+namespace input
 {
 
-// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
-
-
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
+
+MonitoringPlaneOffset::MonitoringPlaneOffset() noexcept
+:
+	RegBase {0.05}
+{}
+
+
+MonitoringPlaneOffset::MonitoringPlaneOffset(const Float f)
+:
+	RegBase {f}
+{}
+
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+String MonitoringPlaneOffset::getName() const
+{
+	return name;
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace geometry
+} // End namespace input
 } // End namespace turbo
 
 // ************************************************************************* //

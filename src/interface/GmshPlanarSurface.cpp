@@ -39,7 +39,7 @@ std::size_t GmshPlanarSurface::operator()
 	// create wires
 	auto makeWire = [](const Curvevector& curves)
 	{
-		std::vector<Integer> tags;
+		Intvector tags;
 		tags.reserve(curves.size());
 
 		for (auto& c : curves)
@@ -51,12 +51,12 @@ std::size_t GmshPlanarSurface::operator()
 		return gmsh::model::occ::addWire(tags);
 	};
 
-	std::vector<Integer> wires;
+	Intvector wires;
 	wires.reserve(holes.size() + 1);
 
-	wires.push_back(makeWire(boundary));
+	wires.emplace_back(makeWire(boundary));
 	for (auto& h : holes)
-		wires.push_back(makeWire(h));
+		wires.emplace_back(makeWire(h));
 
 	return static_cast<std::size_t>
 	(

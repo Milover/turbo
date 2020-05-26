@@ -15,6 +15,7 @@ License
 
 #include "Error.h"
 #include "General.h"
+#include "GmshWrite.h"
 #include "Model.h"
 #include "Registry.h"
 #include "Utility.h"
@@ -24,34 +25,61 @@ License
 namespace turbo
 {
 
-// * * * * * * * * * * * * * * Private Functions * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
-void TurboBase::setFile(const Path& file)
+void TurboBase::handleCwd
+(
+	const Path& parentCwd,
+	const Cwd cwd
+)
 {
-	if (std::filesystem::is_directory(file))
-		file_ = file / "";
-	
-	if (!file_.has_filename())
-		file_.replace_filename(model_->name());
+	if (cwd == Cwd::CREATE)
+	{
+		setCwd(parentCwd / filename.stem());
+
+		if (std::filesystem::exists(cwd_))
+			error
+			(
+				FUNC_INFO, "directory: ", cwd_, " already exists"
+			);
+
+		std::filesystem::create_directory(cwd_);
+	}
+	else
+		setCwd(parentCwd);
 }
 
 
 // * * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * //
 
-TurboBase::TurboBase(const Path& file)
+TurboBase::TurboBase
+(
+	const Path& file,
+	const Path& parentCwd,
+	const std::size_t id,
+	const Cwd cwd
+)
 :
 	ownsData_ {true},
 	data_ {new input::Registry {}},		// we own and manage
-	model_ {new geometry::Model {}}
+	model_ {new geometry::Model {}},
+	id_ {id},
+	filename
+	{
+		addFilenameSuffix(file, id)
+	}
 {
-	setFile(file);
+	handleCwd(parentCwd, cwd);
 }
 
 
 TurboBase::TurboBase
 (
+	const Path& file,
 	const input::Registry& reg,
-	const Path& file
+	const Path& parentCwd,
+	const std::size_t id,
+	const Cwd cwd
 )
 :
 	ownsData_ {false},
@@ -59,22 +87,14 @@ TurboBase::TurboBase
 	{
 		&const_cast<input::Registry&>(reg).create()
 	},
-	model_ {new geometry::Model {}}
+	model_ {new geometry::Model {}},
+	id_ {id},
+	filename
+	{
+		addFilenameSuffix(file, id)
+	}
 {
-	setFile(file);
-}
-
-
-// * * * * * * * * * * * * Protected Member Functions* * * * * * * * * * * * //
-
-void TurboBase::setFile
-(
-	const String& prefix,
-	const String& extension
-)
-{
-	addFilenamePrefix(file_, prefix);
-	file_.replace_extension(extension);
+	handleCwd(parentCwd, cwd);
 }
 
 
@@ -89,31 +109,22 @@ TurboBase::~TurboBase() noexcept
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-Path TurboBase::file() const
+void TurboBase::activate() const
 {
-	return file_;
+	model_->activate();
 }
 
 
-void TurboBase::changeDirectory(const Path& directory)
+Path TurboBase::cwd() const
 {
-	Path newDir {directory};
-
-	if (directory.is_relative())
-		newDir = file_.parent_path() / directory;
-
-	if (!std::filesystem::is_directory(newDir))
-		error(FUNC_INFO, "directory: ", newDir, " doesn't exist");
-
-	file_ = newDir / file_.filename();
+	return cwd_;
 }
 
 
-void TurboBase::changeDirectoryParent()
+std::size_t TurboBase::id() const noexcept
 {
-	file_ = file_.parent_path().parent_path() / file_.filename();
+	return id_;
 }
-
 
 void TurboBase::printAll
 (
@@ -124,6 +135,20 @@ void TurboBase::printAll
 ) const
 {
 	data_->printAll(os, width, delimiter, terminator);
+}
+
+
+void TurboBase::setCwd(const Path& cwd)
+{
+	cwd_ = cwd;
+}
+
+
+void TurboBase::write() const
+{
+	model_->activate();
+
+	interface::GmshWrite {}(cwd_ / filename);
 }
 
 

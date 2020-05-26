@@ -97,7 +97,7 @@ Float computePitch
 Vector computeRootOutletVelocity
 (
 	const Vector& c_1,		// abs. fluid inlet velocity
-	const Float dp,			// total pressure difference
+	const Float dp,			// static pressure difference
 	const Float N,			// rev. per second
 	const Float r_h,		// hub radius
 	const Float rho			// density
@@ -135,11 +135,24 @@ Float computeStationRadius
 
 
 //- Compute total pressure difference
-Float computeTotalPressureDifference
+Float computeStaticPressureDifference
 (
 	const Vector& c_1,		// abs. fluid inlet velocity
 	const Vector& c_2,		// abs. fluid outlet velocity
 	const Vector& U,		// blade velocity
+	const Float rho			// density
+) noexcept;
+
+
+//- Compute the vortex distribution exponent, such that
+//	the cyl. section integral work is equal to the requested work
+Float computeVortexDistributionExponent
+(
+	const Vector& c_2_h,	// abs. root (hub) fluid outlet velocity
+	const Float dp,			// (requested total) static pressure difference
+	const Float N,			// rev. per second
+	const Float r_h,		// hub radius
+	const Float r_s,		// shroud radius
 	const Float rho			// density
 ) noexcept;
 
@@ -162,7 +175,8 @@ Vector deHaller
 (
 	const Vector& c_1,		// abs. fluid inlet velocity
 	const Vector& c_2,		// abs. fluid outlet velocity
-	const Vector& U			// blade velocity
+	const Float N,			// rev. per second
+	const Float r_h			// hub radius
 ) noexcept;
 
 

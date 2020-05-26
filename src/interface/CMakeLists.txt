@@ -12,8 +12,10 @@ set(SRC
 	GmshControl.cpp
 	GmshCopy.cpp
 	GmshExtrude.cpp
+	GmshFilledSurface.cpp
 	GmshGenerate.cpp
 	GmshLine.cpp
+	GmshLoft.cpp
 	GmshPlanarSurface.cpp
 	GmshPoint.cpp
 	GmshPhysicalGroup.cpp
@@ -30,6 +32,7 @@ set(SRC
 	GmshSmooth.cpp
 	GmshSpline.cpp
 	GmshTransfinite.cpp
+	GmshVolume.cpp
 	GmshWrite.cpp
 	)
 

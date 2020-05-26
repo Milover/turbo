@@ -23,6 +23,7 @@ SourceFiles
 #include <filesystem>
 #include <utility>
 
+#include "FoamCaseContents.h"
 #include "General.h"
 #include "Registry.h"
 #include "Variables.h"
@@ -46,19 +47,22 @@ private:
 
 		input::Registry* data_;
 
-		inline static thread_local std::size_t simId_ {0};
+
+	// Member functions
+
+		//- Create an openfoam case in 'parentCwd'
+		[[nodiscard]] Path createCase(const Path& parentCwd);
 
 
 public:
 
 	// Public data
 
+		const std::size_t simId;
 		const Path caseDirectory;
-		const Path meshfile;
 
-		inline static const Path caseTemplate {"turbo_case_template"};
-		inline static const Path turboRun {"turbo_run"};
 		inline static const Path turboValues {"turbo_values"};
+		inline static const Path caseTemplate {foam::turboCaseTemplatePath};
 
 
 	// Constructors
@@ -67,8 +71,8 @@ public:
 		Simulator
 		(
 			const input::Registry& reg,
-			const Path& dir,
-			const Path& mshfile
+			const std::size_t id = 0,
+			const Path& parentCwd = std::filesystem::current_path()
 		);
 
 		//- Disallow copy construction
@@ -84,14 +88,7 @@ public:
 
 	// Member functions
 
-		//- Create an openfoam case in the current directory
-		[[nodiscard]] static Path createCase
-		(
-			const Path& location = std::filesystem::current_path()
-		);
-
-		//- Create an openfoam case template
-		//	at the program root directory
+		//- Create an openfoam case template at the program root directory
 		static void createCaseTemplate();
 
 		//- Run simulation

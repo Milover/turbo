@@ -5,6 +5,7 @@
 # add sources
 set(SRC
 	Extrude.cpp
+	Loft.cpp
 	)
 
 # append to sources

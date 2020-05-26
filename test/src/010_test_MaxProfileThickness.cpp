@@ -8,7 +8,7 @@ License
 
 Description
 	Testing RegistryObject/LimitedValue class basic funtionality
-	through the VortexDistributionExponent class.
+	through the MaxCamberPosition class.
 
 \*---------------------------------------------------------------------------*/
 
@@ -18,7 +18,7 @@ Description
 #include "General.h"
 #include "InputRegistry.h"
 #include "Utility.h"
-#include "VortexDistributionExponent.h"
+#include "MaxCamberPosition.h"
 
 #include "Test.h"
 
@@ -33,12 +33,12 @@ int main(int argc, char* argv[])
 	bool pass {true};
 
 	// try some constructors
-	input::VortexDistributionExponent tmp_1 {};
-	input::VortexDistributionExponent tmp_2 {tmp_1};
-	input::VortexDistributionExponent tmp_3 {std::move(tmp_2)};
-	input::VortexDistributionExponent tmp_4
+	input::MaxCamberPosition tmp_1 {};
+	input::MaxCamberPosition tmp_2 {tmp_1};
+	input::MaxCamberPosition tmp_3 {std::move(tmp_2)};
+	input::MaxCamberPosition tmp_4
 	{
-		input::VortexDistributionExponent {}
+		input::MaxCamberPosition {}
 	};
 	tmp_2 = std::move(tmp_3);
 	tmp_3 = tmp_4;
@@ -48,10 +48,10 @@ int main(int argc, char* argv[])
 	(
 		pass,
 		(
-			isEqual(tmp_1.value(), -1.0)
-		 && isEqual(tmp_2.value(), -1.0)
-		 && isEqual(tmp_3.value(), -1.0)
-		 && isEqual(tmp_4.value(), -1.0)
+			isEqual(tmp_1.value(), 0.4)
+		 && isEqual(tmp_2.value(), 0.4)
+		 && isEqual(tmp_3.value(), 0.4)
+		 && isEqual(tmp_4.value(), 0.4)
 		),
 		output,
 		"Checking default value"
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
 	// try to construct/set with a bunch of stuff,
 	// should catch everything invalid
 	double value;
-	input::VortexDistributionExponent tmp_set {};
+	input::MaxCamberPosition tmp_set {};
 	int shouldBeCaught {0};
 	int caught {0};
 
@@ -78,13 +78,13 @@ int main(int argc, char* argv[])
 		if
 		(
 			std::isnan(value)
-		 || !isInRange(value, -1.0, 1.0)
+		 || !isInRange(value, 0.0, 1.0)
 		)
 			++shouldBeCaught;
 
 		try
 		{
-			input::VortexDistributionExponent tmp {value};
+			input::MaxCamberPosition tmp {value};
 		}
 		catch(...)
 		{
@@ -109,15 +109,15 @@ int main(int argc, char* argv[])
 	// try to read from input,
 	// should default construct because
 	// input has not yet been defined
-	input::VortexDistributionExponent vde
+	input::MaxCamberPosition vde
 	{
-		input::read<input::VortexDistributionExponent>()
+		input::read<input::MaxCamberPosition>()
 	};
 
 	test::compareTest
 	(
 		pass,
-		isEqual(vde.value(), -1.0),
+		isEqual(vde.value(), 0.4),
 		output,
 		"Checking read() default construction"
 	);
@@ -129,11 +129,11 @@ int main(int argc, char* argv[])
 	(
 		HashMap<String>
 		{
-			{"VortexDistributionExponent", "0.5"}
+			{"MaxCamberPosition", "0.5"}
 		}
 	);
 
-	vde = input::read<input::VortexDistributionExponent>();
+	vde = input::read<input::MaxCamberPosition>();
 
 	test::compareTest
 	(

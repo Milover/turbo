@@ -206,7 +206,7 @@ void RegistryObject<T>::check() const noexcept(ndebug)
 	if constexpr (std::is_floating_point_v<T>)
 	{
 		if (std::isnan(this->value_))
-			error(FUNC_INFO, "value is NaN");
+			error(FUNC_INFO, "value of is NaN");
 	}
 	else if constexpr (std::is_same_v<Vector, T>)
 	{

@@ -65,7 +65,7 @@ public:
 		template<typename T>
 		Spline
 		(
-			T start,
+			T&& start,
 			const Coordvector& coords
 		);
 
@@ -77,7 +77,7 @@ public:
 		Spline
 		(
 			const Coordvector& coords,
-			T end
+			T&& end
 		);
 
 		//- Construct from a vector of coordinates,
@@ -87,9 +87,9 @@ public:
 		template<typename T1, typename T2>
 		Spline
 		(
-			T1 start,
+			T1&& start,
 			const Coordvector& coords,
-			T2 end
+			T2&& end
 		);
 
 		//- Copy constructor
@@ -119,7 +119,7 @@ public:
 template<typename T>
 Spline::Spline
 (
-	T start,
+	T&& start,
 	const Coordvector& coords
 )
 :
@@ -136,7 +136,7 @@ template<typename T>
 Spline::Spline
 (
 	const Coordvector& coords,
-	T end
+	T&& end
 )
 :
 	Spline
@@ -151,9 +151,9 @@ Spline::Spline
 template<typename T1, typename T2>
 Spline::Spline
 (
-	T1 start,
+	T1&& start,
 	const Coordvector& coords,
-	T2 end
+	T2&& end
 )
 :
 	Curve
@@ -171,7 +171,7 @@ Spline::Spline
 
 	// skip start/end because we have (stored) them already
 	for (auto it {coords.begin() + 1}; it != coords.end() - 1; ++it)
-		points.push_back(Point {*it});
+		points.emplace_back(*it);
 
 	construct(points);
 }

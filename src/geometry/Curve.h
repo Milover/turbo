@@ -86,7 +86,7 @@ protected:
 
 		//- Construct from start/end point shared pointers
 		template<typename T1, typename T2>
-		Curve(T1 start, T2 end);
+		Curve(T1&& start, T2&& end);
 
 
 	// Member functions
@@ -97,7 +97,7 @@ protected:
 			typename T,
 			typename = enableIfValid_t<T>
 		>
-		void storeEnd(T end);
+		void storeEnd(T&& end);
 
 		//- Store start point, only if start is not set
 		template
@@ -105,11 +105,11 @@ protected:
 			typename T,
 			typename = enableIfValid_t<T>
 		>
-		void storeStart(T start);
+		void storeStart(T&& start);
 
 		//- Store start/end points, only if start/end are not set
 		template<typename T1, typename T2>
-		void storeStartAndEnd(T1 start, T2 end);
+		void storeStartAndEnd(T1&& start, T2&& end);
 
 
 public:
@@ -127,7 +127,7 @@ public:
 
 
 	//- Destructor
-	virtual ~Curve() = default;
+	virtual ~Curve() noexcept;
 
 
 	// Member functions
@@ -158,7 +158,7 @@ public:
 // * * * * * * * * * * * * Protected Constructors  * * * * * * * * * * * * * //
 
 template<typename T1, typename T2>
-Curve::Curve(T1 start, T2 end)
+Curve::Curve(T1&& start, T2&& end)
 {
 	storeStartAndEnd
 	(
@@ -171,51 +171,37 @@ Curve::Curve(T1 start, T2 end)
 // * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * * //
 
 template<typename T, typename>
-void Curve::storeEnd(T end)
+void Curve::storeEnd(T&& end)
 {
 	assert(!end_);
 
-	if constexpr
-	(
-		std::is_same_v<Point, T>
-	 || std::is_same_v<Point&&, T>
-	 || std::is_same_v<Coordinates, removeCVRef_t<T>>
-	)
-	{
-		end_ = Sptr<Point>
-		{
-			new Point {std::forward<T>(end)}
-		};
-	}
-	else
+	if constexpr (isPointSptr_v<T>)
 		end_ = std::forward<T>(end);
+	else
+		end_.reset
+		(
+			new Point {std::forward<T>(end)}
+		);
 }
 
 
 template<typename T, typename>
-void Curve::storeStart(T start)
+void Curve::storeStart(T&& start)
 {
 	assert(!start_);
 
-	if constexpr
-	(
-		std::is_same_v<Point, T>
-	 || std::is_same_v<Point&&, T>
-	 || std::is_same_v<Coordinates, removeCVRef_t<T>>
-	)
-	{
-		start_ = Sptr<Point>
-		{
-			new Point {std::forward<T>(start)}
-		};
-	}
-	else
+	if constexpr (isPointSptr_v<T>)
 		start_ = std::forward<T>(start);
+	else
+		start_.reset
+		(
+			new Point {std::forward<T>(start)}
+		);
 }
 
 
 template<typename T1, typename T2>
-void Curve::storeStartAndEnd(T1 start, T2 end)
+void Curve::storeStartAndEnd(T1&& start, T2&& end)
 {
 	storeStart(std::forward<T1>(start));
 	storeEnd(std::forward<T2>(end));

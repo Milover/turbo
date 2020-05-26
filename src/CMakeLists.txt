@@ -9,6 +9,7 @@ add_subdirectory(general)
 add_subdirectory(geometry)
 add_subdirectory(input)
 add_subdirectory(interface)
+add_subdirectory(math)
 add_subdirectory(mesh)
 add_subdirectory(simulation)
 

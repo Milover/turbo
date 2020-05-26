@@ -26,6 +26,7 @@ set(SRC
 	MaxProfileThickness.cpp
 	MeshCellSize.cpp
 	MeshSize.cpp
+	MonitoringPlaneOffset.cpp
 	NumberOfBlades.cpp
 	NumberOfCamberPoints.cpp
 	NumberOfStations.cpp
@@ -39,7 +40,7 @@ set(SRC
 	Solidity.cpp
 	StaggerAngle.cpp
 	TipClearance.cpp
-	TotalPressureDifference.cpp
+	StaticPressureDifference.cpp
 	TurbulenceKineticEnergy.cpp
 	TurbulenceIntensity.cpp
 	TurbulenceDissipationRate.cpp

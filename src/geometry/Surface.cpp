@@ -49,6 +49,14 @@ Surface::Surface(const detail::PlaceholderSurface& s)
 }
 
 
+// * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * * //
+
+Surface::~Surface() noexcept
+{
+	remove();
+}
+
+
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 const Sptrvector<Curve>& Surface::boundaryCRef() const noexcept

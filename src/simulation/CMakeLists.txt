@@ -3,7 +3,7 @@
 # See the LICENSE file for license information
 
 # add all subdirectories
-#add_subdirectory(detail)
+add_subdirectory(foam)
 
 # add sources
 set(SRC

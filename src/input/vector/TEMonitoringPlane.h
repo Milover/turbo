@@ -7,25 +7,27 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::input::TotalPressureDifference
+	turbo::input::TEMonitoringPlane
 
 Description
-	Class TotalPressureDifference.
+	Class TEMonitoringPlane.
+
+	Point used to define the monitoring plane (foam postprocessing) at
+	the leading edge.
 
 SourceFiles
-	TotalPressureDifference.cpp
+	TEMonitoringPlane.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef INPUT_TOTAL_PRESSURE_DIFFERENCE_H
-#define INPUT_TOTAL_PRESSURE_DIFFERENCE_H
+#ifndef INPUT_TE_MONITORING_PLANE_H
+#define INPUT_TE_MONITORING_PLANE_H
 
-#include "BladeVelocity.h"
-#include "Density.h"
-#include "General.h"
-#include "InletVelocity.h"
-#include "PositiveValue.h"
-#include "OutletVelocity.h"
+#include "Chord.h"
+#include "Error.h"
+#include "MonitoringPlaneOffset.h"
+#include "RegistryObject.h"
+#include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -34,38 +36,34 @@ namespace turbo
 namespace input
 {
 
-// Forward declarations
-class OutletVelocity;
-
 /*---------------------------------------------------------------------------*\
-					Class TotalPressureDifference Declaration
+					Class TEMonitoringPlane Declaration
 \*---------------------------------------------------------------------------*/
 
-class TotalPressureDifference final
+class TEMonitoringPlane final
 :
-	public PositiveValue<Float>
+	public RegistryObject<Vector>
 {
 public:
 
 	// Public static data
 
-		inline static const String name {"TotalPressureDifference"};
+		inline static const String name {"TEMonitoringPlane"};
 
 
 	// Constructors
 
-		//- Construct from a Float,
+		//- Construct from a Vector,
 		//  no aditional checking required
-		explicit TotalPressureDifference(const Float f);
+		explicit TEMonitoringPlane(const Vector& v) noexcept(ndebug);
 
 		//- Compute and construct
-		TotalPressureDifference
+		TEMonitoringPlane
 		(
-			const InletVelocity& c_1,
-			const OutletVelocity& c_2,
-			const BladeVelocity& U,
-			const Density& rho
-		);
+			const Vector& tePoint,
+			const Chord& c,
+			const MonitoringPlaneOffset& mpo
+		) noexcept(ndebug);
 
 
 	// Member functions

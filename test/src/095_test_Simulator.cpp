@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 			{"Density",								"1.2"},
 			{"TurbulenceReferenceLengthScaleRatio",	"0.1"},		// default
 			{"TurbulenceIntensity",					"0.05"},	// default
-			{"TotalPressureDifference",				"400"},		// default
+			{"StaticPressureDifference",			"400"},		// default
 			// profile
 			{"CamberPointSpacing",					"Cosine"},	// default
 			{"Distribution",		"Naca4DigitDistribution"},	// default
@@ -80,7 +80,9 @@ int main(int argc, char* argv[])
 			{"TurbulenceSpecificDissipationRate",	"300"},
 			{"TurbulenceViscosity",					"400"},
 			{"TranslationPerBot",				    "0 0.5 0"},
-			{"TranslationPerTop",				    "0 -0.5 0"}
+			{"TranslationPerTop",				    "0 -0.5 0"},
+			{"LEMonitoringPlane",				    "0 1 0"},
+			{"TEMonitoringPlane",				    "0 -1 0"}
 		}
 	);
 	// A dummy Registry, so things
@@ -94,10 +96,11 @@ int main(int argc, char* argv[])
 
 	updateAndWait(1);
 
-	// build mesh
-	Path workDir {simulation::Simulator::createCase()};
+	// create the simulator so we have a case dir
+	simulation::Simulator sim {reg};
 
-	mesh::ProfileMesh mesh {reg, std::move(model), workDir};
+	// build mesh
+	mesh::ProfileMesh mesh {reg, std::move(model), sim.caseDirectory};
 	mesh.build(profile);
 
 	updateAndWait(1);
@@ -105,15 +108,14 @@ int main(int argc, char* argv[])
 	mesh.write();
 
 	// simulate
-	simulation::Simulator sim {reg, workDir, mesh.file()};
 	sim.simulate();
 
 	control.update();
 	control.run();
 
 	// cleanup
-	auto r_1 {std::filesystem::remove_all(workDir)};
-	auto r_2 {std::filesystem::remove_all(sim.caseTemplate)};
+	auto r_1 {std::filesystem::remove_all(sim.caseDirectory)};
+	auto r_2 {std::filesystem::remove_all("turbo_case_template")};
 
 	// we should have cleaned something up
 	pass = pass && r_1 > 0 && r_2 > 0;

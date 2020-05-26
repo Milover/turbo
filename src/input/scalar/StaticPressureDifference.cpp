@@ -8,7 +8,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "TotalPressureDifference.h"
+#include "StaticPressureDifference.h"
 
 #include "BladeVelocity.h"
 #include "Density.h"
@@ -26,13 +26,13 @@ namespace input
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-TotalPressureDifference::TotalPressureDifference(const Float f)
+StaticPressureDifference::StaticPressureDifference(const Float f)
 :
 	PVBase {f}
 {}
 
 
-TotalPressureDifference::TotalPressureDifference
+StaticPressureDifference::StaticPressureDifference
 (
 	const InletVelocity& c_1,
 	const OutletVelocity& c_2,
@@ -40,9 +40,9 @@ TotalPressureDifference::TotalPressureDifference
 	const Density& rho
 )
 :
-	TotalPressureDifference
+	StaticPressureDifference
 	{
-		compute::computeTotalPressureDifference
+		compute::computeStaticPressureDifference
 		(
 			c_1.value(),
 			c_2.value(),
@@ -55,7 +55,7 @@ TotalPressureDifference::TotalPressureDifference
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-String TotalPressureDifference::getName() const
+String StaticPressureDifference::getName() const
 {
 	return name;
 }

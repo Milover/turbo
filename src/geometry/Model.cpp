@@ -8,11 +8,12 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include <string>
+#include <algorithm>
 #include <utility>
 
 #include <gmsh.h>
 
+#include "General.h"
 #include "Model.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -26,9 +27,14 @@ namespace geometry
 
 bool Model::activate(const std::size_t id) const noexcept
 {
-	if (id != 0 && Model::activeId_ != id)
+	if
+	(
+	 	id != 0
+	 && activeId_ != id
+	 && std::find(log_.begin(), log_.end(), id) != log_.end()
+	)
 	{
-		Model::activeId_ = id;
+		activeId_ = id;
 		gmsh::model::setCurrent(std::to_string(id));
 
 		return true;
@@ -45,8 +51,9 @@ void Model::remove() const noexcept
 	// needs to be the current (active) model to be removed
 	activate();
 	gmsh::model::remove();
+	log_.remove(id_);
 
-	// reactivate the previous model,
+	// reactivate the previous model if possible,
 	// unless we're the only model
 	if (previous != id_)
 		activate(previous);
@@ -57,9 +64,10 @@ void Model::remove() const noexcept
 
 Model::Model() noexcept
 :
-	id_ {++Model::count_}
+	id_ {++count_}
 {
-	Model::activeId_ = id_;
+	log_.emplace_back(id_);
+	activeId_ = id_;
 
 	gmsh::model::add(name());
 }

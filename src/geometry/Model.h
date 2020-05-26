@@ -43,6 +43,8 @@ SourceFiles
 #ifndef GEOMETRY_MODEL_H
 #define GEOMETRY_MODEL_H
 
+#include <list>
+
 #include "General.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -62,8 +64,9 @@ private:
 
 	// Private data
 
-		inline static std::size_t activeId_ {0};
-		inline static std::size_t count_ {0};
+		inline static thread_local std::size_t activeId_ {0};
+		inline static thread_local std::size_t count_ {0};
+		inline static thread_local std::list<std::size_t> log_ {};
 
 		std::size_t id_;
 

@@ -12,7 +12,7 @@ Description
 	TODO: some numeric (comparison) tests would be nice,
 		  mostly visuals checks for now
 
-	NOTE: reference work:
+	NOTE: reference:
 
 		  Buchwald, P. & Vogt, D. M. & Grillat, J. & Laufer, W. &
 		  Schmitz, M. B. & Lucius, A. & Schneider, M. (2017).
@@ -20,6 +20,8 @@ Description
 		  Rotational Speeds in the Design Point.
 		  Journal of Engineering for Gas Turbines and Power,
 		  doi: 10.1115/1.4038122
+
+		  NOTE: required total pressure changed to static pressure
 
 \*---------------------------------------------------------------------------*/
 
@@ -32,6 +34,7 @@ Description
 #include "InputRegistry.h"
 #include "Registry.h"
 #include "Simulator.h"
+#include "Variables.h"
 
 #include "Test.h"
 
@@ -54,7 +57,7 @@ int main(int argc, char* argv[])
 			{"Density",						"1.2"},
 			{"DynamicViscosity",			"1.8206e-5"},
 			{"Rps",							"116.666"},
-			{"TotalPressureDifference",		"400"},
+			{"StaticPressureDifference",	"400"},
 			{"VolumeFlowRate",				"0.222"},
 			{"TurbulenceReferenceLengthScaleRatio",	"0.1"},		// default
 			{"TurbulenceIntensity",			"0.05"},			// default
@@ -66,7 +69,6 @@ int main(int argc, char* argv[])
 			{"ShroudRadius",				"0.075"},
 			{"TipClearance",				"0"},				// default
 			{"Solidity",					"1.0"},				// default
-			{"VortexDistributionExponent",	"-1.0"},			// default
 			// airfoil
 			{"Distribution",	"Naca4DigitDistribution"},		// default
 			{"DeviationAngle",				"0"},				// default
@@ -86,7 +88,8 @@ int main(int argc, char* argv[])
 			// precomputed values, because 'Blade' is not present
 			{"KinematicViscosity",			"1.5172e-5"},
 			{"InletVelocity",				"16.7502 0 0"},
-			{"RootOutletVelocity",			"16.7502 24.2523 0"},
+			{"RootOutletVelocity",			"16.7502 -24.2523 0"},
+			{"VortexDistributionExponent",	"-1.0"},			// default
 			{"TurbulenceKineticEnergy",		"1.0521"}
 		}
 	);
@@ -95,16 +98,12 @@ int main(int argc, char* argv[])
 	// can read the values from the InputRegistry
 	input::Registry reg {};
 
-	// Make a working directory
-	Path workDir {std::filesystem::current_path() / "airfoil_0"};
-	std::filesystem::create_directory(workDir);
-
-	// make the 'Airfoil'
+	// make Airfoil
 	design::Airfoil airfoil
 	{
-		0,
-		reg, std::move(model),
-		workDir
+		input::Radius {0.05625},
+		reg,
+		std::move(model)
 	};
 	airfoil.build();
 
@@ -190,19 +189,30 @@ int main(int argc, char* argv[])
 	// make a new mesh
 	auto caseDir {airfoil.simulate()};
 
+	// check if the airfoil cwd was properly built
+	test::compareTest
+	(
+		pass,
+		(
+			std::filesystem::exists(airfoil.cwd())
+		),
+		output,
+		"Checking airfoil directory"
+	);
+
 	// check if the case dir was properly built
 	test::compareTest
 	(
 		pass,
 		(
-			caseDir == (workDir / "case_0")
+			std::filesystem::exists(caseDir)
 		),
 		output,
 		"Checking case directory"
 	);
 
 	// write out all values from the airfoil registry
-	std::ofstream ofs {workDir / "airfoil_registry"};
+	std::ofstream ofs {airfoil.cwd() / "airfoil_registry"};
 	airfoil.printAll(ofs, 40, " ", ";\n");
 	ofs.flush();
 
@@ -210,11 +220,13 @@ int main(int argc, char* argv[])
 	control.run();
 
 	// cleanup
-	auto r_2 {std::filesystem::remove_all(workDir)};
-	auto r_1 {std::filesystem::remove_all(simulation::Simulator::caseTemplate)};
+	auto r_2 {std::filesystem::remove_all(airfoil.cwd())};
+	auto r_1 {std::filesystem::remove_all("turbo_case_template")};
 
 	// we should have cleaned something up
-	pass = pass && r_1 > 0 && r_2 > 0;
+	pass = pass
+		&& r_1 > 0
+		&& r_2 > 0;
 
 	// test pass or fail
 	if (pass)

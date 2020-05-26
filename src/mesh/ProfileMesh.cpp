@@ -70,19 +70,19 @@ void ProfileMesh::createMeshGenerator()
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-ProfileMesh::ProfileMesh(const Path& file)
+ProfileMesh::ProfileMesh(const Path& parentCwd)
 :
-	BaseType {file}
+	BaseType {parentCwd}
 {}
 
 
 ProfileMesh::ProfileMesh
 (
 	const input::Registry& reg,
-	const Path& file
+	const Path& parentCwd
 )
 :
-	BaseType {reg, file}
+	BaseType {reg, parentCwd}
 {}
 
 

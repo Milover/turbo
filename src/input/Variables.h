@@ -38,6 +38,7 @@ Description
 #include "MaxCamberPosition.h"
 #include "MeshCellSize.h"
 #include "MeshSize.h"
+#include "MonitoringPlaneOffset.h"
 #include "NumberOfBlades.h"
 #include "NumberOfCamberPoints.h"
 #include "NumberOfStations.h"
@@ -51,7 +52,7 @@ Description
 #include "Solidity.h"
 #include "StaggerAngle.h"
 #include "TipClearance.h"
-#include "TotalPressureDifference.h"
+#include "StaticPressureDifference.h"
 #include "TurbulenceKineticEnergy.h"
 #include "TurbulenceIntensity.h"
 #include "TurbulenceDissipationRate.h"
@@ -67,10 +68,12 @@ Description
 #include "BladeVelocity.h"
 #include "InletVelocity.h"
 #include "InletRelativeVelocity.h"
+#include "LEMonitoringPlane.h"
 #include "OutletVelocity.h"
 #include "RootOutletVelocity.h"
 #include "TranslationPerBot.h"
 #include "TranslationPerTop.h"
+#include "TEMonitoringPlane.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

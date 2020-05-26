@@ -116,7 +116,7 @@ void PositiveValue<T>::check() const noexcept(ndebug)
 	if constexpr (std::is_integral_v<T>)
 	{
 		if (this->value_ < 0)
-			error(FUNC_INFO, "value < 0");
+			error(FUNC_INFO, "value of < 0");
 	}
 	else
 	{

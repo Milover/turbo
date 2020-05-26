@@ -177,17 +177,31 @@ Vector operator-(Vector v) noexcept
 }
 
 
-Vector operator*(Vector lhs, const Float& rhs) noexcept
+Vector operator*(Vector lhs, const Float rhs) noexcept
 {
 	lhs *= rhs;
 	return lhs;
 }
 
 
-Vector operator/(Vector lhs, const Float& rhs) noexcept
+Vector operator*(const Float lhs, Vector rhs) noexcept
+{
+	rhs *= lhs;
+	return rhs;
+}
+
+
+Vector operator/(Vector lhs, const Float rhs) noexcept
 {
 	lhs /= rhs;
 	return lhs;
+}
+
+
+Vector operator/(const Float lhs, Vector rhs) noexcept
+{
+	rhs /= lhs;
+	return rhs;
 }
 
 

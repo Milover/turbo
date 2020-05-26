@@ -100,8 +100,8 @@ int main(int argc, char* argv[])
 	control.update();
 	control.run();
 
-	if (std::filesystem::exists(mesh.file()))
-		std::filesystem::remove(mesh.file());
+	if (std::filesystem::exists(mesh.filename))
+		std::filesystem::remove(mesh.filename);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
