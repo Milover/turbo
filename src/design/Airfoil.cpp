@@ -181,6 +181,18 @@ void Airfoil::build()
 }
 
 
+Sptr<mesh::ProfileMesh> Airfoil::mesh() const
+{
+	Sptr<mesh::ProfileMesh> mesh
+	{
+		new mesh::ProfileMesh {*data_, model_}
+	};
+	mesh->build(profile);
+
+	return mesh;
+}
+
+
 Path Airfoil::simulate(Sptr<mesh::ProfileMesh> mesh)
 {
 	// compute and store monitoring plane positions and
@@ -212,21 +224,13 @@ Path Airfoil::simulate(Sptr<mesh::ProfileMesh> mesh)
 
 	simulation::Simulator sim {*data_, simId_, cwd_};
 
-	// make the mesh if we're running just the single sim
 	if (!mesh)
-		mesh.reset
-		(
-			new mesh::ProfileMesh {*data_, model_, sim.caseDirectory}
-		);
-	// change the mesh working directory if we're designing
-	else
-		mesh->setCwd(sim.caseDirectory);
+		mesh = this->mesh();
 
-	mesh->build(profile);
+	mesh->setCwd(sim.caseDirectory);
 	mesh->write();
 
 	sim.simulate();
-
 	++simId_;
 
 	return sim.caseDirectory;

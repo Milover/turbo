@@ -112,6 +112,9 @@ public:
 		//- Build geometry
 		void build();
 
+		//- Build mesh
+		Sptr<mesh::ProfileMesh> mesh() const;
+
 		//- Run simulation, return the simulation directory
 		Path simulate
 		(

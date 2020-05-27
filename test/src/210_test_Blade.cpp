@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
 	#include "TestInclude.h"
 	#include "TestGmshInclude.h"
 
-	//control.set("General.Verbosity", 10);
+	control.set("General.Verbosity", 10);
 
 	input::InputRegistry::store					// TODO: should mass test this
 	(
@@ -58,11 +58,11 @@ int main(int argc, char* argv[])
 			// blade
 			{"HubRadius",					"0.075"},
 			{"IncidenceAngle",				"0"},				// default
-			{"NumberOfBlades",				"6"},
+			{"NumberOfBlades",				"7"},
 			{"NumberOfStations",			"3"},
 			{"ShroudRadius",				"0.3945"},
 			{"TipClearance",				"0"},				// default
-			{"Solidity",					"0.6"},				// default
+			{"Solidity",					"1"},				// default
 			{"SkewDistribution",			"BezierTangential"},
 			{"HubSkewAngle",				"0.0"},	// ~15°
 			{"ShroudSkewAngle",				"0.5236"},	// ~30°
@@ -77,12 +77,12 @@ int main(int argc, char* argv[])
 			// mesh
 			{"ProfileMeshGenerator","ProfileTetMeshGenerator"},	// default
 			//{"MeshSize",					"20000"},			// disabled
-			{"MeshCellSize",				"1e-3"},
+			{"MeshCellSize",				"1e-3"},	// NOTE: this has to scale with chord somehow
 			//{"BLNumberOfLayers",			"5"},				// disabled
 			{"BLGrowthRate",				"1.2"},				// default
 			{"BLTransitionRatio",			"0.75"},			// default
 			{"ProfileBumpFactor",			"0.25"},			// default
-			{"YPlus",						"150"}				// default
+			{"YPlus",						"1"}				// default
 		}
 	);
 
@@ -97,23 +97,20 @@ int main(int argc, char* argv[])
 		std::move(model)
 	};
 
-	// keep track of the files we generate manually
-	std::vector<Path> files;
+	Path filename {"data"};
 
+	Sptrvector<mesh::ProfileMesh> msh;
 	for (const auto& airfoil : blade.airfoilsCRef())
 	{
 		airfoil->build();
+		msh.emplace_back(airfoil->mesh());
 
 		// write airfoil data
-		Path filename {"airfoil_" + std::to_string(airfoil->id())};
-		files.push_back(filename);
-		std::ofstream ofs {filename};
+		std::ofstream ofs {airfoil->cwd() / filename};
 		airfoil->printAll(ofs, 40);
 	}
-
 	// write blade data
-	files.push_back("blade");
-	std::ofstream ofs {"blade"};
+	std::ofstream ofs {blade.cwd() / filename};
 	blade.printAll(ofs, 40);
 	ofs.flush();
 
@@ -121,6 +118,7 @@ int main(int argc, char* argv[])
 
 	// build the blade
 	blade.build();
+	blade.write();
 
 	updateAndWait(1);
 
@@ -129,11 +127,6 @@ int main(int argc, char* argv[])
 
 	// cleanup
 	pass = pass && std::filesystem::remove_all(blade.cwd()) > 0;
-	for (auto& file : files)
-	{
-		auto tmp {std::filesystem::remove_all(file)};
-		pass = pass && tmp > 0;
-	}
 
 	// test pass or fail
 	if (pass)

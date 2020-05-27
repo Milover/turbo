@@ -73,10 +73,6 @@ private:
 
 	// Member functions
 
-		//- Activate the model with id 'id',
-		//	true if successful, false otherwise
-		bool activate(const std::size_t id) const noexcept;
-
 		//- Remove the underlying geometry (model)
 		void remove() const noexcept;
 
@@ -106,6 +102,14 @@ public:
 		//- Activate the model if it isn't active,
 		//	true if successfull, false otherwise
 		bool activate() const noexcept;
+
+		//- Activate the model with id 'id',
+		//	true if successful, false otherwise
+		static bool activate(const std::size_t id) noexcept;
+
+		//- Activate the model with id 'id',
+		//	true if successful, false otherwise
+		static std::size_t activeId() noexcept;
 
 		//- Get id
 		std::size_t id() const noexcept;

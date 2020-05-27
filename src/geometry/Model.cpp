@@ -25,25 +25,6 @@ namespace geometry
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
-bool Model::activate(const std::size_t id) const noexcept
-{
-	if
-	(
-	 	id != 0
-	 && activeId_ != id
-	 && std::find(log_.begin(), log_.end(), id) != log_.end()
-	)
-	{
-		activeId_ = id;
-		gmsh::model::setCurrent(std::to_string(id));
-
-		return true;
-	}
-
-	return false;
-}
-
-
 void Model::remove() const noexcept
 {
 	auto previous {Model::activeId_};
@@ -92,9 +73,41 @@ Model::~Model() noexcept
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
+std::size_t Model::activeId() noexcept
+{
+	return Model::activeId_;
+}
+
+
 bool Model::activate() const noexcept
 {
 	return activate(id_);
+}
+
+
+bool Model::activate(const std::size_t id) noexcept
+{
+	if
+	(
+	 	id != 0
+	 && Model::activeId_ != id
+	 && std::find
+	 	(
+			Model::log_.begin(),
+			Model::log_.end(),
+			id
+		) != Model::log_.end()
+	)
+	{
+		Model::activeId_ = id;
+		gmsh::model::setCurrent(std::to_string(id));
+
+		return true;
+	}
+	else if (Model::activeId_ == id)
+		return true;
+
+	return false;
 }
 
 

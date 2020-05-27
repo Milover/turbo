@@ -26,10 +26,12 @@ SourceFiles
 #ifndef GEOMETRY_SHAPE_H
 #define GEOMETRY_SHAPE_H
 
+#include <cassert>
 #include <type_traits>
 
 #include "GmshBase.h"
 #include "GmshRemove.h"
+#include "Model.h"
 #include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -74,10 +76,15 @@ protected:
 	);
 
 
+	// Protected data
+
+		const std::size_t modelId_;
+
+
 	// Constructors
 
 		//- Default constructor
-		Shape() = default;
+		Shape() noexcept;
 
 		//- Construct from tag
 		Shape(const std::size_t) noexcept;
@@ -128,10 +135,26 @@ template
 	typename Entity,
 	typename Deleter
 >
+Shape<Entity, Deleter>::Shape() noexcept
+:
+	modelId_ {Model::activeId()}
+{
+	assert(modelId_ != 0);
+}
+
+
+template
+<
+	typename Entity,
+	typename Deleter
+>
 Shape<Entity, Deleter>::Shape(const std::size_t tag) noexcept
 :
-	Entity {tag}
-{}
+	Entity {tag},
+	modelId_ {Model::activeId()}
+{
+	assert(modelId_ != 0);
+}
 
 
 // * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
@@ -143,7 +166,11 @@ template
 >
 void Shape<Entity, Deleter>::remove() noexcept
 {
-	if (this->tag_ != 0)
+	if
+	(
+		Model::activate(this->modelId_)
+	 && this->tag_ != 0
+	)
 	{
 		Deleter {}(this);
 		this->sync_ = false;
