@@ -9,6 +9,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include <algorithm>
+#include <cassert>
 #include <vector>
 
 #include "Profile.h"
@@ -31,65 +32,6 @@ namespace turbo
 {
 namespace design
 {
-
-// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
-
-void Profile::centerOn(const Point& p) noexcept
-{
-	translate
-	(
-		Vector {p - centroid()}
-	);
-}
-
-
-void Profile::rotate2D(const Float angle) noexcept
-{
-	Float x_top;
-	Float y_top;
-	Float x_bot;
-	Float y_bot;
-
-	for (auto& [top, bot] : points_)
-	{
-		x_top = top.x();
-		y_top = top.y();
-		x_bot = bot.x();
-		y_bot = bot.y();
-
-		top.x() = x_top * std::cos(angle) - y_top * std::sin(angle);
-		top.y() = x_top * std::sin(angle) + y_top * std::cos(angle);
-		bot.x() = x_bot * std::cos(angle) - y_bot * std::sin(angle);
-		bot.y() = x_bot * std::sin(angle) + y_bot * std::cos(angle);
-	}
-}
-
-
-void Profile::scale(const Float factor) noexcept
-{
-	scale(centroid(), factor);
-}
-
-
-void Profile::scale(const Point& p, const Float factor) noexcept
-{
-	for (auto& [top, bot] : points_)
-	{
-		top = p + (top - p) * factor;
-		bot = p + (bot - p) * factor;
-	}
-}
-
-
-void Profile::translate(const Vector& v) noexcept
-{
-	for (auto& [top, bot] : points_)
-	{
-		top += v;
-		bot += v;
-	}
-}
-
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
@@ -123,13 +65,10 @@ void Profile::build
 	const input::Registry& reg
 )
 {
+	radius_ = reg.cref<input::Radius>().value();
 	auto chord
 	{
 		reg.cref<input::Chord>()
-	};
-	auto radius
-	{
-		reg.cref<input::Radius>()
 	};
 	auto stagger
 	{
@@ -143,9 +82,9 @@ void Profile::build
 	scale(chord.value());
 	centerOn
 	(
-		Point {0.0, 0.0, radius.value()}
+		Point {0.0, 0.0, radius_}
 	);
-	rotate2D(stagger.value());
+	rotateZ(stagger.value());
 }
 
 
@@ -177,6 +116,15 @@ Profile::Point Profile::centroid() const noexcept
 	center /= static_cast<Float>(2 * size());
 
 	return center;
+}
+
+
+void Profile::centerOn(const Point& p) noexcept
+{
+	translate
+	(
+		Vector {p - centroid()}
+	);
 }
 
 
@@ -353,6 +301,40 @@ Profile::Data Profile::points() const noexcept
 }
 
 
+void Profile::rotateX(const Float angle) noexcept
+{
+	rotate<0>(angle);
+}
+
+
+void Profile::rotateY(const Float angle) noexcept
+{
+	rotate<1>(angle);
+}
+
+
+void Profile::rotateZ(const Float angle) noexcept
+{
+	rotate<2>(angle);
+}
+
+
+void Profile::scale(const Float factor) noexcept
+{
+	scale(centroid(), factor);
+}
+
+
+void Profile::scale(const Point& p, const Float factor) noexcept
+{
+	for (auto& [top, bot] : points_)
+	{
+		top = p + (top - p) * factor;
+		bot = p + (bot - p) * factor;
+	}
+}
+
+
 Profile::Sizetype Profile::size() const noexcept
 {
 	return points_.size();
@@ -391,26 +373,30 @@ Profile::Point Profile::tePoint() const noexcept(ndebug)
 }
 
 
+void Profile::translate(const Vector& v) noexcept
+{
+	for (auto& [top, bot] : points_)
+	{
+		top += v;
+		bot += v;
+	}
+}
+
+
 void Profile::wrap() noexcept
 {
 	if (wrapped_)
 		return;
 
-	Float r;		// radius
-	Float a_top;	// angle
-	Float a_bot;
-
-	// compute wrapped coordinates
 	for (auto& [top, bot] : points_)
 	{
-		r = top.z();		// z_top == z_bot
-		a_top = top.y() / r;
-		a_bot = bot.y() / r;
+		Float aTop {top.y() / radius_};
+		Float aBot {bot.y() / radius_};
 
-		top.y() = r * std::sin(a_top);
-		top.z() = r * std::cos(a_top);
-		bot.y() = r * std::sin(a_bot);
-		bot.z() = r * std::cos(a_bot);
+		top.y() = radius_ * std::sin(aTop);
+		top.z() = radius_ * std::cos(aTop);
+		bot.y() = radius_ * std::sin(aBot);
+		bot.z() = radius_ * std::cos(aBot);
 	}
 
 	wrapped_ = true;

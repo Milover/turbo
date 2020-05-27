@@ -6,6 +6,7 @@
 
 # add sources
 set(SRC
+	BezierSkewRelativeRadius.cpp
 	BLFirstCellHeight.cpp
 	BLGrowthRate.cpp
 	BLNumberOfLayers.cpp
@@ -18,6 +19,7 @@ set(SRC
 	DeviationAngle.cpp
 	DynamicViscosity.cpp
 	HubRadius.cpp
+	HubSkewAngle.cpp
 	IncidenceAngle.cpp
 	InclinationAngle.cpp
 	KinematicViscosity.cpp
@@ -36,6 +38,7 @@ set(SRC
 	Rps.cpp
 	SectionExtensionFactor.cpp
 	ShroudRadius.cpp
+	ShroudSkewAngle.cpp
 	SmootherIter.cpp
 	Solidity.cpp
 	StaggerAngle.cpp

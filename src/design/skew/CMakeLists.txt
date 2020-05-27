@@ -2,14 +2,11 @@
 #
 # See the LICENSE file for license information
 
-# add all subdirectories
-add_subdirectory(profile)
-add_subdirectory(skew)
-
 # add sources
 set(SRC
-	Airfoil.cpp
-	Blade.cpp
+	BezierTangential.cpp
+	NoSkew.cpp
+	SkewDistribution.cpp
 	)
 
 # append to sources

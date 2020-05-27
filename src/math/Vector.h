@@ -21,6 +21,7 @@ SourceFiles
 #define VECTOR_H
 
 #include <array>
+#include <cmath>
 #include <ostream>
 
 #include "General.h"
@@ -47,6 +48,16 @@ private:
 	// Private data
 		
 		Array data_;
+
+
+	// Member functions
+
+		//- Rotate around an axis by 'angle' radians
+		//	perm = 0 == x-axis
+		//	perm = 1 == z-axis
+		//	perm = 2 == y-axis
+		template<std::size_t permutation>
+		void rotate(const Float angle) noexcept;
 
 
 public:
@@ -81,6 +92,15 @@ public:
 
 		//- Return origin point
 		static constexpr Vector origin() noexcept;
+
+		//- Rotate around x-axis by 'angle' radians
+		void rotateX(const Float angle) noexcept;
+
+		//- Rotate around y-axis by 'angle' radians
+		void rotateY(const Float angle) noexcept;
+
+		//- Rotate around z-axis by 'angle' radians
+		void rotateZ(const Float angle) noexcept;
 
 		//- Access X component by reference
 		Float& x() noexcept;
@@ -134,6 +154,31 @@ public:
 		bool operator==(const Vector& v) const noexcept;
 
 };
+
+
+// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
+
+template<std::size_t permutation>
+void Vector::rotate(const Float angle) noexcept
+{
+	static_assert(permutation >= 0 && permutation <= 2);
+
+	static constexpr std::size_t indices[3]
+	{
+		(0 + permutation) % 3,
+		(1 + permutation) % 3,
+		(2 + permutation) % 3
+	};
+
+	Float c {std::cos(angle)};
+	Float s {std::sin(angle)};
+
+	Float f = data_[indices[1]];
+	Float g = data_[indices[2]];
+
+	data_[indices[1]] = f * c - g * s;
+	data_[indices[2]] = f * s + g * c;
+}
 
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
@@ -218,31 +263,43 @@ std::ostream& operator<<(std::ostream& os, const Vector& v);
 
 // * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * * //
 
-// Angle between two vectors
+//- Angle between two vectors
 Float angleBetween(const Vector& v1, const Vector& v2) noexcept;
 
 
-// Cross product
+//- Cross product
 Vector cross(const Vector& v1, const Vector& v2) noexcept;
 
 
-// Dot product
+//- Dot product
 Float dot(const Vector& v1, const Vector& v2) noexcept;
 
 
-// Is NAN
+//- Is NAN
 bool isNan(const Vector& v) noexcept;
 
 
-// Magnitude
+//- Magnitude
 Float mag(const Vector& v) noexcept;
 
 
-// Midpoint
+//- Midpoint
 Vector midpoint(const Vector& v1, const Vector& v2) noexcept;
 
 
-// Normalize (to unit vector)
+//- Rotate around x-axis by 'angle' radians
+Vector rotateX(Vector v, const Float angle) noexcept;
+
+
+//- Rotate around y-axis by 'angle' radians
+Vector rotateY(Vector v, const Float angle) noexcept;
+
+
+//- Rotate around z-axis by 'angle' radians
+Vector rotateZ(Vector v, const Float angle) noexcept;
+
+
+//- Normalize (to unit vector)
 Vector unit(Vector v) noexcept;
 
 

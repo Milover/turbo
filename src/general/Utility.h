@@ -29,9 +29,11 @@ namespace turbo
 
 // * * * * * * * * * * * * * * * * Constants * * * * * * * * * * * * * * * * //
 
-static constexpr Float pi {M_PI};
+inline static constexpr Float pi {M_PI};
 
-static constexpr char filenameSeparator {'_'};
+inline static constexpr Float eps {1e-15};
+
+inline static constexpr char filenameSeparator {'_'};
 
 
 // * * * * * * * * * * * * * Arithmetic Functions  * * * * * * * * * * * * * //

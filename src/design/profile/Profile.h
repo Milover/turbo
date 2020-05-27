@@ -20,6 +20,8 @@ SourceFiles
 #ifndef DESIGN_PROFILE_H
 #define DESIGN_PROFILE_H
 
+#include <cmath>
+
 #include "Curve.h"
 #include "Error.h"
 #include "General.h"
@@ -53,34 +55,24 @@ public:
 	using Reference			= Data::reference;
 	using Constreference	= Data::const_reference;
 
-
 private:
-
 
 	// Private data
 
 		// [top, bot]
 		Data points_;
-
+		Float radius_;
 		bool wrapped_ {false};
 
 
 	// Member functions
 
-		//- Center on point 'p'
-		void centerOn(const Point& p) noexcept;
-
-		//- 2d rotate around z-axis positioned (in radians)
-		void rotate2D(const Float angle) noexcept;
-
-		//- Uniform scale about centroid
-		void scale(const Float factor) noexcept;
-
-		//- Uniform scale about point
-		void scale(const Point& p, const Float factor) noexcept;
-
-		//- Translate by vector 'v'
-		void translate(const Vector& v) noexcept;
+		//- Rotate around an axis
+		//	perm = 0 == x-axis
+		//	perm = 1 == y-axis
+		//	perm = 2 == z-axis
+		template<std::size_t permutation>
+		void rotate(const Float angle) noexcept;
 
 
 public:
@@ -108,6 +100,9 @@ public:
 
 		//- Get the camber line
 		std::vector<Point> camberLine() const noexcept(ndebug);
+
+		//- Center on point 'p'
+		void centerOn(const Point& p) noexcept;
 
 		//- Get geometric center
 		Point centroid() const noexcept;
@@ -161,6 +156,21 @@ public:
 		//- Get raw data (raw points)
 		Data points() const noexcept;
 
+		//- Rotate around x-axis (in radians)
+		void rotateX(const Float angle) noexcept;
+
+		//- Rotate around y-axis (in radians)
+		void rotateY(const Float angle) noexcept;
+
+		//- Rotate around z-axis (in radians)
+		void rotateZ(const Float angle) noexcept;
+
+		//- Uniform scale about centroid
+		void scale(const Float factor) noexcept;
+
+		//- Uniform scale about point
+		void scale(const Point& p, const Float factor) noexcept;
+
 		//- Get size
 		Sizetype size() const noexcept;
 
@@ -173,6 +183,9 @@ public:
 
 		//- Get TE point (midpoint between top/bot TE)
 		Point tePoint() const noexcept(ndebug);
+
+		//- Translate by vector 'v'
+		void translate(const Vector& v) noexcept;
 
 		//- Wrap to cylinder
 		void wrap() noexcept;
@@ -190,6 +203,38 @@ public:
 		Constreference operator[](Sizetype pos) const;
 
 };
+
+
+// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
+
+template<std::size_t permutation>
+void Profile::rotate(const Float angle) noexcept
+{
+	static_assert(permutation >= 0 && permutation <= 2);
+
+	static constexpr std::size_t indices[3]
+	{
+		(0 + permutation) % 3,
+		(1 + permutation) % 3,
+		(2 + permutation) % 3
+	};
+
+	Float c {std::cos(angle)};
+	Float s {std::sin(angle)};
+
+	for (auto& [top, bot] : points_)
+	{
+		Float top_1 = top[indices[1]];
+		Float top_2 = top[indices[2]];
+		Float bot_1 = bot[indices[1]];
+		Float bot_2 = bot[indices[2]];
+
+		top[indices[1]] = top_1 * c - top_2 * s;
+		top[indices[2]] = top_1 * s + top_2 * c;
+		bot[indices[1]] = bot_1 * c - bot_2 * s;
+		bot[indices[2]] = bot_1 * s + bot_2 * c;
+	}
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

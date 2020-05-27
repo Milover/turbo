@@ -18,6 +18,7 @@ Description
 #include "RegistryObjectBase.h"
 
 // scalars
+#include "BezierSkewRelativeRadius.h"
 #include "BLFirstCellHeight.h"
 #include "BLGrowthRate.h"
 #include "BLNumberOfLayers.h"
@@ -30,6 +31,7 @@ Description
 #include "DeviationAngle.h"
 #include "DynamicViscosity.h"
 #include "HubRadius.h"
+#include "HubSkewAngle.h"
 #include "IncidenceAngle.h"
 #include "InclinationAngle.h"
 #include "KinematicViscosity.h"
@@ -48,6 +50,7 @@ Description
 #include "Rps.h"
 #include "SectionExtensionFactor.h"
 #include "ShroudRadius.h"
+#include "ShroudSkewAngle.h"
 #include "SmootherIter.h"
 #include "Solidity.h"
 #include "StaggerAngle.h"

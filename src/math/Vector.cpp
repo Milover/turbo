@@ -19,6 +19,8 @@ License
 #include "General.h"
 #include "Utility.h"
 
+#include <iomanip>
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace turbo
@@ -47,6 +49,24 @@ Vector::Iterator Vector::end() noexcept
 Vector::Constiterator Vector::end() const noexcept
 {
 	return data_.end();
+}
+
+
+void Vector::rotateX(const Float angle) noexcept
+{
+	rotate<0>(angle);
+}
+
+
+void Vector::rotateY(const Float angle) noexcept
+{
+	rotate<1>(angle);
+}
+
+
+void Vector::rotateZ(const Float angle) noexcept
+{
+	rotate<2>(angle);
 }
 
 
@@ -227,10 +247,14 @@ std::ostream& operator<<(std::ostream& os, const Vector& v)
 
 Float angleBetween(const Vector& v1, const Vector& v2) noexcept
 {
-	return std::acos
-	(
-		dot(v1, v2) / (mag(v1) * mag(v2))
-	);
+	Float cos {dot(v1, v2) / (mag(v1) * mag(v2))};
+
+	if (isEqual(cos, 1.0))
+		return 0.0;
+	else if (isEqual(cos, -1.0))
+		return pi;
+	else
+		return std::acos(cos);
 }
 
 
@@ -274,6 +298,27 @@ Vector midpoint(const Vector& v1, const Vector& v2) noexcept
 	{
 		(v1 + v2) * 0.5
 	};
+}
+
+
+Vector rotateX(Vector v, const Float angle) noexcept
+{
+	v.rotateX(angle);
+	return v;
+}
+
+
+Vector rotateY(Vector v, const Float angle) noexcept
+{
+	v.rotateY(angle);
+	return v;
+}
+
+
+Vector rotateZ(Vector v, const Float angle) noexcept
+{
+	v.rotateZ(angle);
+	return v;
 }
 
 

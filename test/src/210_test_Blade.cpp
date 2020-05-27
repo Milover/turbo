@@ -12,16 +12,8 @@ Description
 	TODO: some numeric (comparison) tests would be nice,
 		  mostly visuals checks for now
 
-	NOTE: reference:
+	NOTE: Koncar MES VAAZ-C 800 redesign
 
-		  Buchwald, P. & Vogt, D. M. & Grillat, J. & Laufer, W. &
-		  Schmitz, M. B. & Lucius, A. & Schneider, M. (2017).
-		  Aeroacoustic Analysis of Low-Speed Axial Fans with Different
-		  Rotational Speeds in the Design Point.
-		  Journal of Engineering for Gas Turbines and Power,
-		  doi: 10.1115/1.4038122
-
-		  NOTE: required total pressure changed to static pressure
 
 \*---------------------------------------------------------------------------*/
 
@@ -55,33 +47,37 @@ int main(int argc, char* argv[])
 	(
 		HashMap<String>
 		{
-			// machine
+			// general
 			{"Density",						"1.2"},
 			{"DynamicViscosity",			"1.8206e-5"},
-			{"Rps",							"116.666"},
-			{"StaticPressureDifference",	"400"},
-			{"VolumeFlowRate",				"0.222"},
+			{"Rps",							"11.83334"},
+			{"StaticPressureDifference",	"145"},
+			{"VolumeFlowRate",				"4.16667"},
 			{"TurbulenceReferenceLengthScaleRatio",	"0.1"},		// default
 			{"TurbulenceIntensity",			"0.05"},			// default
-			// blade/blade row
-			{"HubRadius",					"0.0375"},
+			// blade
+			{"HubRadius",					"0.075"},
 			{"IncidenceAngle",				"0"},				// default
 			{"NumberOfBlades",				"6"},
 			{"NumberOfStations",			"3"},
-			{"ShroudRadius",				"0.075"},
+			{"ShroudRadius",				"0.3945"},
 			{"TipClearance",				"0"},				// default
-			{"Solidity",					"1.0"},				// default
+			{"Solidity",					"0.6"},				// default
+			{"SkewDistribution",			"BezierTangential"},
+			{"HubSkewAngle",				"0.0"},	// ~15°
+			{"ShroudSkewAngle",				"0.5236"},	// ~30°
+			{"BezierSkewRelativeRadius",	"0.5"},				// default
 			// airfoil
-			{"Distribution",	"Naca4DigitDistribution"},		// default
+			{"Distribution",		"Naca4DigitDistribution"},	// default
 			{"DeviationAngle",				"0"},				// default
 			{"MaxProfileThickness",			"0.1"},
-			{"Camber",				"CircularArcCamber"},		// default
+			{"Camber",					"CircularArcCamber"},	// default
 			{"CamberPointSpacing",			"Cosine"},			// default
 			{"NumberOfCamberPoints",		"150"},				// default
 			// mesh
 			{"ProfileMeshGenerator","ProfileTetMeshGenerator"},	// default
 			//{"MeshSize",					"20000"},			// disabled
-			{"MeshCellSize",				"5e-4"},
+			{"MeshCellSize",				"1e-3"},
 			//{"BLNumberOfLayers",			"5"},				// disabled
 			{"BLGrowthRate",				"1.2"},				// default
 			{"BLTransitionRatio",			"0.75"},			// default
@@ -107,7 +103,6 @@ int main(int argc, char* argv[])
 	for (const auto& airfoil : blade.airfoilsCRef())
 	{
 		airfoil->build();
-		airfoil->profile.wrap();
 
 		// write airfoil data
 		Path filename {"airfoil_" + std::to_string(airfoil->id())};

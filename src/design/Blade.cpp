@@ -19,12 +19,11 @@ License
 #include "InputRegistry.h"
 #include "Loft.h"
 #include "Registry.h"
+#include "SkewDistribution.h"
 #include "Spline.h"
 #include "Surface.h"
 #include "TurboBase.h"
 #include "Variables.h"
-
-#include <gmsh.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -160,33 +159,55 @@ Uptrvector<Airfoil>& Blade::airfoilsRef()
 }
 
 
-void Blade::build()		// FIXME: reimplement, this is wrong
+// FIXME:
+// 		Reimplement:
+// 			implement a math-spline class (B-spline, NURBS, Catmul-Rom...)
+// 			and use instead of geometric splines to generate the interpolated
+// 			profiles, then loft the contours.
+// 		Implement:
+// 			we have to handle cases when airfoils_.size() == 1
+void Blade::build()
 {
 	model_->activate();
 
-	auto numPoints {airfoils_.front()->profile.size()};
+	// create hub/shroud airfoils if airfoils_.size() == 1
+
+	// get profiles
+	std::vector<Profile> profiles;
+	profiles.reserve(airfoils_.size());
+
+	for (auto& a : airfoils_)
+		profiles.emplace_back(a->profile);
+
+	// wrap and apply skew
+	SkewDistribution sd {*data_};
+	for (auto& p : profiles)
+	{
+		sd.skew(p);
+		p.wrap();
+	}
 
 	// make main surface splines
 	Sptrvector<geometry::Curve> topSplines;				// suction
 	Sptrvector<geometry::Curve> botSplines;				// pressure
-	topSplines.reserve(numPoints);
-	botSplines.reserve(numPoints);
+	topSplines.reserve(profiles.front().size());
+	botSplines.reserve(profiles.front().size());
 
 	// for each profile point-pair [top, bot]
-	std::vector<Vector> tmpTop;
-	std::vector<Vector> tmpBot;
-	tmpTop.reserve(airfoils_.size());
-	tmpBot.reserve(airfoils_.size());
+	std::vector<Profile::Point> tmpTop;
+	std::vector<Profile::Point> tmpBot;
+	tmpTop.reserve(profiles.size());
+	tmpBot.reserve(profiles.size());
 
-	for (std::size_t i {0}; i < numPoints; ++i)
+	for (std::size_t i {0}; i < profiles.front().size(); ++i)
 	{
 		tmpTop.clear();
 		tmpBot.clear();
 
-		for (auto& a : airfoils_)
+		for (auto& p : profiles)
 		{
-			tmpTop.emplace_back(a->profile[i].first);
-			tmpBot.emplace_back(a->profile[i].second);
+			tmpTop.emplace_back(p[i].first);
+			tmpBot.emplace_back(p[i].second);
 		}
 
 		topSplines.emplace_back
@@ -199,7 +220,7 @@ void Blade::build()		// FIXME: reimplement, this is wrong
 		);
 	}
 
-	// make top, bot and te
+	// make surfaces
 	Sptr<geometry::Surface> topSurf
 	{
 		new geometry::Surface
