@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
 			{"TipClearance",				"0"},				// default
 			{"Solidity",					"1"},				// default
 			{"SkewDistribution",			"BezierTangential"},
-			{"HubSkewAngle",				"0.0"},	// ~15°
+			{"HubSkewAngle",				"0.0"},				// default
 			{"ShroudSkewAngle",				"0.5236"},	// ~30°
 			{"BezierSkewRelativeRadius",	"0.5"},				// default
 			// airfoil
@@ -76,8 +76,7 @@ int main(int argc, char* argv[])
 			{"NumberOfCamberPoints",		"150"},				// default
 			// mesh
 			{"ProfileMeshGenerator","ProfileTetMeshGenerator"},	// default
-			//{"MeshSize",					"20000"},			// disabled
-			{"MeshCellSize",				"1e-3"},	// NOTE: this has to scale with chord somehow
+			{"RelMeshSize",					"0.01"},			// default
 			//{"BLNumberOfLayers",			"5"},				// disabled
 			{"BLGrowthRate",				"1.2"},				// default
 			{"BLTransitionRatio",			"0.75"},			// default

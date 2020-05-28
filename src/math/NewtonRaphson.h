@@ -7,7 +7,7 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::compute::NewtonRapshon
+	turbo::math::NewtonRapshon
 
 Description
 	Class NewtonRaphson
@@ -17,11 +17,10 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef COMPUTE_NEWTON_RAPHSON_H
-#define COMPUTE_NEWTON_RAPHSON_H
+#ifndef MATH_NEWTON_RAPHSON_H
+#define MATH_NEWTON_RAPHSON_H
 
 #include <cmath>
-#include <iomanip>
 #include <iostream>
 #include <type_traits>
 
@@ -33,11 +32,11 @@ SourceFiles
 
 namespace turbo
 {
-namespace compute
+namespace math
 {
 
 /*---------------------------------------------------------------------------*\
-					Class NewtonRaphson Declaration
+					Class NewtonRaphson Definition
 \*---------------------------------------------------------------------------*/
 
 struct NewtonRaphson
@@ -114,7 +113,7 @@ X NewtonRaphson::operator()
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace compute
+} // End namespace math
 } // End namespace turbo
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

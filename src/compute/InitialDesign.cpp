@@ -270,7 +270,7 @@ Float computeVortexDistributionExponent
 			 * std::log(0.5 * (D - 1.0));
 	};
 
-	auto n (NewtonRaphson {}(0.0, f, dfdn));
+	auto n (math::NewtonRaphson {}(0.0, f, dfdn));
 
 	// limited to [-1, 1]
 	if (n > 1.0)

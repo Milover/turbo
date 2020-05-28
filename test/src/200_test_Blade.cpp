@@ -80,8 +80,7 @@ int main(int argc, char* argv[])
 			{"NumberOfCamberPoints",		"150"},				// default
 			// mesh
 			{"ProfileMeshGenerator","ProfileTetMeshGenerator"},	// default
-			//{"MeshSize",					"20000"},			// disabled
-			{"MeshCellSize",				"5e-4"},
+			{"RelMeshSize",					"0.01"},			// default
 			//{"BLNumberOfLayers",			"5"},				// disabled
 			{"BLGrowthRate",				"1.2"},				// default
 			{"BLTransitionRatio",			"0.75"},			// default

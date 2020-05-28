@@ -8,7 +8,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "MeshSize.h"
+#include "RelMeshSize.h"
 
 #include "General.h"
 
@@ -21,21 +21,21 @@ namespace input
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-MeshSize::MeshSize() noexcept
+RelMeshSize::RelMeshSize() noexcept
 :
-	PVBase {40000}
+	PVBase {0.01}
 {}
 
 
-MeshSize::MeshSize(const Integer i)
+RelMeshSize::RelMeshSize(const Float f)
 :
-	PVBase {i}
+	PVBase {f}
 {}
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-String MeshSize::getName() const
+String RelMeshSize::getName() const
 {
 	return name;
 }

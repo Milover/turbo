@@ -181,13 +181,16 @@ void Airfoil::build()
 }
 
 
-Sptr<mesh::ProfileMesh> Airfoil::mesh() const
+Sptr<mesh::ProfileMesh> Airfoil::mesh(const bool writeMesh) const
 {
 	Sptr<mesh::ProfileMesh> mesh
 	{
-		new mesh::ProfileMesh {*data_, model_}
+		new mesh::ProfileMesh {*data_, model_, cwd_}
 	};
 	mesh->build(profile);
+
+	if (writeMesh)
+		mesh->write();
 
 	return mesh;
 }

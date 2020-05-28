@@ -185,28 +185,7 @@ ProfileTetMeshGenerator::Pointvector ProfileTetMeshGenerator::constructPoints
 ProfileTetMeshGenerator::ProfileTetMeshGenerator(const input::Registry& reg)
 :
 	BaseType {reg}
-{
-//	NOTE: this makes meshing unintuitive and difficult,
-//		  so we're specifying the 'MeshCellSize' directly
-//	// approx. section area
-//	Float area
-//	{
-//		pitch_.value() * (1.0 + 2.0 * extension_.value()) * chord_.value()
-//	};
-//
-//	// approx. avg. cell size
-//	reg.store
-//	(
-//		input::MeshCellSize
-//		{
-//			compute::computeMeshCellSize
-//			(
-//				reg.cref<input::MeshSize>().value(),
-//				area
-//			)
-//		}
-//	);
-}
+{}
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //

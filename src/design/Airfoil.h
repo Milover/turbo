@@ -113,7 +113,7 @@ public:
 		void build();
 
 		//- Build mesh
-		Sptr<mesh::ProfileMesh> mesh() const;
+		Sptr<mesh::ProfileMesh> mesh(const bool writeMesh = false) const;
 
 		//- Run simulation, return the simulation directory
 		Path simulate

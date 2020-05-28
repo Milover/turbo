@@ -19,8 +19,6 @@ License
 #include "General.h"
 #include "Utility.h"
 
-#include <iomanip>
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace turbo

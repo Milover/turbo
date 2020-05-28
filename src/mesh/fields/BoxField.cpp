@@ -37,7 +37,8 @@ BoxField::BoxField(const input::Registry& reg)
 
 	input::MeshCellSize size
 	{
-		reg.cref<input::MeshCellSize>()
+		reg.cref<input::Chord>(),
+		reg.cref<input::RelMeshSize>()
 	};
 
 	auto min	// :)

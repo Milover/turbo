@@ -7,20 +7,19 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::math::BezierCurve
+	turbo::math::Polyline
 
 Description
-	BezierCurve class.
+	Polyline class.
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef MATH_BEZIER_CURVE_H
-#define MATH_BEZIER_CURVE_H
+#ifndef MATH_POLYLINE_H
+#define MATH_POLYLINE_H
 
-#include <array>
 #include <type_traits>
+#include <vector>
 
-#include "BiCoeff.h"
 #include "Error.h"
 #include "General.h"
 #include "MathGeneral.h"
@@ -35,20 +34,17 @@ namespace math
 {
 
 /*---------------------------------------------------------------------------*\
-						Class BezierCurve Definition
+						Class Polyline Definition
 \*---------------------------------------------------------------------------*/
 
-template<Integer n, typename T = Vector>
-class BezierCurve
+template<T = Vector>
+class Polyline
 {
 private:
-
-	static_assert(n > 0);
 
 	// Member functions
 
 		//- Compute value at 't'
-		template<Integer k = 0>
 		constexpr T compute(const Float t) noexcept;
 
 
@@ -58,8 +54,7 @@ public:
 
 	// Public data
 
-		inline static constexpr Integer order {n};
-		const std::array<const T, n + 1> points;
+		std::vector<const T> points;
 
 
 	// Constructors
@@ -73,7 +68,18 @@ public:
 				(std::is_same_v<T, removeCVRef_t<Points>> && ...)
 			>
 		>
-		constexpr BezierCurve(Points&&... ps) noexcept;
+		Polyline(Points&&... ps) noexcept;
+
+		//- Construct from a vector of control points
+		template
+		<
+			typename Points,
+			typename = std::enable_if_t
+			<
+				std::is_same_v<std::vector<T>, removeCVRef_t<Points>>
+			>
+		>
+		Polyline(Points&& ps) noexcept;
 
 
 	// Member operators
@@ -86,46 +92,55 @@ public:
 
 // * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * * * //
 
-template<Integer n, typename T>
-template<Integer k>
-constexpr T BezierCurve<n, T>::compute(const Float t) noexcept
+template<typename T>
+constexpr T Polyline<T>::compute(const Float t) noexcept
 {
-	auto term = [&]() constexpr -> T
+	using Type = decltype(this->points)::size_type;
+
+	auto val
 	{
-		return BiCoeff_v<n, k>
-			 * pow<n - k>(1.0 - t)
-			 * pow<k>(t)
-			 * this->points[k];
+		t * static_cast<Float>(this->points.size())
+	};
+	auto a
+	{
+		static_cast<Type>std::floor(val)
+	};
+	auto b
+	{
+		static_cast<Type>std::ceil(val)
 	};
 
-	if constexpr (k == n)
-		return term();
-	else
-		return this->compute<k + 1>(t) + term();
+	return lerp(points[a], points[b], t);
 }
 
 
 // * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * * * //
 
-template<Integer n, typename T>
+template<typename T>
 template<typename... Points, typename>
-constexpr BezierCurve<n, T>::BezierCurve(Points&&... ps) noexcept
+Polyline<T>::Polyline(Points&&... ps) noexcept
 :
 	points {std::forward<Points>(ps)...}
-{
-	static_assert(sizeof...(ps) == n + 1);
-}
+{}
+
+
+template<typename T>
+template<typename Points, typename>
+Polyline<T>::Polyline(Points&& ps) noexcept
+:
+	points {std::forward<Points>(ps)}
+{}
 
 
 // * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * * * //
 
-template<Integer n, typename T>
-constexpr T BezierCurve<n, T>::operator()(const Float t)
+template<typename T>
+constexpr T Polyline<n>::operator()(const Float t)
 {
 	if (!isInRange(t, 0.0, 1.0))
 		error(FUNC_INFO, "parameter t out of range [0, 1]");
 
-	return this->compute<>(t);
+	return this->compute(t);
 }
 
 

@@ -20,8 +20,10 @@ SourceFiles
 #ifndef INPUT_MESH_CELL_SIZE_H
 #define INPUT_MESH_CELL_SIZE_H
 
+#include "Chord.h"
 #include "General.h"
 #include "PositiveValue.h"
+#include "RelMeshSize.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,6 +52,15 @@ public:
 		//- Construct from a Float,
 		//  no aditional checking required
 		explicit MeshCellSize(const Float f);
+
+		//- Compute and construct
+		//  no aditional checking required
+		MeshCellSize
+		(
+			const Chord& c,
+			const RelMeshSize& g
+
+		);
 
 
 	// Member functions

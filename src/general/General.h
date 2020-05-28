@@ -146,7 +146,6 @@ template<typename T>
 inline constexpr bool isSptr_v = isSptr<T>::value;
 
 
-
 //- Check if a type is a Wptr
 template<typename T, typename Element = void>
 struct isWptr : std::false_type {};
@@ -166,6 +165,28 @@ struct isWptr<T, std::void_t<typename removeCVRef_t<T>::element_type>>
 
 template<typename T>
 inline constexpr bool isWptr_v = isWptr<T>::value;
+
+
+//- Check if a type is iterable (has a begin() and end() member function)
+template<typename T, typename = void>
+struct isIterable : std::false_type {};
+
+template<typename T>
+struct isIterable
+<
+	T,
+	std::void_t
+	<
+		decltype(std::declval<removeCVRef_t<T>>().begin()),
+		decltype(std::declval<removeCVRef_t<T>>().end())
+	>
+>
+:
+	std::true_type
+{};
+
+template<typename T>
+inline constexpr bool isIterable_v = isIterable<T>::value;
 
 
 // * * * * * * * * * * * * * * * * Flags * * * * * * * * * * * * * * * * * * //

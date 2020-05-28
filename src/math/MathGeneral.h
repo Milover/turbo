@@ -55,6 +55,20 @@ inline constexpr T pow(T t [[maybe_unused]])
 }
 
 
+//- Linear interpolate, $a + t \cdot (b - a)$,
+//	will extrapolate if $t \notin [0, 1]$
+template<typename T1, typename T2, typename T3>
+inline constexpr auto lerp
+(
+	const T1 a,
+	const T2 b,
+	const T3 t
+)
+{
+	return a + t * (b - a);
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace math

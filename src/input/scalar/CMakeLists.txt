@@ -27,7 +27,6 @@ set(SRC
 	MaxCamberPosition.cpp
 	MaxProfileThickness.cpp
 	MeshCellSize.cpp
-	MeshSize.cpp
 	MonitoringPlaneOffset.cpp
 	NumberOfBlades.cpp
 	NumberOfCamberPoints.cpp
@@ -35,6 +34,7 @@ set(SRC
 	Pitch.cpp
 	ProfileBumpFactor.cpp
 	Radius.cpp
+	RelMeshSize.cpp
 	Rps.cpp
 	SectionExtensionFactor.cpp
 	ShroudRadius.cpp

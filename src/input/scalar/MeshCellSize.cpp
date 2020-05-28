@@ -10,7 +10,9 @@ License
 
 #include "MeshCellSize.h"
 
+#include "Chord.h"
 #include "General.h"
+#include "RelMeshSize.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -24,6 +26,20 @@ namespace input
 MeshCellSize::MeshCellSize(const Float f)
 :
 	PVBase {f}
+{}
+
+
+MeshCellSize::MeshCellSize
+(
+	const Chord& c,
+	const RelMeshSize& g
+
+)
+:
+	MeshCellSize
+	{
+		c.value() * g.value()
+	}
 {}
 
 

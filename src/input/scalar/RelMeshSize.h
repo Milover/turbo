@@ -7,22 +7,22 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::input::MeshSize
+	turbo::input::RelMeshSize
 
 Description
-	Class MeshSize.
+	Class RelMeshSize.
 
-	Target mesh cell count.
+	Ratio of average mesh cell size to chord.
 
-	Defaults to 40000.
+	Defaults to 0.01.
 
 SourceFiles
-	MeshSize.cpp
+	RelMeshSize.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef INPUT_MESH_SIZE_H
-#define INPUT_MESH_SIZE_H
+#ifndef INPUT_REL_MESH_SIZE_H
+#define INPUT_REL_MESH_SIZE_H
 
 #include "General.h"
 #include "PositiveValue.h"
@@ -35,28 +35,28 @@ namespace input
 {
 
 /*---------------------------------------------------------------------------*\
-					Class MeshSize Declaration
+					Class RelMeshSize Declaration
 \*---------------------------------------------------------------------------*/
 
-class MeshSize final
+class RelMeshSize final
 :
-	public PositiveValue<Integer>
+	public PositiveValue<Float>
 {
 public:
 
 	// Public static data
 
-		inline static const String name {"MeshSize"};
+		inline static const String name {"RelMeshSize"};
 
 
 	// Constructors
 
 		//- Default constructor
-		MeshSize() noexcept;
+		RelMeshSize() noexcept;
 
 		//- Construct from a Integer,
 		//  no aditional checking required
-		explicit MeshSize(const Integer i);
+		explicit RelMeshSize(const Float f);
 
 
 	// Member functions

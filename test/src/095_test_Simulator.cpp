@@ -58,8 +58,7 @@ int main(int argc, char* argv[])
 			{"Solidity",							"1"},		// default
 			// mesh
 			{"ProfileMeshGenerator","ProfileTetMeshGenerator"},	// default
-			//{"MeshSize",							"20000"},	// disabled
-			{"MeshCellSize",						"0.005"},
+			{"RelMeshSize",							"0.01"},	// default
 			//{"BLNumberOfLayers",					"5"},		// disabled
 			{"BLGrowthRate",						"1.2"},		// default
 			{"BLTransitionRatio",					"0.75"},	// default

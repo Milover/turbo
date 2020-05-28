@@ -18,6 +18,7 @@ License
 #include "GmshAddField.h"
 #include "GmshSetBLMesh.h"
 #include "GmshSetOptionNumber.h"
+#include "InputRegistry.h"
 #include "Point.h"
 #include "Registry.h"
 #include "Variables.h"
@@ -53,7 +54,8 @@ BoundaryLayerField::BoundaryLayerField(const input::Registry& reg)
 	};
 	input::MeshCellSize size
 	{
-		reg.cref<input::MeshCellSize>()
+		reg.cref<input::Chord>(),
+		reg.cref<input::RelMeshSize>()
 	};
 	input::BLThickness thickness
 	{
