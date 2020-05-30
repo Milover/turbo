@@ -55,9 +55,7 @@ boundaryField
 
     outlet
     {
-        type            freestreamVelocity;
-		freestreamValue	uniform (0 0 0);
-		value			$internalField;
+        type            zeroGradient;
     }
 
     ".*wall.*"

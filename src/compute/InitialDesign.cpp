@@ -180,7 +180,7 @@ Float computeStaggerAngle
 	const Float i			// incidence angle
 ) noexcept
 {
-	return i + computeFluidAngle(c_1, U) - zeta;
+	return 0.5 * pi - i - computeFluidAngle(c_1, U) - zeta;
 }
 
 

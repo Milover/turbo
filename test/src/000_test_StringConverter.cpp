@@ -27,16 +27,22 @@ using namespace turbo;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void pad(String& s)
+void pad(String& s, bool withCR = true)
 {
+	String padding;
+
+	if (withCR)
+		padding = {" \t\n"};
+	else
+		padding = {" \t"};
+
 	// leading pad
 	if (test::randomBool())
 	{
 		s = test::randomString
 		(
 			static_cast<size_t>(test::randomInt(1, 20)),
-			R"(	 
-			)"
+			padding
 		)
 		  + s;
 	}
@@ -47,8 +53,7 @@ void pad(String& s)
 		s += test::randomString
 		(
 			static_cast<size_t>(test::randomInt(1, 20)),
-			R"(	 
-			)"
+			padding
 		);
 	}
 }
@@ -59,6 +64,25 @@ void good(String& s)
 	(
 		test::randomInt(-10000, 10000)
 	);
+	pad(s);
+}
+
+void goodVector(String& s)
+{
+	s = '(';
+	// add content
+	for (auto i {0}; i < 3; ++i)
+	{
+		s += std::to_string
+		(
+			test::randomInt(-10000, 10000)
+		);
+		s += " ";
+
+		pad(s);
+	}
+	s += ')';
+
 	pad(s);
 }
 
@@ -117,7 +141,7 @@ void testFunction(bool& testPass, int numIter)
 			good(iStr);
 			fStr = iStr;
 			// make sure we have 3 values
-			vStr = iStr + " " + iStr + " " + iStr;
+			goodVector(vStr);
 		}
 		else
 		{

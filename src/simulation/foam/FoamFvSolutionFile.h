@@ -39,6 +39,8 @@ R"delim(FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+#include                "../turbo_values"
+
 solvers
 {
     p
@@ -80,27 +82,36 @@ solvers
 
 potentialFlow
 {
-    nNonOrthogonalCorrectors 30;
+    nNonOrthogonalCorrectors 50;
+
+    PhiRefValue         0;
+    PhiRefPoint         $InletRefPoint;
 }
 
 
 SIMPLE
 {
-    consistent          true;
     residualControl
     {
         p               1e-4;
         U               1e-4;
         "(k|omega)"     1e-4;
     }
+
+    pRefValue           0;
+    pRefPoint           $InletRefPoint;
 }
 
 
 relaxationFactors
 {
+    fields
+    {
+        p               0.25;
+    }
     equations
     {
-        U               0.85;
+        U               0.7;
         "(k|omega)"     0.7;
     }
 }

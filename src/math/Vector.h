@@ -22,6 +22,7 @@ SourceFiles
 
 #include <array>
 #include <cmath>
+#include <istream>
 #include <ostream>
 
 #include "General.h"
@@ -256,6 +257,11 @@ Vector operator/(const Float lhs, Vector rhs) noexcept;
 
 //- Inequality operator
 bool operator!=(const Vector& lhs, const Vector& rhs) noexcept;
+
+
+//- Stream input operator, formatted output '(x, y, z)'
+std::istream& operator>>(std::istream& is, Vector& v);
+
 
 //- Stream output operator, formatted output '(x, y, z)'
 std::ostream& operator<<(std::ostream& os, const Vector& v);

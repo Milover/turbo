@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
 	(
 		HashMap<String>
 		{
-			{"BladeVelocity",			"0.0 1.0 0.0"},
+			{"BladeVelocity",			"(0.0 1.0 0.0)"},
 			{"Chord",					"0.1"},
 			{"Density",					"1.22"},
 			{"NumberOfBlades",			"6"}

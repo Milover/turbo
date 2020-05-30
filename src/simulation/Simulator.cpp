@@ -173,8 +173,32 @@ R"(FoamFile
 }
 
 )";
-	// fuck it, print everything
-	data_->printAll(file, 40);
+	// this is dumb
+	massPrint
+	(
+		file, 40, " ", ";\n",
+		// general
+		data_->cref<input::InletRefPoint>(),
+		data_->cref<input::TranslationPerTop>(),
+		data_->cref<input::TranslationPerBot>(),
+		// main 
+		data_->cref<input::Density>(),
+		data_->cref<input::DynamicViscosity>(),
+		data_->cref<input::KinematicViscosity>(),
+		data_->cref<input::BladeVelocity>(),
+		data_->cref<input::InletRelativeVelocity>(),
+		data_->cref<input::StaticPressureDifference>(),
+		// turbulence
+		data_->cref<input::TurbulenceIntensity>(),
+		data_->cref<input::TurbulenceReferenceLengthScale>(),
+		data_->cref<input::TurbulenceKineticEnergy>(),
+		data_->cref<input::TurbulenceDissipationRate>(),
+		data_->cref<input::TurbulenceSpecificDissipationRate>(),
+		data_->cref<input::TurbulenceViscosity>(),
+		// postprocessing
+		data_->cref<input::TEMonitoringPlane>(),
+		data_->cref<input::TEMonitoringPlane>()
+	);
 
 	file << "\n#inputMode merge\n";
 }

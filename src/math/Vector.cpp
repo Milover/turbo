@@ -11,11 +11,14 @@ License
 #include <array>
 #include <cmath>
 #include <numeric>
+#include <istream>
 #include <ostream>
+#include <sstream>
 #include <utility>
 
 #include "Vector.h"
 
+#include "Error.h"
 #include "General.h"
 #include "Utility.h"
 
@@ -226,6 +229,43 @@ Vector operator/(const Float lhs, Vector rhs) noexcept
 bool operator!=(const Vector& lhs, const Vector& rhs) noexcept
 {
 	return !(lhs == rhs);
+}
+
+
+std::istream& operator>>(std::istream& is, Vector& v)
+{
+	char c {' '};
+	String s {""};
+	std::stringstream ss;
+
+	while (c != '(')
+	{
+		if (!std::iswspace(c))
+			error(FUNC_INFO, "Expected '(' but found '", c, "'");
+
+		is.get(c);
+	}
+
+	c = ' ';
+	while (c != ')')
+	{
+		if (is.eof())
+			error(FUNC_INFO, "Expected ')' but found '", c, "'");
+
+		s += c;
+		is.get(c);
+	}
+	trimWhiteLR(s);
+
+	ss << s;
+	ss >> v.x() >> v.y() >> v.z();
+
+	if (ss.fail())
+		error(FUNC_INFO, "Could not convert '", s, "' to vector");
+	else if (!ss.eof())
+		error(FUNC_INFO, "Partial match on '", s, "'");
+
+	return is;
 }
 
 

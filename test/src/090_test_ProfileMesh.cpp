@@ -56,13 +56,14 @@ int main(int argc, char* argv[])
 			// mesh
 			{"ProfileMeshGenerator",	"ProfileTetMeshGenerator"},	// default
 			{"RelMeshSize",				"0.01"},	// default
+			{"SectionExtensionFactor",	"1.0"},		// default
 			//{"BLNumberOfLayers",		"5"},		// disabled
 			{"BLGrowthRate",			"1.2"},		// default
 			{"BLTransitionRatio",		"0.4"},	// default
 			{"ProfileBumpFactor",		"0.25"},	// default
 			// precomputed values because 'Airfoil' is not present
-			{"InletVelocity",			"16.7502 0.0 0.0"},
-			{"BladeVelocity",			"0.0 315.0 0.0"},
+			{"InletVelocity",			"(16.7502 0 0)"},
+			{"BladeVelocity",			"(0 -50 0)"},
 			{"CamberAngle",				std::to_string(0.15 * M_PI)},
 			{"Chord",					"0.5"},
 			{"Pitch",					"0.4"},

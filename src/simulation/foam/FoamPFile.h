@@ -54,8 +54,7 @@ boundaryField
 
     outlet
     {
-        type            fixedMean;
-        meanValue       $StaticPressureDifference;
+        type            fixedValue;
         value           $internalField;
     }
 

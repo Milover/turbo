@@ -79,6 +79,7 @@ int main(int argc, char* argv[])
 			// mesh
 			{"ProfileMeshGenerator","ProfileTetMeshGenerator"},	// default
 			{"RelMeshSize",					"0.01"},			// default
+			{"SectionExtensionFactor",		"1.0"},				// default
 			//{"BLNumberOfLayers",			"5"},				// disabled
 			{"BLGrowthRate",				"1.2"},				// default
 			{"BLTransitionRatio",			"0.75"},			// default
@@ -86,8 +87,8 @@ int main(int argc, char* argv[])
 			{"YPlus",						"1"},
 			// precomputed values, because 'Blade' is not present
 			{"KinematicViscosity",			"1.5172e-5"},
-			{"InletVelocity",				"16.7502 0 0"},
-			{"RootOutletVelocity",			"16.7502 -24.2523 0"},
+			{"InletVelocity",				"(16.7502 0 0)"},
+			{"RootOutletVelocity",			"(16.7502 -24.2523 0)"},
 			{"VortexDistributionExponent",	"-1.0"},			// default
 			{"TurbulenceKineticEnergy",		"1.0521"}
 		}
@@ -185,6 +186,14 @@ int main(int argc, char* argv[])
 	// reset and test simulation
 	airfoil.build();
 
+debug::echo("inlet metal angle:   \t", angleBetween(airfoil.profile.leDirection(), -Vector::yAxis()));
+debug::echo("inlet relative angle:\t", angleBetween(airfoil.get<input::InletRelativeVelocity>().value(), Vector::yAxis()));
+
+	// data dump
+	std::ofstream ofs {airfoil.cwd() / "data"};
+	airfoil.printAll(ofs, 40);
+	ofs.flush();
+
 	// make a new mesh
 	auto caseDir {airfoil.simulate()};
 
@@ -209,11 +218,6 @@ int main(int argc, char* argv[])
 		output,
 		"Checking case directory"
 	);
-
-	// write out all values from the airfoil registry
-	std::ofstream ofs {airfoil.cwd() / "airfoil_registry"};
-	airfoil.printAll(ofs, 40, " ", ";\n");
-	ofs.flush();
 
 	control.update();
 	control.run();

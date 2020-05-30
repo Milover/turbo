@@ -81,6 +81,7 @@ int main(int argc, char* argv[])
 			// mesh
 			{"ProfileMeshGenerator","ProfileTetMeshGenerator"},	// default
 			{"RelMeshSize",					"0.01"},			// default
+			{"SectionExtensionFactor",		"1.0"},				// default
 			//{"BLNumberOfLayers",			"5"},				// disabled
 			{"BLGrowthRate",				"1.2"},				// default
 			{"BLTransitionRatio",			"0.75"},			// default

@@ -12,6 +12,7 @@ License
 
 #include "Error.h"
 #include "General.h"
+#include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,15 +48,14 @@ Integer StringConverter<Integer>::convert(const String& s)
 
 
 template<>
-Vector StringConverter<Vector>::convert(const String& s)
+Vector StringConverter<Vector>::convert(const String& s [[maybe_unused]])
 {
-	double x, y, z;
+	Vector v;
 
-	this->stream_ >> x >> y >> z;
+	// the vector does all the checking
+	this->stream_ >> v;
 
-	this->check(s);
-
-	return Vector {x, y, z};
+	return v;
 }
 
 

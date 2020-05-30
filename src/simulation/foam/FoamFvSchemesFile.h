@@ -54,6 +54,7 @@ divSchemes
     default         none;
 
     div(phi,U)      Gauss linearUpwind grad(U);
+    div(div(phi,U)) Gauss linear;
 
     div(phi,k)      Gauss upwind;
     div(phi,omega)  Gauss upwind;

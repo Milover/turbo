@@ -59,15 +59,16 @@ int main(int argc, char* argv[])
 			// mesh
 			{"ProfileMeshGenerator","ProfileTetMeshGenerator"},	// default
 			{"RelMeshSize",							"0.01"},	// default
+			{"SectionExtensionFactor",				"1.0"},		// default
 			//{"BLNumberOfLayers",					"5"},		// disabled
 			{"BLGrowthRate",						"1.2"},		// default
 			{"BLTransitionRatio",					"0.75"},	// default
 			{"ProfileBumpFactor",					"0.25"},	// default
 			// precomputed values because 'Blade'/'Airfoil' aren't present
 			{"KinematicViscosity",					"1.5172e-5"},
-			{"InletVelocity",						"16.7502 0 0"},
-			{"BladeVelocity",						"0 315 0"},
-			{"InletRelativeVelocity",				"16.7502 -315 0"},
+			{"InletVelocity",						"(16.7502 0 0)"},
+			{"BladeVelocity",						"(0 -24.2523 0)"},
+			{"InletRelativeVelocity",				"(16.7502 24.2523 0)"},
 			{"CamberAngle",							std::to_string(0.15 * M_PI)},
 			{"Chord",								"0.5"},
 			{"Pitch",								"0.5"},
@@ -78,14 +79,14 @@ int main(int argc, char* argv[])
 			{"TurbulenceDissipationRate",			"200"},
 			{"TurbulenceSpecificDissipationRate",	"300"},
 			{"TurbulenceViscosity",					"400"},
-			{"TranslationPerBot",				    "0 0.5 0"},
-			{"TranslationPerTop",				    "0 -0.5 0"},
-			{"LEMonitoringPlane",				    "0 1 0"},
-			{"TEMonitoringPlane",				    "0 -1 0"}
+			{"InletRefPoint",						"(-0.563228 -0.242321 1)"},
+			{"TranslationPerBot",				    "(0 0.5 0)"},
+			{"TranslationPerTop",				    "(0 -0.5 0)"},
+			{"LEMonitoringPlane",				    "(0  1 0)"},
+			{"TEMonitoringPlane",				    "(0 -1 0)"}
 		}
 	);
-	// A dummy Registry, so things
-	// can read the values from the InputRegistry
+	// load stuff into the registry
 	input::Registry reg {};
 
 	// build profile

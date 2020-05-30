@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
 	(
 		HashMap<String>
 		{
-			{"OutletVelocity", "1.0 0.0 0.0"}
+			{"OutletVelocity", "(1.0 0.0 0.0)"}
 		}
 	);
 

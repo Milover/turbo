@@ -44,6 +44,7 @@ set -e
 
 # reset
 cp -r 0.orig 0
+touch case.foam
 
 # create mesh
 runApplication gmshToFoam ./*msh > log.turbo
@@ -59,10 +60,8 @@ runApplication decomposePar -force -latestTime >> log.turbo
 runParallel renumberMesh -overwrite -latestTime >> log.turbo
 runParallel checkMesh -latestTime -allTopology -allGeometry >> log.turbo
 
-touch case.foam
-
 # initialize
-runParallel potentialFoam >> log.turbo
+runParallel potentialFoam -writep -writePhi -initialiseUBCs >> log.turbo
 
 # run
 runParallel $application >> log.turbo

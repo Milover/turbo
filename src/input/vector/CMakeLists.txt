@@ -8,6 +8,7 @@
 set(SRC
 	BladeVelocity.cpp
 	InletVelocity.cpp
+	InletRefPoint.cpp
 	InletRelativeVelocity.cpp
 	LEMonitoringPlane.cpp
 	OutletVelocity.cpp

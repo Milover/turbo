@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
 	#include "TestInclude.h"
 	#include "TestGmshInclude.h"
 
-	control.set("General.Verbosity", 10);
+	//control.set("General.Verbosity", 10);
 
 	input::InputRegistry::store					// TODO: should mass test this
 	(
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
 			{"IncidenceAngle",				"0"},				// default
 			{"NumberOfBlades",				"7"},
 			{"NumberOfStations",			"3"},
-			{"ShroudRadius",				"0.3945"},
+			{"ShroudRadius",				"0.3975"},
 			{"TipClearance",				"0"},				// default
 			{"Solidity",					"1"},				// default
 			{"SkewDistribution",			"BezierTangential"},
@@ -71,17 +71,19 @@ int main(int argc, char* argv[])
 			{"Distribution",		"Naca4DigitDistribution"},	// default
 			{"DeviationAngle",				"0"},				// default
 			{"MaxProfileThickness",			"0.1"},
+			{"MonitoringPlaneOffset",		"0.05"},			// default
 			{"Camber",					"CircularArcCamber"},	// default
 			{"CamberPointSpacing",			"Cosine"},			// default
 			{"NumberOfCamberPoints",		"150"},				// default
 			// mesh
 			{"ProfileMeshGenerator","ProfileTetMeshGenerator"},	// default
 			{"RelMeshSize",					"0.01"},			// default
+			{"SectionExtensionFactor",		"1.0"},				// default
 			//{"BLNumberOfLayers",			"5"},				// disabled
 			{"BLGrowthRate",				"1.2"},				// default
 			{"BLTransitionRatio",			"0.75"},			// default
 			{"ProfileBumpFactor",			"0.25"},			// default
-			{"YPlus",						"1"}				// default
+			{"YPlus",						"1"}
 		}
 	);
 
@@ -98,11 +100,10 @@ int main(int argc, char* argv[])
 
 	Path filename {"data"};
 
-	Sptrvector<mesh::ProfileMesh> msh;
 	for (const auto& airfoil : blade.airfoilsCRef())
 	{
 		airfoil->build();
-		msh.emplace_back(airfoil->mesh());
+		airfoil->simulate();
 
 		// write airfoil data
 		std::ofstream ofs {airfoil->cwd() / filename};

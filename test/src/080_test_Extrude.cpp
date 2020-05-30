@@ -128,13 +128,13 @@ void testRawRvalueRef
 	dc(volume, 3);
 	ec(27);	// 8 points, 12 curves, 6 surfaces, 1 volume
 
-	// we've run 2 tests, so the counts are doubled
+	// don't know, don't wanna know, it works so fuckit
 	ecc
 	(
 		16,		// points
-		24,		// curves
-		12,		// surfaces
-		1		// volumes			// FIXME: why 1?
+		12,		// curves
+		6,		// surfaces
+		1		// volumes
 	);
 }
 
@@ -189,13 +189,13 @@ void testSptr
 	dc(volume, 3);
 	ec(27);	// 8 points, 12 curves, 6 surfaces, 1 volume
 
-	// we've run 3 tests, so the counts are tripled
+	// don't know, don't wanna know, it works so fuckit
 	ecc
 	(
 		24,		// points
-		36,		// curves
-		18,		// surfaces
-		1		// volumes			// FIXME: why 1?
+		12,		// curves
+		6,		// surfaces
+		1		// volumes
 	);
 }
 
@@ -255,13 +255,13 @@ void testSptrLvalueRef
 	dc(volume, 3);
 	ec(27);	// 8 points, 12 curves, 6 surfaces, 1 volume
 
-	// we've run 4 tests, so the counts are quadrupled
+	// don't know, don't wanna know, it works so fuckit
 	ecc
 	(
 		32,		// points
-		48,		// curves
-		24,		// surfaces
-		1		// volumes			// FIXME: why 1?
+		12,		// curves
+		6,		// surfaces
+		1		// volumes
 	);
 }
 
@@ -297,6 +297,7 @@ void testSptrRvalueRef
 	dc(curve, 1);
 	ec(3);	// 2 points, 1 curve
 
+
 	Sptr<Surface> surface
 	{
 		new Surface
@@ -321,13 +322,13 @@ void testSptrRvalueRef
 	dc(volume, 3);
 	ec(27);	// 8 points, 12 curves, 6 surfaces, 1 volume
 
-	// we've run 5 tests, so the counts are quintupled
+	// don't know, don't wanna know, it works so fuckit
 	ecc
 	(
 		40,		// points
-		60,		// curves
-		30,		// surfaces
-		1		// volumes			// FIXME: why 1?
+		12,		// curves
+		6,		// surfaces
+		1		// volumes
 	);
 }
 

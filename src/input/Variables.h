@@ -70,6 +70,7 @@ Description
 // vectors
 #include "BladeVelocity.h"
 #include "InletVelocity.h"
+#include "InletRefPoint.h"
 #include "InletRelativeVelocity.h"
 #include "LEMonitoringPlane.h"
 #include "OutletVelocity.h"

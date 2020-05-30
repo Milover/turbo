@@ -222,6 +222,13 @@ Path Airfoil::simulate(Sptr<mesh::ProfileMesh> mesh)
 		input::TranslationPerTop
 		{
 			data_->cref<input::Pitch>()
+		},
+		input::InletRefPoint
+		{
+			data_->cref<input::Chord>(),
+			data_->cref<input::RelMeshSize>(),
+			data_->cref<input::SectionExtensionFactor>(),
+			profile.lePoint()
 		}
 	);
 
