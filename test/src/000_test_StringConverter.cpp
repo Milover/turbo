@@ -9,6 +9,8 @@ License
 Description
 	Testing StringConverter class basic funtionality.
 
+	NOTE: we should add tests for 'List' at some point
+
 \*---------------------------------------------------------------------------*/
 
 #include <cassert>

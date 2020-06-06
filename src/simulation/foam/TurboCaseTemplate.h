@@ -20,16 +20,20 @@ Description
 #include "FoamCreatePatchDictFile.h"
 #include "FoamDecomposeParDictFile.h"
 #include "FoamEpsilonFile.h"
+#include "FoamForcesFile.h"
 #include "FoamFvSchemesFile.h"
 #include "FoamFvSolutionFile.h"
 #include "FoamKFile.h"
 #include "FoamNutFile.h"
 #include "FoamOmegaFile.h"
+#include "FoamPatchSurfaceFieldValueFile.h"
 #include "FoamPFile.h"
+#include "FoamSampledSurfaceFieldValueFile.h"
 #include "FoamSetSetbatchFile.h"
 #include "FoamTransportPropertiesFile.h"
 #include "FoamTurbulencePropertiesFile.h"
 #include "FoamUFile.h"
+#include "FoamYPlusFile.h"
 #include "General.h"
 #include "TurboRunFile.h"
 
@@ -48,13 +52,14 @@ namespace detail
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-inline static const std::array<detail::ps, 19> turboCaseTemplateArray
+inline static const std::array<detail::ps, 24> turboCaseTemplateArray
 {
 	detail::ps {turboCaseTemplatePath,			""},
 	detail::ps {foam0origPath,					""},
 	detail::ps {foamConstantPath,				""},
 	detail::ps {foamSystemPath,					""},
 	detail::ps {turboRunPath,					turboRunFile},
+	detail::ps {turboPostPath,					""},
 
 	detail::ps {foamEpsilonPath,				foamEpsilonFile},
 	detail::ps {foamKPath,						foamKFile},
@@ -71,7 +76,12 @@ inline static const std::array<detail::ps, 19> turboCaseTemplateArray
 	detail::ps {foamDecomposeParDictPath,		foamDecomposeParDictFile},
 	detail::ps {foamfvSchemesPath,				foamFvSchemesFile},
 	detail::ps {foamFvSolutionPath,				foamFvSolutionFile},
-	detail::ps {foamSetSetbatchPath,			foamSetSetbatchFile}
+	detail::ps {foamSetSetbatchPath,			foamSetSetbatchFile},
+
+	detail::ps {foamForcesFilePath,					foamForcesFile},
+	detail::ps {foamPatchSurfaceFieldValuePath,		foamPatchSurfaceFieldValueFile},
+	detail::ps {foamSampledSurfaceFieldValuePath,	foamSampledSurfaceFieldValueFile},
+	detail::ps {foamYPlusPath,						foamYPlusFile}
 };
 
 

@@ -12,6 +12,7 @@ License
 
 #include "Error.h"
 #include "General.h"
+#include "List.h"
 #include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -44,18 +45,6 @@ Integer StringConverter<Integer>::convert(const String& s)
 	this->check(s);
 
 	return i;
-}
-
-
-template<>
-Vector StringConverter<Vector>::convert(const String& s [[maybe_unused]])
-{
-	Vector v;
-
-	// the vector does all the checking
-	this->stream_ >> v;
-
-	return v;
 }
 
 

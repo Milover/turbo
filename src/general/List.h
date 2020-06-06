@@ -12,14 +12,18 @@ Class
 Description
 	List class.
 
+	NOTE: input parsing provisionally tested, godspeed
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef LIST_H
 #define LIST_H
 
+#include <algorithm>
 #include <type_traits>
 #include <istream>
 #include <ostream>
+#include <sstream>
 
 #include "Error.h"
 #include "General.h"
@@ -30,6 +34,33 @@ Description
 namespace turbo
 {
 
+// Forward declarations
+template<typename T>
+class List;
+
+// * * * * * * * * * * * * * * * Type Traits * * * * * * * * * * * * * * * * //
+
+//- Check if a type is a List
+template<typename T, typename Value = void>
+struct isList : std::false_type {};
+
+template<typename T>
+struct isList<T, std::void_t<typename removeCVRef_t<T>::value_type>>
+:
+	std::bool_constant
+	<
+		std::is_same_v
+		<
+			List<typename removeCVRef_t<T>::value_type>,
+			removeCVRef_t<T>
+		>
+	>
+{};
+
+template<typename T>
+inline constexpr bool isList_v = isList<T>::value;
+
+
 /*---------------------------------------------------------------------------*\
 						Class List Definition
 \*---------------------------------------------------------------------------*/
@@ -37,13 +68,16 @@ namespace turbo
 template<typename T>
 class List
 {
-private:
+public:
 
-	using Type = std::vector<T>;
+	using type = std::vector<T>;
+	using value_type = T;
+
+private:
 
 	// Private data
 
-		Type data_;
+		type data_;
 
 public:
 
@@ -61,15 +95,16 @@ public:
 				(std::is_same_v<T, removeCVRef_t<U>> && ...)
 			>
 		>
-		List(U&&... u) noexcept;
+		List(U&&... u);
 
 		//- Construct from data
+		//	NOTE: could also just request something iterable
 		template
 		<
 			typename U,
-			typename = std::enable_if_t<std::is_same_v<Type, removeCVRef_t<U>>>
+			typename = std::enable_if_t<std::is_same_v<type, removeCVRef_t<U>>>
 		>
-		List(Type&& data) noexcept;
+		List(U&& u);
 
 		//- Copy constructor
 		List(const List&) = default;
@@ -84,11 +119,34 @@ public:
 
 	// Member functions
 
-		//- Get data
-		const Type& dataCRef() const noexcept;
+		//- Append data
+		template<typename... U>
+		void append(U&&... u);
+
+		//- Append data
+		//	NOTE: could also just request something iterable
+		template
+		<
+			typename U,
+			typename = std::enable_if_t
+			<
+				std::is_same_v<type, removeCVRef_t<U>>
+			 || std::is_same_v<List<T>, removeCVRef_t<U>>
+			>
+		>
+		void append(U&& u);
+
+		//- Clear
+		void clear() noexcept;
+
+		//- Check if empty
+		[[nodiscard]] bool empty() const noexcept;
 
 		//- Get data
-		Type& dataRef() noexcept;
+		const type& get() const noexcept;
+
+		//- Get data
+		type& get() noexcept;
 
 
 	// Member operators
@@ -99,20 +157,206 @@ public:
 		//- Move assignment operator
 		List& operator=(List&&) = default;
 
+		//- Equality operator
+		bool operator==(const List& l) const noexcept;
+
 };
 
+// * * * * * * * * * * * * * * Global Operators  * * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
+//- stream output operator
+template
+<
+	typename T,
+	typename = std::enable_if_t<std::is_default_constructible_v<T>>
+>
+std::istream& operator>>(std::istream& is, List<T>& l)
+{
+	// NOTE: we should implement this at some point
+	static_assert(!std::is_same_v<String, T>);
 
+	char c = is.get();
+
+	// eat whitespace while looking for a '('
+	while (c != '(')
+	{
+		if (!std::iswspace(c))
+			error(FUNC_INFO, "expected '(' but found '", c, "'");
+		else if (is.eof())
+			error(FUNC_INFO, "could not find '(' before eof");
+		else if (is.fail())
+			error(FUNC_INFO, "input error");
+
+		is.get(c);
+	}
+
+	while (is.peek() != ')')
+	{
+		if (is.eof())
+			error(FUNC_INFO, "could not find ')' before eof");
+		else if (is.fail())
+			error(FUNC_INFO, "input error");
+
+		// strings are (will be) read differently
+		if constexpr (std::is_same_v<String, T>)
+		{
+			error(FUNC_INFO, "string parsing not implemented");
+		}
+		else
+		{
+			T t;
+			is >> t;
+
+			if (!is)
+				error(FUNC_INFO, "input error");
+
+			l.append(std::move(t));
+		}
+	}
+	// extract the ')'
+	c = is.get();
+
+	return is;
+}
+
+
+//- stream input operator
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const List<T>& l)
+{
+	// so we don't mess up any formatting
+	std::stringstream ss;
+
+	ss << "(";
+	for (auto& item : l.get())
+	{
+		ss << item;
+
+		if (&item != &l.get().back())
+			ss << " ";
+	}
+	ss << ")";
+
+	os << ss.str();
+
+	return os;
+}
 
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
+template<typename T>
+template<typename... U, typename>
+List<T>::List(U&&... u)
+{
+	this->append(std::forward<U>(u)...);
+}
+
+
+template<typename T>
+template<typename U, typename>
+List<T>::List(U&& u)
+:
+	data_ {std::forward<U>(u)}
+{}
+
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
+template<typename T>
+template<typename... U>
+void List<T>::append(U&&... u)
+{
+	// no need to reserve for single input
+	if constexpr (sizeof...(u) > 1)
+	{
+		this->data_.reserve(sizeof...(u) + this->data_.size());
+	}
+
+	(this->data_.emplace_back(std::forward<U>(u)), ...);
+}
+
+
+template<typename T>
+template<typename U, typename>
+void List<T>::append(U&& u)
+{
+	if constexpr (std::is_same_v<List<T>, removeCVRef_t<U>>)
+	{
+		this->data_.insert
+		(
+			this->data_.end(),
+			u.data_.begin(),
+			u.data_.end()
+		);
+	}
+	else
+	{
+		this->data_.insert
+		(
+			this->data_.end(),
+			u.begin(),
+			u.end()
+		);
+	}
+}
+
+
+template<typename T>
+void List<T>::clear() noexcept
+{
+	this->data_.clear();
+}
+
+
+template<typename T>
+bool List<T>::empty() const noexcept
+{
+	return this->data_.empty();
+}
+
+
+
+template<typename T>
+const typename List<T>::type& List<T>::get() const noexcept
+{
+	return this->data_;
+}
+
+
+template<typename T>
+typename List<T>::type& List<T>::get() noexcept
+{
+	return this->data_;
+}
+
 
 // * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
+
+template<typename T>
+bool List<T>::operator==(const List<T>& l) const noexcept
+{
+	if constexpr (std::is_floating_point_v<T>)
+	{
+		return std::equal
+		(
+			this->data_.begin(),
+			this->data_.end(),
+			l.data_.begin(),
+			[](const auto& t1, const auto& t2) -> bool
+			{
+				return isEqual(t1, t2);
+			}
+		);
+	}
+	else
+		return std::equal
+		(
+			this->data_.begin(),
+			this->data_.end(),
+			l.data_.begin()
+		);
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

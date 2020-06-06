@@ -31,6 +31,29 @@ namespace compute
 
 // * * * * * * * * * * * * * * Functions * * * * * * * * * * * * * * * * * * //
 
+//- Compute the max (rel) profile thickness such that
+//	the requested max abs. blade thickness is satisfied
+//	NOTE: we assume a symmetric thickness distribution
+[[deprecated("we're not using this anymore")]]
+Float computeBladeThicknessForcedMaxProfileThickness
+(
+	const Float c,			// chord
+	const Float r,			// (profile section) radius
+	const Float t_abs		// max abs. blade thickness
+) noexcept;
+
+
+//- Compute the chord for a given axial chord and stagger angle,
+//	returns min[chord, chord_lim]
+[[deprecated("we're not using this anymore")]]
+Float computeAxialLimitedChord
+(
+	const Float c,			// chord
+	const Float b,			// axial chord (passage width)
+	const Float xi			// stagger angle
+) noexcept;
+
+
 //- Compute blade velocity
 Vector computeBladeVelocity
 (
@@ -93,17 +116,6 @@ Float computePitch
 ) noexcept;
 
 
-//- Compute the velocity at the root of the blade.
-Vector computeRootOutletVelocity
-(
-	const Vector& c_1,		// abs. fluid inlet velocity
-	const Float dp,			// static pressure difference
-	const Float N,			// rev. per second
-	const Float r_h,		// hub radius
-	const Float rho			// density
-) noexcept;
-
-
 //- Compute blade span
 Float computeSpan
 (
@@ -140,6 +152,33 @@ Float computeStaticPressureDifference
 	const Vector& c_1,		// abs. fluid inlet velocity
 	const Vector& c_2,		// abs. fluid outlet velocity
 	const Vector& U,		// blade velocity
+	const Float eta,		// aerodynamic efficiency
+	const Float rho			// density
+) noexcept;
+
+
+//- Compute the swirl constant at hub such that the pressure rise is maximal
+Vector computeRootOutletVelocity
+(
+	const Vector& c_1,		// abs. fluid inlet velocity
+	const Float eta,		// aerodynamic efficiency
+	const Float N,			// rev. per second
+	const Float r_h			// hub radius
+) noexcept;
+
+
+//- Compute the swirl constant at hub,
+//	simply computes the swirl for the maximum pressure difference possible
+[[deprecated("not using this anymore")]]
+Vector computeRootOutletVelocity_depr
+(
+	const Vector& c_1,		// abs. fluid inlet velocity
+	const Float dp,			// (requested total) static pressure difference
+	const Float eta,		// aerodynamic efficiency
+	const Float N,			// rev. per second
+	const Float n,			// vortex distribution coefficient
+	const Float r_h,		// hub radius
+	const Float r_s,		// shroud radius
 	const Float rho			// density
 ) noexcept;
 
@@ -150,6 +189,7 @@ Float computeVortexDistributionExponent
 (
 	const Vector& c_2_h,	// abs. root (hub) fluid outlet velocity
 	const Float dp,			// (requested total) static pressure difference
+	const Float eta,		// hydraulic efficiency
 	const Float N,			// rev. per second
 	const Float r_h,		// hub radius
 	const Float r_s,		// shroud radius

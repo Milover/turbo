@@ -33,7 +33,102 @@ namespace turbo
 namespace design
 {
 
+// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
+
+void Profile::constrain(const input::Registry& reg)
+{
+	if (reg.has<input::MaxPassageWidth>())
+		constrainPassageWidth
+		(
+			reg.cref<input::MaxPassageWidth>().value()
+		);
+
+	// constrain local max abs. blade thickness
+	if (reg.has<input::MaxAbsBladeThickness>())
+		constrainMaxThickness
+		(
+			reg.cref<input::MaxAbsBladeThickness>().value()
+		);
+}
+
+
+void Profile::constrainMaxThickness(const Float maxAbsBladeThickness) noexcept
+{
+	// we have to find the thickness after wrapping
+	Float tMax {0.0};
+	Float aMax {0.0};
+
+	// FIXME: this can probably be better
+	for (auto& [top, bot] : points_)
+	{
+		Float tTmp
+		{
+			std::hypot
+			(
+				top.x() - bot.x(),
+				radius_
+			  * (std::sin(top.y() / radius_) - std::sin(bot.y() / radius_))
+			)
+		};
+
+		if (!isLessOrEqual(tTmp, tMax))
+		{
+			tMax = tTmp;
+			aMax = 0.5 * mag(top - bot);
+		}
+	}
+
+	if
+	(
+		isGreaterOrEqual(tMax, maxAbsBladeThickness)
+	)
+		inflate
+		(
+			radius_ * std::asin(0.5 * maxAbsBladeThickness / radius_) / aMax
+		);
+}
+
+
+void Profile::constrainPassageWidth(const Float maxPassageWidth) noexcept
+{
+	Float pw {passageWidth()};
+	if
+	(
+		isGreaterOrEqual(pw, maxPassageWidth)
+	)
+		scale(maxPassageWidth / pw);
+}
+
+
+void Profile::recompute(const input::Registry& reg)
+{
+	reg.store
+	(
+		input::Chord {chord()}
+	);
+	reg.store
+	(
+		input::Solidity
+		{
+			reg.cref<input::Chord>(),
+			reg.cref<input::Pitch>()
+		}
+	);
+}
+
+
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+Float Profile::axialChord() const noexcept(ndebug)
+{
+	if (empty())
+		error(FUNC_INFO, "profile not built");
+
+	Vector chord {tePoint() - lePoint()};
+
+	return mag(chord) * std::sin(angleBetween(chord, Vector::yAxis()));
+}
+
 
 Profile::Reference Profile::back()
 {
@@ -84,7 +179,10 @@ void Profile::build
 	(
 		Point {0.0, 0.0, radius_}
 	);
-	rotateZ(stagger.value());
+	rotateZ(0.5 * pi - stagger.value());
+
+	constrain(reg);
+	recompute(reg);
 }
 
 
@@ -125,6 +223,15 @@ void Profile::centerOn(const Point& p) noexcept
 	(
 		Vector {p - centroid()}
 	);
+}
+
+
+Float Profile::chord() const noexcept(ndebug)
+{
+	if (empty())
+		error(FUNC_INFO, "profile not built");
+
+	return mag(tePoint() - lePoint());
 }
 
 
@@ -242,6 +349,30 @@ geometry::Line Profile::getTrailingEdge() const noexcept(ndebug)
 }
 
 
+void Profile::inflate(const Float factor) noexcept(ndebug)
+{
+	if (empty())
+		error(FUNC_INFO, "profile not built");
+
+	Point mid;
+	Point topTmp;
+	Point botTmp;
+
+	for (auto& [top, bot] : points_)
+	{
+		mid = midpoint(top, bot);
+
+		topTmp = mid + factor * (top - mid);
+		botTmp = mid + factor * (bot - mid);
+
+		top.x() = topTmp.x();
+		top.y() = topTmp.y();
+		bot.x() = botTmp.x();
+		bot.y() = botTmp.y();
+	}
+}
+
+
 Vector Profile::leDirection() const noexcept(ndebug)
 {
 	if (empty())
@@ -274,6 +405,25 @@ Profile::Point Profile::lePoint() const noexcept(ndebug)
 }
 
 
+Float Profile::maxThickness() const noexcept(ndebug)
+{
+	if (empty())
+		error(FUNC_INFO, "profile not built");
+
+	Float thickness {0.0};
+	for (const auto& [top, bot] : points_)
+	{
+		thickness = std::max
+		(
+			thickness,
+			mag(top - bot)
+		);
+	}
+
+	return thickness;
+}
+
+
 std::vector<Profile::Point> Profile::orderedPoints() const noexcept
 {
 	// we have to map from a pair list --- top - bot
@@ -295,9 +445,39 @@ std::vector<Profile::Point> Profile::orderedPoints() const noexcept
 }
 
 
+Float Profile::passageWidth() const noexcept(ndebug)
+{
+	if (empty())
+		error(FUNC_INFO, "profile not built");
+
+	Float xMin {0.0};
+	Float xMax {0.0};
+	for (const auto& [top, bot] : points_)
+	{
+		// we know the extrema will be on the top side because
+		// the camber is positive (concave camber line)
+		if (!isGreaterOrEqual(top.x(), xMin))
+			xMin = top.x();
+		// NOTE:
+		// 		this is probably overkill since the TE is probably the
+		// 		farthers point, but fuck it, we'll check anyways
+		if (!isLessOrEqual(top.x(), xMin))
+			xMax = top.x();
+	}
+
+	return xMax - xMin;
+}
+
+
 Profile::Data Profile::points() const noexcept
 {
 	return points_;
+}
+
+
+Float Profile::radius() const noexcept
+{
+	return radius_;
 }
 
 

@@ -47,14 +47,6 @@ void Blade::construct()
 		data_->cref<input::HubRadius>(),
 		data_->cref<input::ShroudRadius>()
 	};
-	input::RootOutletVelocity c_2_h
-	{
-		c_1,
-		data_->cref<input::StaticPressureDifference>(),
-		data_->cref<input::Rps>(),
-		data_->cref<input::HubRadius>(),
-		data_->cref<input::Density>()
-	};
 	input::TurbulenceKineticEnergy k
 	{
 		c_1,
@@ -64,21 +56,37 @@ void Blade::construct()
 	(
 		*data_,
 		std::move(c_1),
-		std::move(c_2_h),
 		std::move(k),
 		std::move(nu)
 	);
-	// we allow this to be user defined
+
+	// we allow this to be user input
 	if
 	(
-		!input::InputRegistry::has(input::VortexDistributionExponent::name)
+		!data_->storeFromInput<input::RootOutletVelocity>()
+	)
+		data_->store
+		(
+			input::RootOutletVelocity
+			{
+				c_1,
+				data_->cref<input::AerodynamicEfficiency>(),
+				data_->cref<input::Rps>(),
+				data_->cref<input::HubRadius>()
+			}
+		);
+	// we allow this to be user input
+	if
+	(
+		!data_->storeFromInput<input::VortexDistributionExponent>()
 	)
 		data_->store
 		(
 			input::VortexDistributionExponent
 			{
-				c_2_h,
+				data_->cref<input::RootOutletVelocity>(),
 				data_->cref<input::StaticPressureDifference>(),
+				data_->cref<input::AerodynamicEfficiency>(),
 				data_->cref<input::Rps>(),
 				data_->cref<input::HubRadius>(),
 				data_->cref<input::ShroudRadius>(),
@@ -109,7 +117,7 @@ void Blade::construct()
 			{
 				radius,
 				*data_,
-				input::DeviationAngle {},
+				input::DeviationAngle {},	// we're probably never using this
 				cwd_,
 				station
 			}
@@ -166,6 +174,13 @@ Uptrvector<Airfoil>& Blade::airfoilsRef()
 // 			profiles, then loft the contours.
 // 		Implement:
 // 			we have to handle cases when airfoils_.size() == 1
+// 		Issue:
+// 			using splines to interpolate intermediate profiles causes issues
+// 			wherein the requested passage width is not satisfied because
+// 			the spline bends outward on parts of the span with uniform
+// 			passage width. In general there seem to be transition issues
+// 			when enough stations are requested and the blade is of uniform
+// 			width, so we should think about how this cam be fixed.
 void Blade::build()
 {
 	model_->activate();

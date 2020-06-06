@@ -8,15 +8,9 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "StaticPressureDifference.h"
+#include "MaxAbsBladeThickness.h"
 
-#include "AerodynamicEfficiency.h"
-#include "BladeVelocity.h"
-#include "Density.h"
 #include "General.h"
-#include "InitialDesign.h"
-#include "InletVelocity.h"
-#include "OutletVelocity.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -27,38 +21,15 @@ namespace input
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-StaticPressureDifference::StaticPressureDifference(const Float f)
+MaxAbsBladeThickness::MaxAbsBladeThickness(const Float f)
 :
 	PVBase {f}
 {}
 
 
-StaticPressureDifference::StaticPressureDifference
-(
-	const InletVelocity& c_1,
-	const OutletVelocity& c_2,
-	const BladeVelocity& U,
-	const AerodynamicEfficiency& eta,
-	const Density& rho
-)
-:
-	StaticPressureDifference
-	{
-		compute::computeStaticPressureDifference
-		(
-			c_1.value(),
-			c_2.value(),
-			U.value(),
-			eta.value(),
-			rho.value()
-		)
-	}
-{}
-
-
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-String StaticPressureDifference::getName() const
+String MaxAbsBladeThickness::getName() const
 {
 	return name;
 }

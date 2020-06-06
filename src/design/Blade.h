@@ -108,6 +108,7 @@ public:
 		void build();
 
 		//- Get blade geometry
+		//	FIXME: see .cpp file
 		Sptr<geometry::Volume> geometry() const noexcept;
 
 };

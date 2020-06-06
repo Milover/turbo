@@ -4,8 +4,9 @@
 
 # add sources
 set(SRC
-	ConstantDistribution.cpp
-	Naca4DigitDistribution.cpp
+	ConstantThickness.cpp
+	ThicknessGeneratorBase.cpp
+	Naca4DigitThickness.cpp
 	)
 
 # append to sources

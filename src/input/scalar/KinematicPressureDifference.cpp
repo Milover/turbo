@@ -8,15 +8,11 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "StaticPressureDifference.h"
+#include "KinematicPressureDifference.h"
 
-#include "AerodynamicEfficiency.h"
-#include "BladeVelocity.h"
 #include "Density.h"
 #include "General.h"
-#include "InitialDesign.h"
-#include "InletVelocity.h"
-#include "OutletVelocity.h"
+#include "StaticPressureDifference.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -27,38 +23,28 @@ namespace input
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-StaticPressureDifference::StaticPressureDifference(const Float f)
+KinematicPressureDifference::KinematicPressureDifference(const Float f)
 :
 	PVBase {f}
 {}
 
 
-StaticPressureDifference::StaticPressureDifference
+KinematicPressureDifference::KinematicPressureDifference
 (
-	const InletVelocity& c_1,
-	const OutletVelocity& c_2,
-	const BladeVelocity& U,
-	const AerodynamicEfficiency& eta,
+	const StaticPressureDifference& dp,
 	const Density& rho
 )
 :
-	StaticPressureDifference
+	KinematicPressureDifference
 	{
-		compute::computeStaticPressureDifference
-		(
-			c_1.value(),
-			c_2.value(),
-			U.value(),
-			eta.value(),
-			rho.value()
-		)
+		dp.value() / rho.value()
 	}
 {}
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-String StaticPressureDifference::getName() const
+String KinematicPressureDifference::getName() const
 {
 	return name;
 }

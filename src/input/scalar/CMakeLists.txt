@@ -6,6 +6,7 @@
 
 # add sources
 set(SRC
+	AerodynamicEfficiency.cpp
 	BezierSkewRelativeRadius.cpp
 	BLFirstCellHeight.cpp
 	BLGrowthRate.cpp
@@ -23,8 +24,11 @@ set(SRC
 	IncidenceAngle.cpp
 	InclinationAngle.cpp
 	KinematicViscosity.cpp
+	KinematicPressureDifference.cpp
+	MaxAbsBladeThickness.cpp
 	MaxCamber.cpp
 	MaxCamberPosition.cpp
+	MaxPassageWidth.cpp
 	MaxProfileThickness.cpp
 	MeshCellSize.cpp
 	MonitoringPlaneOffset.cpp
@@ -35,6 +39,7 @@ set(SRC
 	ProfileBumpFactor.cpp
 	Radius.cpp
 	RelMeshSize.cpp
+	RelRadius.cpp
 	Rps.cpp
 	SectionExtensionFactor.cpp
 	ShroudRadius.cpp

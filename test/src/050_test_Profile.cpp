@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
 		HashMap<String>
 		{
 			{"CamberPointSpacing",		"Cosine"},
-			{"Distribution",			"Naca4DigitDistribution"},
+			{"Thickness",				"Naca4DigitThickness"},
 			{"Camber",					"CircularArcCamber"},
 			{"NumberOfCamberPoints",	"250"},
 			{"MaxProfileThickness",		"0.1"},

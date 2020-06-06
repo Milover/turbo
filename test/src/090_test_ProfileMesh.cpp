@@ -48,18 +48,18 @@ int main(int argc, char* argv[])
 			{"Density",					"1.2"},
 			// profile
 			{"CamberPointSpacing",		"Cosine"},	// default
-			{"Distribution",			"Naca4DigitDistribution"},	// default
-			{"Camber",					"CircularArcCamber"},		// default
+			{"Thickness",	"Naca4DigitThickness"},	// default
+			{"Camber",		"CircularArcCamber"},	// default
 			{"NumberOfCamberPoints",	"150"},		// default
 			{"MaxProfileThickness",		"0.1"},
 			{"Solidity",				"1.0"},		// default
 			// mesh
-			{"ProfileMeshGenerator",	"ProfileTetMeshGenerator"},	// default
+			{"ProfileMeshGenerator","ProfileTetMeshGenerator"},	// default
 			{"RelMeshSize",				"0.01"},	// default
 			{"SectionExtensionFactor",	"1.0"},		// default
 			//{"BLNumberOfLayers",		"5"},		// disabled
 			{"BLGrowthRate",			"1.2"},		// default
-			{"BLTransitionRatio",		"0.4"},	// default
+			{"BLTransitionRatio",		"0.4"},		// default
 			{"ProfileBumpFactor",		"0.25"},	// default
 			// precomputed values because 'Airfoil' is not present
 			{"InletVelocity",			"(16.7502 0 0)"},

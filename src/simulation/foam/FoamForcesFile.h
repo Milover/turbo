@@ -7,12 +7,12 @@ License
 	See the LICENSE file for license information.
 
 Description
-	0.orig/p file contents
+	system/turbo_post/forces file contents
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef SIMULATION_FOAM_FOAM_P_FILE_H
-#define SIMULATION_FOAM_FOAM_P_FILE_H
+#ifndef SIMULATION_FOAM_FOAM_FORCES_FILE_H
+#define SIMULATION_FOAM_FOAM_FORCES_FILE_H
 
 #include "General.h"
 
@@ -27,51 +27,21 @@ namespace foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-inline static const String foamPFile
+inline static const String foamForcesFile
 {
-R"(FoamFile
+R"(
+turbo_forces
 {
-    version     2.0;
-    format      ascii;
-    class       volScalarField;
-    location    "0";
-    object      p;
-}
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#include		"../turbo_values";
-
-dimensions      [0 2 -2 0 0 0 0];
-
-internalField   uniform $KinematicPressureDifference;
-
-boundaryField
-{
-    inlet
-    {
-        type            zeroGradient;
-    }
-
-    outlet
-    {
-        type            fixedValue;
-        value           $internalField;
-    }
-
-    ".*wall.*"
-    {
-        type            zeroGradient;
-    }
-
-    ".*periodic.*"
-    {
-        type            cyclicAMI;
-    }
-
-	topAndBot
-	{
-		type			empty;
-	}
+    type            forces;
+    libs            ( "libforces.so" );
+    writeControl    onEnd;
+    log             false;
+    p               p;
+    U               U;
+    rho             rhoInf;
+    rhoInf          $Density;
+    CofR            ( 0 0 0 );
+    patches         ( wall_top wall_bot wall_te );
 }
 
 

@@ -34,6 +34,9 @@ namespace turbo
 namespace input
 {
 
+// Forward declarations
+class Solidity;
+
 /*---------------------------------------------------------------------------*\
 						Class Chord Declaration
 \*---------------------------------------------------------------------------*/

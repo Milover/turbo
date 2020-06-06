@@ -7,26 +7,31 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::input::StaticPressureDifference
+	turbo::input::RelRadius
 
 Description
-	Class StaticPressureDifference.
+	Class RelRadius.
+
+	Defined as:
+
+	/[
+		(r - r_h) / (r_s - z_tip - r_h)
+	/]
 
 SourceFiles
-	StaticPressureDifference.cpp
+	RelRadius.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef INPUT_STATIC_PRESSURE_DIFFERENCE_H
-#define INPUT_STATIC_PRESSURE_DIFFERENCE_H
+#ifndef INPUT_REL_RADIUS_H
+#define INPUT_REL_RADIUS_H
 
-#include "AerodynamicEfficiency.h"
-#include "BladeVelocity.h"
-#include "Density.h"
 #include "General.h"
-#include "InletVelocity.h"
-#include "PositiveValue.h"
-#include "OutletVelocity.h"
+#include "HubRadius.h"
+#include "LimitedValue.h"
+#include "Radius.h"
+#include "ShroudRadius.h"
+#include "TipClearance.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -35,38 +40,34 @@ namespace turbo
 namespace input
 {
 
-// Forward declarations
-class OutletVelocity;
-
 /*---------------------------------------------------------------------------*\
-					Class StaticPressureDifference Declaration
+						Class RelRadius Declaration
 \*---------------------------------------------------------------------------*/
 
-class StaticPressureDifference final
+class RelRadius final
 :
-	public PositiveValue<Float>
+	public LimitedValue<Float, 0, 1>
 {
 public:
 
 	// Public static data
 
-		inline static const String name {"StaticPressureDifference"};
+		inline static const String name {"RelRadius"};
 
 
 	// Constructors
 
 		//- Construct from a Float,
 		//  no aditional checking required
-		explicit StaticPressureDifference(const Float f);
+		explicit RelRadius(const Float f);
 
 		//- Compute and construct
-		StaticPressureDifference
+		RelRadius
 		(
-			const InletVelocity& c_1,
-			const OutletVelocity& c_2,
-			const BladeVelocity& U,
-			const AerodynamicEfficiency& eta,
-			const Density& rho
+			const Radius& r,
+			const HubRadius& r_h,
+			const ShroudRadius& r_s,
+			const TipClearance& z_tip
 		);
 
 

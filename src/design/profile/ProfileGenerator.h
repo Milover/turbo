@@ -21,7 +21,7 @@ SourceFiles
 #define DESIGN_PROFILE_GENERATOR_H
 
 #include "CamberGeneratorBase.h"
-#include "DistributionGeneratorBase.h"
+#include "ThicknessGeneratorBase.h"
 #include "Error.h"
 #include "General.h"
 #include "Registry.h"
@@ -47,7 +47,7 @@ private:
 	// Private data
 
 		Uptr<CamberGeneratorBase> cGen_;
-		Uptr<DistributionGeneratorBase> dGen_;
+		Uptr<ThicknessGeneratorBase> tGen_;
 
 
 	// Member functions
@@ -56,7 +56,7 @@ private:
 		void createCamberGenerator(const input::Registry& reg);
 
 		//- Set distribution type
-		void createDistributionGenerator();
+		void createDistributionGenerator(const input::Registry& reg);
 
 
 public:

@@ -22,7 +22,9 @@ SourceFiles
 #ifndef INPUT_SOLIDITY_H
 #define INPUT_SOLIDITY_H
 
+#include "Chord.h"
 #include "General.h"
+#include "Pitch.h"
 #include "PositiveValue.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -31,6 +33,9 @@ namespace turbo
 {
 namespace input
 {
+
+// Forward declarations
+class Chord;
 
 /*---------------------------------------------------------------------------*\
 						Class Solidity Declaration
@@ -55,6 +60,13 @@ public:
 		//- Construct from a Float,
 		//  no aditional checking required
 		explicit Solidity(const Float f);
+
+		//- Compute and construct
+		Solidity
+		(
+			const Chord& c,
+			const Pitch& l
+		);
 
 
 	// Member functions

@@ -12,6 +12,10 @@ Class
 Description
 	Class Profile
 
+	NOTE:
+		We seem to be introducing a fair bit of numerical error,
+		should check ourselves at some point.
+
 SourceFiles
 	Profile.cpp
 
@@ -67,6 +71,18 @@ private:
 
 	// Member functions
 
+		//- Enforce constraints if any
+		void constrain(const input::Registry& reg);
+
+		//- Constrain max thickness
+		void constrainMaxThickness(const Float maxAbsBladeThickness) noexcept;
+
+		//- Constrain passage width
+		void constrainPassageWidth(const Float maxPassageWidth) noexcept;
+
+		//- Recompute Registry values
+		void recompute(const input::Registry& reg);
+
 		//- Rotate around an axis
 		//	perm = 0 == x-axis
 		//	perm = 1 == y-axis
@@ -79,17 +95,20 @@ public:
 	
 	// Member functions
 
-		//- Get TE point pair
-		Reference back();
+		//- Get axial chord length
+		[[nodiscard]] Float axialChord() const noexcept(ndebug);
 
 		//- Get TE point pair
-		Constreference back() const;
+		[[nodiscard]] Reference back();
+
+		//- Get TE point pair
+		[[nodiscard]] Constreference back() const;
 
 		//- Get iterator to beginning
-		Iterator begin();
+		[[nodiscard]] Iterator begin();
 
 		//- Get const iterator to beginning
-		Constiterator begin() const;
+		[[nodiscard]] Constiterator begin() const;
 
 		//- Build geometry
 		void build
@@ -99,62 +118,79 @@ public:
 		);
 
 		//- Get the camber line
-		std::vector<Point> camberLine() const noexcept(ndebug);
+		[[nodiscard]] std::vector<Point> camberLine() const noexcept(ndebug);
 
 		//- Center on point 'p'
 		void centerOn(const Point& p) noexcept;
 
 		//- Get geometric center
-		Point centroid() const noexcept;
+		[[nodiscard]] Point centroid() const noexcept;
+
+		//- Get chord length
+		[[nodiscard]] Float chord() const noexcept(ndebug);
 
 		//- Check if empty
-		bool empty() const noexcept;
+		[[nodiscard]] bool empty() const noexcept;
 
 		//- Get iterator to end
-		Iterator end();
+		[[nodiscard]] Iterator end();
 
 		//- Get const iterator to end
-		Constiterator end() const;
+		[[nodiscard]] Constiterator end() const;
 
 		//- Get LE point pair
-		Reference front();
+		[[nodiscard]] Reference front();
 
 		//- Get LE point pair
-		Constreference front() const;
+		[[nodiscard]] Constreference front() const;
 
 		//- Get contour in the form of a single spline
 		//	made from top/bot curves ordered as 'getOrderedPoints()'.
 		//	Outputs to current model.
-		geometry::Spline getContour() const noexcept(ndebug);
+		[[nodiscard]] geometry::Spline getContour() const noexcept(ndebug);
 
 		//- Get full contour, ordered [top, bot, tedge].
 		//	Curves form a topologically connected loop.
 		//	Outputs to current model.
-		Sptrvector<geometry::Curve> getFullContour() const noexcept(ndebug);
+		[[nodiscard]] Sptrvector<geometry::Curve>
+		getFullContour() const noexcept(ndebug);
 
 		//- Get geometry points ordered from top (upper) TE to
 		//	bot (lower) TE. Outputs to current model.
-		std::vector<geometry::Point> getPoints() const noexcept(ndebug);
+		[[nodiscard]] std::vector<geometry::Point>
+		getPoints() const noexcept(ndebug);
 
 		//- Get trailing edge. Outputs to current model.
-		geometry::Line getTrailingEdge() const noexcept(ndebug);
+		[[nodiscard]] geometry::Line getTrailingEdge() const noexcept(ndebug);
+
+		//- Scale thickness by factor
+		void inflate(const Float factor) noexcept(ndebug);
 
 		//- Get the unit direction vector
 		//	of the camberline tangent at
 		//	the leading edge.
 		//	The vector points outward with
 		//	respect to the profile contour.
-		Vector leDirection() const noexcept(ndebug);
+		[[nodiscard]] Vector leDirection() const noexcept(ndebug);
 
 		//- Get LE point
-		Point lePoint() const noexcept(ndebug);
+		[[nodiscard]] Point lePoint() const noexcept(ndebug);
+
+		//- Get max abs. thickness
+		[[nodiscard]] Float maxThickness() const noexcept(ndebug);
 
 		//- Get raw points ordered from top (upper) TE
 		//	to bot (lower) TE
-		std::vector<Point> orderedPoints() const noexcept;
+		[[nodiscard]] std::vector<Point> orderedPoints() const noexcept;
+
+		//- Get passage width
+		[[nodiscard]] Float passageWidth() const noexcept(ndebug);
 
 		//- Get raw data (raw points)
-		Data points() const noexcept;
+		[[nodiscard]] Data points() const noexcept;
+
+		//- Get radius
+		[[nodiscard]] Float radius() const noexcept;
 
 		//- Rotate around x-axis (in radians)
 		void rotateX(const Float angle) noexcept;
@@ -172,17 +208,17 @@ public:
 		void scale(const Point& p, const Float factor) noexcept;
 
 		//- Get size
-		Sizetype size() const noexcept;
+		[[nodiscard]] Sizetype size() const noexcept;
 
 		//- Get the unit direction vector
 		//	of the camberline tangent at
 		//	the trailing edge.
 		//	The vector points outward with
 		//	respect to the profile contour.
-		Vector teDirection() const noexcept(ndebug);
+		[[nodiscard]] Vector teDirection() const noexcept(ndebug);
 
 		//- Get TE point (midpoint between top/bot TE)
-		Point tePoint() const noexcept(ndebug);
+		[[nodiscard]] Point tePoint() const noexcept(ndebug);
 
 		//- Translate by vector 'v'
 		void translate(const Vector& v) noexcept;
@@ -191,16 +227,16 @@ public:
 		void wrap() noexcept;
 
 		//- Return wrapped state
-		bool wrapped() const noexcept;
+		[[nodiscard]] bool wrapped() const noexcept;
 
 
 	// Member operators
 
 		//- Access operator
-		Reference operator[](Sizetype pos);
+		[[nodiscard]] Reference operator[](Sizetype pos);
 
 		//- Access operator
-		Constreference operator[](Sizetype pos) const;
+		[[nodiscard]] Constreference operator[](Sizetype pos) const;
 
 };
 

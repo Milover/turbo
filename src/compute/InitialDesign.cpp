@@ -26,6 +26,36 @@ namespace compute
 
 // * * * * * * * * * * * * * * Functions * * * * * * * * * * * * * * * * * * //
 
+Float computeBladeThicknessForcedMaxProfileThickness
+(
+	const Float c,			// chord
+	const Float r,			// (profile section) radius
+	const Float t_abs		// max abs. blade thickness
+) noexcept
+{
+	return 2.0 * r * std::asin(0.5 * t_abs / r) / c;
+}
+
+
+Float computeAxialLimitedChord
+(
+	const Float c,			// chord
+	const Float b,			// axial chord (passage width)
+	const Float xi			// stagger angle
+) noexcept
+{
+	Float c_lim
+	{
+		b / std::sin(xi)
+	};
+
+	if (isGreaterOrEqual(c, c_lim))
+		return c_lim;
+	else
+		return c;
+}
+
+
 Vector computeBladeVelocity 
 (
 	const Float N,			// rev. per second
@@ -131,35 +161,6 @@ Float computePitch
 }
 
 
-Vector computeRootOutletVelocity 
-(
-	const Vector& c_1,		// abs. fluid inlet velocity
-	const Float dp,			// static pressure difference
-	const Float N,			// rev. per second
-	const Float r_h,		// hub radius
-	const Float rho			// density
-) noexcept
-{
-	Vector U
-	{
-		computeBladeVelocity(N, r_h)
-	};
-	Float D
-	{
-		std::pow(mag(U), 2) - 2.0 * dp / rho
-	};
-
-	Float c_y;
-	if (isLessOrEqual(D, 0.0))
-		c_y = U.y();
-	else
-		c_y = U.y() - std::sqrt(D);		// because U.y() always < 0, see note
-										// on blade velocity
-
-	return Vector {c_1.x(), c_y};
-}
-
-
 //- Compute blade span
 Float computeSpan
 (
@@ -180,7 +181,7 @@ Float computeStaggerAngle
 	const Float i			// incidence angle
 ) noexcept
 {
-	return 0.5 * pi - i - computeFluidAngle(c_1, U) - zeta;
+	return i + computeFluidAngle(c_1, U) + zeta;
 }
 
 
@@ -211,6 +212,7 @@ Float computeStaticPressureDifference
 	const Vector& c_1,		// abs. fluid inlet velocity
 	const Vector& c_2,		// abs. fluid outlet velocity
 	const Vector& U,		// blade velocity
+	const Float eta,		// aerodynamic efficiency
 	const Float rho			// density
 ) noexcept
 {
@@ -219,7 +221,112 @@ Float computeStaticPressureDifference
 		0.5 * (std::pow(mag(c_2), 2) - std::pow(mag(c_1), 2))
 	};
 
-	return rho * (U.y() * c_2.y() - e_k);
+	return rho * (eta * U.y() * c_2.y() - e_k);
+}
+
+
+Vector computeRootOutletVelocity
+(
+	const Vector& c_1,		// abs. fluid inlet velocity
+	const Float eta,		// aerodynamic efficiency
+	const Float N,			// rev. per second
+	const Float r_h			// hub radius
+) noexcept
+{
+	Float c_2_h_y
+	{
+		eta * N * pi * r_h
+	};
+
+	return Vector {c_1.x(), -c_2_h_y};	// rotation is counterclockwise
+}
+
+
+[[deprecated("not using this anymore")]]
+Vector computeRootOutletVelocity_depr
+(
+	const Vector& c_1,		// abs. fluid inlet velocity
+	const Float dp,			// (requested total) static pressure difference
+	const Float eta,		// aerodynamic efficiency
+	const Float N,			// rev. per second
+	const Float n,			// vortex distribution coefficient
+	const Float r_h,		// hub radius
+	const Float r_s,		// shroud radius
+	const Float rho			// density
+) noexcept
+{
+	Float D {r_s / r_h};
+	Float K_1
+	{
+		0.5 * std::pow(0.5 * (D - 1.0), 2.0 * n)
+	};
+	Float K_2
+	{
+		-2.0 * eta * N * pi * r_h * (std::pow(D, n + 3.0) - 1.0) / (n + 3.0)
+	};
+
+	// check max requested pressure
+	Float dp_max
+	{
+		std::pow(K_2, 2) / (4.0 * rho * K_1 * (std::pow(D, 2) - 1.0))
+	};
+
+	if (!isLessOrEqual(dp, dp_max))
+	{
+		if constexpr (ndebug)
+		{
+			std::cerr << "WARNING: "
+						 "recomputed static pressure difference: "
+					  << dp_max << '\n';
+		}
+	}
+	else
+		dp_max = dp;
+
+	Float K_3
+	{
+		(std::pow(D, 2) - 1.0) * dp_max / rho
+	};
+
+	// check discriminant
+	Float discriminant
+	{
+		std::pow(K_2, 2) - 4.0 * K_1 * K_3
+	};
+	if (!isGreaterOrEqual(discriminant, 0.0))
+	{
+		error
+		(
+			FUNC_INFO,
+			"discriminant < 0, try increasing the r_s/r_h ratio or the "
+			"vortex distribution exponent"
+		);
+	}
+
+	Float c
+	{
+		-K_2 + std::sqrt(discriminant) / (2.0 * K_1)
+	};
+
+	// check swirl
+	Float c_max
+	{
+		eta * N * pi * r_h
+	};
+	if (isLessOrEqual(c_max, c))
+	{
+		if constexpr (ndebug)
+		{
+			std::cerr << "WARNING: "
+						 "recomputed hub swirl component: "
+					  << c_max << '\n';
+		}
+	}
+	else
+		c_max = c;
+
+
+	return Vector {c_1.x(), -c_max};	// rotation is counterclockwise
 }
 
 
@@ -227,6 +334,7 @@ Float computeVortexDistributionExponent
 (
 	const Vector& c_2_h,	// abs. root (hub) fluid outlet velocity
 	const Float dp,			// (requested total) static pressure difference
+	const Float eta,		// hydraulic efficiency
 	const Float N,			// rev. per second
 	const Float r_h,		// hub radius
 	const Float r_s,		// shroud radius
@@ -234,70 +342,53 @@ Float computeVortexDistributionExponent
 ) noexcept
 {
 	Float D {r_s / r_h};
-	Float K_1	// we didn't keep track while deriving => |c_2_h.y()|
+	Float K_1
 	{
-		2.0 * N * pi * std::abs(c_2_h.y()) * std::pow(r_h, 2)
+		(std::pow(D, 2) - 1.0) * dp / rho
 	};
 	Float K_2
 	{
-		-0.5 * std::pow(c_2_h.y(), 2) * (std::pow(D, 2) - 1.0)
+		0.5 * std::pow(c_2_h.y(), 2) * (std::pow(D, 2) - 1.0)
 	};
-	Float K_3
+	Float K_3	// we didn't keep track of signs => |c_2_h.y()|
 	{
-		-dp * (std::pow(D, 2) - 1.0) / rho
+		-2.0 * eta * N * pi * std::abs(c_2_h.y()) * r_h
 	};
 
-	auto f = [&](auto&& n)
+	auto f = [&](const auto& n)
 	{
 		auto a {n + 3.0};
-		auto b {2.0 * n};
-
-		return K_1 * (std::pow(D, a) - 1.0) / a
-			 + K_2 * std::pow(0.5 * (D - 1.0), b)
-			 + K_3;
-	};
-	auto dfdn = [&](auto&& n)
-	{
-		auto a {n + 3.0};
-		auto b {2.0 * n};
 
 		return K_1
-			 * (std::pow(D, a) * (a * std::log(D) - 1.0) + 1.0)
-			 / std::pow(a, 2)
-			 + K_2
-			 * std::pow(2.0, 1.0 - b)
-			 * std::pow(D - 1.0, b)
-			 * std::log(0.5 * (D - 1.0));
+			 + K_2 * std::pow(0.5 * (D - 1.0), 2.0 * n)
+			 + K_3 * (std::pow(D, a) - 1.0) / a;
 	};
-
-	auto n (math::NewtonRaphson {}(0.0, f, dfdn));
-
-	// limited to [-1, 1]
-	if (n > 1.0)
+	auto dfdn = [&](const auto& n)
 	{
-		if constexpr (ndebug)
-		{
-			std::cerr << "WARNING: "
-						 "vortex distribution exponent limited to 1.0\n"
-						 "computed value: "
-					  << n << '\n';
-		}
-		n = 1.0;
-	}
-	else if (n < -1.0 || std::isnan(n))	// nan for n = -3
-	{
-		if constexpr (ndebug)
-		{
-			std::cerr << "WARNING: "
-						 "vortex distribution exponent limited to -1.0\n"
-						 "computed value: "
-					  << n << '\n';
-		}
+		auto a {n + 3.0};
+
+		return K_2
+			 * std::pow(2.0, 1.0 - 2.0 * n)
+			 * std::pow(D - 1.0, 2.0 * n)
+			 * std::log(0.5 * (D - 1.0))
+			 + K_3 / std::pow(a, 2)
+			 * (1.0 + std::pow(D, a) * (a * std::log(D) - 1.0));
+	};
+	auto n {math::NewtonRaphson {}(-1.0, f, dfdn)};
+
+	// nan for n = -3 and must be greater than -1
+	if (n < -1.0 || std::isnan(n))
 		n = -1.0;
-	}
+
+	// we have to check if the shroud swirl is physically achievable
+	Float n_max
+	{
+		std::log(eta * N * pi * r_s) / std::log(c_2_h.y() * D)
+	};
+	if (!isLessOrEqual(n, n_max))
+		n = n_max;
 
 	return n;
-
 }
 
 

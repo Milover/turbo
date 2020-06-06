@@ -8,65 +8,46 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "StaticPressureDifference.h"
+#include "ConstantThickness.h"
 
-#include "AerodynamicEfficiency.h"
-#include "BladeVelocity.h"
-#include "Density.h"
+#include "Error.h"
 #include "General.h"
-#include "InitialDesign.h"
-#include "InletVelocity.h"
-#include "OutletVelocity.h"
+#include "Registry.h"
+#include "ThicknessGeneratorBase.h"
+#include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace turbo
 {
-namespace input
+namespace design
 {
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-StaticPressureDifference::StaticPressureDifference(const Float f)
+ConstantThickness::ConstantThickness(const input::Registry& reg)
 :
-	PVBase {f}
-{}
-
-
-StaticPressureDifference::StaticPressureDifference
-(
-	const InletVelocity& c_1,
-	const OutletVelocity& c_2,
-	const BladeVelocity& U,
-	const AerodynamicEfficiency& eta,
-	const Density& rho
-)
-:
-	StaticPressureDifference
-	{
-		compute::computeStaticPressureDifference
-		(
-			c_1.value(),
-			c_2.value(),
-			U.value(),
-			eta.value(),
-			rho.value()
-		)
-	}
+	ThicknessGeneratorBase {reg}
 {}
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-String StaticPressureDifference::getName() const
+Float ConstantThickness::thickness(const Float x) const noexcept(ndebug)
 {
-	return name;
+	if
+	(
+		!isInRange(x, 0.0, 1.0)
+	)
+		error(FUNC_INFO, x, " out of range [0, 1]");
+
+	return 0.5 * max_.value();
 }
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace input
+} // End namespace design
 } // End namespace turbo
 
 // ************************************************************************* //

@@ -8,48 +8,42 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "ConstantDistribution.h"
+#include "AerodynamicEfficiency.h"
 
-#include "Error.h"
 #include "General.h"
-#include "Utility.h"
-#include "Variables.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace turbo
 {
-namespace design
+namespace input
 {
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-ConstantDistribution::ConstantDistribution()
+AerodynamicEfficiency::AerodynamicEfficiency() noexcept
 :
-	max_
-	{
-		input::read<input::MaxProfileThickness>()
-	}
+	LVBase {0.6}
+{}
+
+
+AerodynamicEfficiency::AerodynamicEfficiency(const Float f)
+:
+	LVBase {f}
 {}
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-Float ConstantDistribution::thickness(const Float x) const noexcept(ndebug)
+String AerodynamicEfficiency::getName() const
 {
-	if
-	(
-		!isInRange(x, 0.0, 1.0)
-	)
-		error(FUNC_INFO, x, " out of range [0, 1]");
-
-	return 0.5 * max_.value();
+	return name;
 }
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace design
+} // End namespace input
 } // End namespace turbo
 
 // ************************************************************************* //

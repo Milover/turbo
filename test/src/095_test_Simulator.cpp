@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
 			{"StaticPressureDifference",			"400"},		// default
 			// profile
 			{"CamberPointSpacing",					"Cosine"},	// default
-			{"Distribution",		"Naca4DigitDistribution"},	// default
+			{"Thickness",				"Naca4DigitThickness"},	// default
 			{"Camber",					"CircularArcCamber"},	// default
 			{"NumberOfCamberPoints",				"150"},		// default
 			{"MaxProfileThickness",					"0.1"},
@@ -66,6 +66,7 @@ int main(int argc, char* argv[])
 			{"ProfileBumpFactor",					"0.25"},	// default
 			// precomputed values because 'Blade'/'Airfoil' aren't present
 			{"KinematicViscosity",					"1.5172e-5"},
+			{"KinematicPressureDifference",			"333.3333"},
 			{"InletVelocity",						"(16.7502 0 0)"},
 			{"BladeVelocity",						"(0 -24.2523 0)"},
 			{"InletRelativeVelocity",				"(16.7502 24.2523 0)"},

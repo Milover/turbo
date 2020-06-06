@@ -54,6 +54,7 @@ private:
 	// Member functions
 
 		//- Construct the component
+		// XXX: can this be const?
 		void construct
 		(
 			const input::Radius& radius,

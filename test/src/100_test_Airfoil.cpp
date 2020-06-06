@@ -26,7 +26,6 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include <filesystem>
-#include <fstream>
 
 #include "Airfoil.h"
 #include "General.h"
@@ -70,7 +69,7 @@ int main(int argc, char* argv[])
 			{"TipClearance",				"0"},				// default
 			{"Solidity",					"1.0"},				// default
 			// airfoil
-			{"Distribution",	"Naca4DigitDistribution"},		// default
+			{"Thickness",			"Naca4DigitThickness"},		// default
 			{"DeviationAngle",				"0"},				// default
 			{"MaxProfileThickness",			"0.1"},
 			{"Camber",				"CircularArcCamber"},		// default
@@ -88,7 +87,7 @@ int main(int argc, char* argv[])
 			// precomputed values, because 'Blade' is not present
 			{"KinematicViscosity",			"1.5172e-5"},
 			{"InletVelocity",				"(16.7502 0 0)"},
-			{"RootOutletVelocity",			"(16.7502 -24.2523 0)"},
+			{"RootOutletVelocity",			"(16.7502 -20.6166 0)"},
 			{"VortexDistributionExponent",	"-1.0"},			// default
 			{"TurbulenceKineticEnergy",		"1.0521"}
 		}
@@ -186,13 +185,8 @@ int main(int argc, char* argv[])
 	// reset and test simulation
 	airfoil.build();
 
-debug::echo("inlet metal angle:   \t", angleBetween(airfoil.profile.leDirection(), -Vector::yAxis()));
-debug::echo("inlet relative angle:\t", angleBetween(airfoil.get<input::InletRelativeVelocity>().value(), Vector::yAxis()));
-
 	// data dump
-	std::ofstream ofs {airfoil.cwd() / "data"};
-	airfoil.printAll(ofs, 40);
-	ofs.flush();
+	airfoil.dumpData();
 
 	// make a new mesh
 	auto caseDir {airfoil.simulate()};
@@ -223,13 +217,8 @@ debug::echo("inlet relative angle:\t", angleBetween(airfoil.get<input::InletRela
 	control.run();
 
 	// cleanup
-	auto r_2 {std::filesystem::remove_all(airfoil.cwd())};
-	auto r_1 {std::filesystem::remove_all("turbo_case_template")};
-
-	// we should have cleaned something up
-	pass = pass
-		&& r_1 > 0
-		&& r_2 > 0;
+	pass = pass && std::filesystem::remove_all(airfoil.cwd()) > 0;
+	pass = pass && std::filesystem::remove_all("turbo_case_template") > 0;
 
 	// test pass or fail
 	if (pass)

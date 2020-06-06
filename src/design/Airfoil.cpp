@@ -29,7 +29,7 @@ namespace turbo
 namespace design
 {
 
-// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
+// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
 void Airfoil::construct
 (
@@ -37,7 +37,13 @@ void Airfoil::construct
 	const input::DeviationAngle& delta
 )
 {
-	// general
+	input::RelRadius r_rel
+	{
+		radius,
+		data_->cref<input::HubRadius>(),
+		data_->cref<input::ShroudRadius>(),
+		data_->cref<input::TipClearance>()
+	};
 	input::BladeVelocity U
 	{
 		data_->cref<input::Rps>(),
@@ -60,8 +66,16 @@ void Airfoil::construct
 		data_->cref<input::InletVelocity>(),
 		c_2,
 		U,
+		data_->cref<input::AerodynamicEfficiency>(),
 		data_->cref<input::Density>()
 	};
+	input::KinematicPressureDifference dp_kin
+	{
+		dp,
+		data_->cref<input::Density>()
+	};
+
+	// geometry
 	input::CamberAngle camber
 	{
 		data_->cref<input::InletVelocity>(),
@@ -75,32 +89,14 @@ void Airfoil::construct
 		data_->cref<input::NumberOfBlades>(),
 		radius
 	};
+	// NOTE: placeholders untill distributions are implemented
+	data_->storeFromInput<input::MaxAbsBladeThickness>();
+	data_->storeFromInput<input::MaxPassageWidth>();
+	data_->storeFromInput<input::Solidity>();
 	input::Chord chord
 	{
 		pitch,
 		data_->cref<input::Solidity>()
-	};
-
-	// turbulence
-	input::TurbulenceReferenceLengthScale L_turb
-	{
-		chord,
-		data_->cref<input::TurbulenceReferenceLengthScaleRatio>()
-	};
-	input::TurbulenceDissipationRate epsilon
-	{
-		data_->cref<input::TurbulenceKineticEnergy>(),
-		L_turb
-	};
-	input::TurbulenceSpecificDissipationRate omega
-	{
-		data_->cref<input::TurbulenceKineticEnergy>(),
-		L_turb
-	};
-	input::TurbulenceViscosity nut
-	{
-		data_->cref<input::TurbulenceKineticEnergy>(),
-		L_turb
 	};
 
 	// store
@@ -112,12 +108,10 @@ void Airfoil::construct
 		std::move(chord),
 		delta,
 		std::move(dp),
-		std::move(epsilon),
-		std::move(L_turb),
-		std::move(nut),
-		std::move(omega),
+		std::move(dp_kin),
 		std::move(pitch),
 		radius,
+		std::move(r_rel),
 		std::move(U),
 		std::move(w_1)
 	);
@@ -176,8 +170,39 @@ void Airfoil::build()
 		}
 	);
 
-	// now we can build it properly
+	// now we can build the profile
 	profile.build(generator, *data_);
+
+	// compute the turbulence values
+	input::TurbulenceReferenceLengthScale L_turb
+	{
+		data_->cref<input::Chord>(),
+		data_->cref<input::TurbulenceReferenceLengthScaleRatio>()
+	};
+	input::TurbulenceDissipationRate epsilon
+	{
+		data_->cref<input::TurbulenceKineticEnergy>(),
+		L_turb
+	};
+	input::TurbulenceSpecificDissipationRate omega
+	{
+		data_->cref<input::TurbulenceKineticEnergy>(),
+		L_turb
+	};
+	input::TurbulenceViscosity nut
+	{
+		data_->cref<input::TurbulenceKineticEnergy>(),
+		L_turb
+	};
+	// store
+	input::storeAll
+	(
+		*data_,
+		std::move(epsilon),
+		std::move(L_turb),
+		std::move(nut),
+		std::move(omega)
+	);
 }
 
 

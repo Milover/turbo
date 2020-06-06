@@ -51,6 +51,11 @@ inline static const Path turboRunPath
 	turboCaseTemplatePath / "turbo_run"
 };
 
+inline static const Path turboPostPath
+{
+	foamSystemPath / "turbo_post"
+};
+
 
 inline static const Path foamEpsilonPath
 {
@@ -122,6 +127,27 @@ inline static const Path foamFvSolutionPath
 inline static const Path foamSetSetbatchPath
 {
 	foamSystemPath / "setSet.batch"
+};
+
+
+inline static const Path foamForcesFilePath
+{
+	turboPostPath / "forces"
+};
+
+inline static const Path foamPatchSurfaceFieldValuePath
+{
+	turboPostPath / "patchSurfaceFieldValue"
+};
+
+inline static const Path foamSampledSurfaceFieldValuePath
+{
+	turboPostPath / "sampledSurfaceFieldValue"
+};
+
+inline static const Path foamYPlusPath
+{
+	turboPostPath / "yPlus"
 };
 
 

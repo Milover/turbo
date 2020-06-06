@@ -18,7 +18,6 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include <filesystem>
-#include <fstream>
 
 #include "Blade.h"
 #include "General.h"
@@ -43,21 +42,25 @@ int main(int argc, char* argv[])
 
 	//control.set("General.Verbosity", 10);
 
-	input::InputRegistry::store					// TODO: should mass test this
+	input::InputRegistry::store
 	(
 		HashMap<String>
 		{
 			// general
+			{"AerodynamicEfficiency",		"0.85"},			// nondefault
 			{"Density",						"1.2"},
 			{"DynamicViscosity",			"1.8206e-5"},
 			{"Rps",							"11.83334"},
-			{"StaticPressureDifference",	"145"},
+			{"StaticPressureDifference",	"160"},
 			{"VolumeFlowRate",				"4.16667"},
 			{"TurbulenceReferenceLengthScaleRatio",	"0.1"},		// default
 			{"TurbulenceIntensity",			"0.05"},			// default
+			{"VortexDistributionExponent",	"1.0"},				// nondefault
 			// blade
 			{"HubRadius",					"0.075"},
 			{"IncidenceAngle",				"0"},				// default
+			{"MaxAbsBladeThickness",		"0.008"},			// optional
+			{"MaxPassageWidth",				"0.1"},				// optional
 			{"NumberOfBlades",				"7"},
 			{"NumberOfStations",			"3"},
 			{"ShroudRadius",				"0.3975"},
@@ -68,7 +71,7 @@ int main(int argc, char* argv[])
 			{"ShroudSkewAngle",				"0.5236"},	// ~30°
 			{"BezierSkewRelativeRadius",	"0.5"},				// default
 			// airfoil
-			{"Distribution",		"Naca4DigitDistribution"},	// default
+			{"Thickness",				"Naca4DigitThickness"},	// default
 			{"DeviationAngle",				"0"},				// default
 			{"MaxProfileThickness",			"0.1"},
 			{"MonitoringPlaneOffset",		"0.05"},			// default
@@ -98,21 +101,13 @@ int main(int argc, char* argv[])
 		std::move(model)
 	};
 
-	Path filename {"data"};
-
 	for (const auto& airfoil : blade.airfoilsCRef())
 	{
 		airfoil->build();
 		airfoil->simulate();
-
-		// write airfoil data
-		std::ofstream ofs {airfoil->cwd() / filename};
-		airfoil->printAll(ofs, 40);
+		airfoil->dumpData();
 	}
-	// write blade data
-	std::ofstream ofs {blade.cwd() / filename};
-	blade.printAll(ofs, 40);
-	ofs.flush();
+	blade.dumpData();
 
 	updateAndWait(1);
 
@@ -127,6 +122,7 @@ int main(int argc, char* argv[])
 
 	// cleanup
 	pass = pass && std::filesystem::remove_all(blade.cwd()) > 0;
+	pass = pass && std::filesystem::remove_all("turbo_case_template") > 0;
 
 	// test pass or fail
 	if (pass)

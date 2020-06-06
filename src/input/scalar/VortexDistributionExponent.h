@@ -11,6 +11,7 @@ Class
 
 Description
 	Class VortexDistributionExponent.
+
 	Computed automatically, such that the integral requested work is
 	satisfied. Orientational values:
 
@@ -26,6 +27,9 @@ SourceFiles
 #ifndef INPUT_VORTEX_DISTRIBUTION_EXPONENT_H
 #define INPUT_VORTEX_DISTRIBUTION_EXPONENT_H
 
+#include <limits>
+
+#include "AerodynamicEfficiency.h"
 #include "Density.h"
 #include "General.h"
 #include "HubRadius.h"
@@ -43,8 +47,8 @@ namespace input
 {
 
 // Forward declarations
-class RootOutletVelocity;
 class StaticPressureDifference;
+class RootOutletVelocity;
 
 /*---------------------------------------------------------------------------*\
 				Class VortexDistributionExponent Declaration
@@ -52,7 +56,8 @@ class StaticPressureDifference;
 
 class VortexDistributionExponent final
 :
-	public LimitedValue<Float, -1, 1>
+	// FIXME: this is not good, but we're using it for now
+	public LimitedValue<Float, -1, std::numeric_limits<Integer>::max()>
 {
 public:
 
@@ -72,6 +77,7 @@ public:
 		(
 			const RootOutletVelocity& c_2_h,
 			const StaticPressureDifference& dp,
+			const AerodynamicEfficiency& eta,
 			const Rps& rps,
 			const HubRadius& r_h,
 			const ShroudRadius& r_s,

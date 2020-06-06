@@ -7,26 +7,23 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::design::Naca4DigitDistribution
+	turbo::design::ConstantThickness
 
 Description
-	Class Naca4DigitDistribution
-	For more information on the generation procedure see \cite{}.
+	Class ConstantThickness
 
 SourceFiles
-	Naca4DigitDistribution.cpp
+	ConstantThickness.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef DESIGN_NACA_4_DIGIT_DISTRIBUTION_H
-#define DESIGN_NACA_4_DIGIT_DISTRIBUTION_H
+#ifndef DESIGN_PROFILE_THICKNESS_CONSTANT_THICKNESS_H
+#define DESIGN_PROFILE_THICKNESS_CONSTANT_THICKNESS_H
 
-#include <array>
-
-#include "DistributionGeneratorBase.h"
 #include "Error.h"
 #include "General.h"
-#include "Variables.h"
+#include "Registry.h"
+#include "ThicknessGeneratorBase.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -36,40 +33,24 @@ namespace design
 {
 
 /*---------------------------------------------------------------------------*\
-				Class Naca4DigitDistribution Declaration
+				Class ConstantThickness Declaration
 \*---------------------------------------------------------------------------*/
 
-class Naca4DigitDistribution final
+class ConstantThickness final
 :
-	public DistributionGeneratorBase
+	public ThicknessGeneratorBase
 {
-private:
-
-	// Private data
-
-		static constexpr Float scale_ {5.0};
-		std::array<Float, 5> a_
-		{
-			0.2969,
-		   -0.1260,
-		   -0.3516,
-			0.2843,
-		   -0.1015
-		};
-
-		input::MaxProfileThickness max_;
-
 public:
 
-	// Private data
+	// Public data
 
-		inline static const String name {"Naca4DigitDistribution"};
+		inline static const String name {"ConstantThickness"};
 
 
 	// Constructors
 
-		//- Default constructor
-		Naca4DigitDistribution();
+		//- Defaul constructor
+		ConstantThickness(const input::Registry& reg);
 
 
 	// Member functions

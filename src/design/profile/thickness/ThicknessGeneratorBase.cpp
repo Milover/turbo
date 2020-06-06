@@ -6,41 +6,35 @@
 License
 	See the LICENSE file for license information.
 
-Description
-	Highly advanced debugging tools and utilities.
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef DEBUG_DEBUG_H
-#define DEBUG_DEBUG_H
+#include "ThicknessGeneratorBase.h"
 
-#include <iomanip>
-#include <iostream>
-#include <utility>
+#include "General.h"
+#include "Registry.h"
+#include "Variables.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace turbo
 {
-namespace debug
+namespace design
 {
 
-// * * * * * * * * * * * * * * Functions * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-template<typename... Ts>
-inline void echo(Ts&&... ts)
-{
-    (std::cerr << ... << std::forward<Ts>(ts)) << '\n';
-}
+ThicknessGeneratorBase::ThicknessGeneratorBase(const input::Registry& reg)
+:
+	max_
+	{
+		reg.cref<input::MaxProfileThickness>()
+	}
+{}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace debug
+} // End namespace design
 } // End namespace turbo
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

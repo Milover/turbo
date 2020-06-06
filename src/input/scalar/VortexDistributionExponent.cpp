@@ -10,6 +10,7 @@ License
 
 #include "VortexDistributionExponent.h"
 
+#include "AerodynamicEfficiency.h"
 #include "Density.h"
 #include "General.h"
 #include "InitialDesign.h"
@@ -33,11 +34,11 @@ VortexDistributionExponent::VortexDistributionExponent(const Float f)
 	LVBase {f}
 {}
 
-
 VortexDistributionExponent::VortexDistributionExponent
 (
 	const RootOutletVelocity& c_2_h,
 	const StaticPressureDifference& dp,
+	const AerodynamicEfficiency& eta,
 	const Rps& rps,
 	const HubRadius& r_h,
 	const ShroudRadius& r_s,
@@ -50,6 +51,7 @@ VortexDistributionExponent::VortexDistributionExponent
 		(
 			c_2_h.value(),
 			dp.value(),
+			eta.value(),
 			rps.value(),
 			r_h.value(),
 			r_s.value(),

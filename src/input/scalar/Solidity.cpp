@@ -10,7 +10,9 @@ License
 
 #include "Solidity.h"
 
+#include "Chord.h"
 #include "General.h"
+#include "Pitch.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -30,6 +32,19 @@ Solidity::Solidity() noexcept
 Solidity::Solidity(const Float f)
 :
 	PVBase {f}
+{}
+
+
+Solidity::Solidity
+(
+	const Chord& c,
+	const Pitch& l
+)
+:
+	Solidity
+	{
+		c.value() / l.value()
+	}
 {}
 
 

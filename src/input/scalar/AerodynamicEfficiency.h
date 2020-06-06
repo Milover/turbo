@@ -7,26 +7,25 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::input::StaticPressureDifference
+	turbo::input::AerodynamicEfficiency
 
 Description
-	Class StaticPressureDifference.
+	Class AerodynamicEfficiency.
+
+	Guesstimate for the initial design, corrected after simulations are run.
+
+	Defaults to 0.6.
 
 SourceFiles
-	StaticPressureDifference.cpp
+	AerodynamicEfficiency.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef INPUT_STATIC_PRESSURE_DIFFERENCE_H
-#define INPUT_STATIC_PRESSURE_DIFFERENCE_H
+#ifndef INPUT_AERODYNAMIC_EFFICIENCY_H
+#define INPUT_AERODYNAMIC_EFFICIENCY_H
 
-#include "AerodynamicEfficiency.h"
-#include "BladeVelocity.h"
-#include "Density.h"
 #include "General.h"
-#include "InletVelocity.h"
-#include "PositiveValue.h"
-#include "OutletVelocity.h"
+#include "LimitedValue.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -35,39 +34,29 @@ namespace turbo
 namespace input
 {
 
-// Forward declarations
-class OutletVelocity;
-
 /*---------------------------------------------------------------------------*\
-					Class StaticPressureDifference Declaration
+				Class AerodynamicEfficiency Declaration
 \*---------------------------------------------------------------------------*/
 
-class StaticPressureDifference final
+class AerodynamicEfficiency final
 :
-	public PositiveValue<Float>
+	public LimitedValue<Float, 0, 1>
 {
 public:
 
 	// Public static data
 
-		inline static const String name {"StaticPressureDifference"};
+		inline static const String name {"AerodynamicEfficiency"};
 
 
 	// Constructors
 
+		//- Default constructor
+		AerodynamicEfficiency() noexcept;
+
 		//- Construct from a Float,
 		//  no aditional checking required
-		explicit StaticPressureDifference(const Float f);
-
-		//- Compute and construct
-		StaticPressureDifference
-		(
-			const InletVelocity& c_1,
-			const OutletVelocity& c_2,
-			const BladeVelocity& U,
-			const AerodynamicEfficiency& eta,
-			const Density& rho
-		);
+		explicit AerodynamicEfficiency(const Float f);
 
 
 	// Member functions

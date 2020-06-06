@@ -26,6 +26,7 @@ SourceFiles
 #include <type_traits>
 
 #include "General.h"
+#include "InputRegistry.h"
 #include "RegistryObject.h"
 #include "RegistryObjectBase.h"
 
@@ -170,6 +171,11 @@ public:
 		template<typename T>
 		[[maybe_unused]] Pair<Data::iterator, bool> store(T&& t) const;
 
+		//- Store (insert or assign) a registry object (locally) from
+		//	the InputRegistry
+		template<typename T>
+		[[maybe_unused]] bool storeFromInput() const;
+
 		//- Print all stored data (formatted)
 		void printAll
 		(
@@ -310,6 +316,21 @@ Registry::store(T&& t) const
 		removeCVRef_t<T>::name,
 		std::make_unique<removeCVRef_t<T>>(std::forward<T>(t))
 	);
+}
+
+
+template<typename T>
+[[maybe_unused]] bool Registry::storeFromInput() const
+{
+	if (!InputRegistry::has(T::name))
+		return false;
+
+	auto [iter, success]
+	{
+		store(input::read<T>())
+	};
+
+	return success;
 }
 
 

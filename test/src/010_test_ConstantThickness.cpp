@@ -7,15 +7,16 @@ License
 	See the LICENSE file for license information.
 
 Description
-	Testing ConstantDistribution class basic funtionality.
+	Testing ConstantThickness class basic funtionality.
 
 \*---------------------------------------------------------------------------*/
 
 #include <utility>
 
-#include "ConstantDistribution.h"
+#include "ConstantThickness.h"
 #include "General.h"
 #include "InputRegistry.h"
+#include "Registry.h"
 #include "Utility.h"
 
 #include "Test.h"
@@ -36,10 +37,12 @@ int main(int argc, char* argv[])
 			{"MaxProfileThickness", "0.5"}
 		}
 	);
+	// a dummy registry so we can read the values
+	input::Registry reg {};
 
-	design::ConstantDistribution temp_1 {};
-	design::ConstantDistribution temp_2 {std::move(temp_1)};
-	design::ConstantDistribution temp_3 {};
+	design::ConstantThickness temp_1 {reg};
+	design::ConstantThickness temp_2 {std::move(temp_1)};
+	design::ConstantThickness temp_3 {reg};
 	temp_3 = std::move(temp_2);
 
 	test::echo(isGreaterOrEqual(-1.0, 0.0));

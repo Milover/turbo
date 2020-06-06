@@ -7,26 +7,21 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::input::StaticPressureDifference
+	turbo::input::MaxPassageWidth
 
 Description
-	Class StaticPressureDifference.
+	Class MaxPassageWidth.
 
 SourceFiles
-	StaticPressureDifference.cpp
+	MaxPassageWidth.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef INPUT_STATIC_PRESSURE_DIFFERENCE_H
-#define INPUT_STATIC_PRESSURE_DIFFERENCE_H
+#ifndef INPUT_MAX_PASSAGE_WIDTH_H
+#define INPUT_MAX_PASSAGE_WIDTH_H
 
-#include "AerodynamicEfficiency.h"
-#include "BladeVelocity.h"
-#include "Density.h"
 #include "General.h"
-#include "InletVelocity.h"
 #include "PositiveValue.h"
-#include "OutletVelocity.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -35,14 +30,11 @@ namespace turbo
 namespace input
 {
 
-// Forward declarations
-class OutletVelocity;
-
 /*---------------------------------------------------------------------------*\
-					Class StaticPressureDifference Declaration
+					Class MaxPassageWidth Declaration
 \*---------------------------------------------------------------------------*/
 
-class StaticPressureDifference final
+class MaxPassageWidth final
 :
 	public PositiveValue<Float>
 {
@@ -50,24 +42,14 @@ public:
 
 	// Public static data
 
-		inline static const String name {"StaticPressureDifference"};
+		inline static const String name {"MaxPassageWidth"};
 
 
 	// Constructors
 
 		//- Construct from a Float,
 		//  no aditional checking required
-		explicit StaticPressureDifference(const Float f);
-
-		//- Compute and construct
-		StaticPressureDifference
-		(
-			const InletVelocity& c_1,
-			const OutletVelocity& c_2,
-			const BladeVelocity& U,
-			const AerodynamicEfficiency& eta,
-			const Density& rho
-		);
+		explicit MaxPassageWidth(const Float f);
 
 
 	// Member functions

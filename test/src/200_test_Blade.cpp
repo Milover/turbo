@@ -26,7 +26,6 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include <filesystem>
-#include <fstream>
 
 #include "Blade.h"
 #include "General.h"
@@ -56,6 +55,7 @@ int main(int argc, char* argv[])
 		HashMap<String>
 		{
 			// machine
+			{"AerodynamicEfficiency",		"0.6"},				// default
 			{"Density",						"1.2"},
 			{"DynamicViscosity",			"1.8206e-5"},
 			{"Rps",							"116.666"},
@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 			{"TipClearance",				"0"},				// default
 			{"Solidity",					"1.0"},				// default
 			// airfoil
-			{"Distribution",	"Naca4DigitDistribution"},		// default
+			{"Thickness",			"Naca4DigitThickness"},		// default
 			{"DeviationAngle",				"0"},				// default
 			{"MaxProfileThickness",			"0.1"},
 			{"Camber",				"CircularArcCamber"},		// default
@@ -101,26 +101,12 @@ int main(int argc, char* argv[])
 		std::move(model)
 	};
 
-	// keep track of the files we generate manually
-	std::vector<Path> files;
-
 	for (const auto& airfoil : blade.airfoilsCRef())
 	{
 		airfoil->build();
-		airfoil->profile.wrap();
-
-		// write airfoil data
-		Path filename {"airfoil_" + std::to_string(airfoil->id())};
-		files.push_back(filename);
-		std::ofstream ofs {filename};
-		airfoil->printAll(ofs, 40);
+		airfoil->dumpData();
 	}
-
-	// write blade data
-	files.push_back("blade");
-	std::ofstream ofs {"blade"};
-	blade.printAll(ofs, 40);
-	ofs.flush();
+	blade.dumpData();
 
 	updateAndWait(1);
 
@@ -134,11 +120,6 @@ int main(int argc, char* argv[])
 
 	// cleanup
 	pass = pass && std::filesystem::remove_all(blade.cwd()) > 0;
-	for (auto& file : files)
-	{
-		auto tmp {std::filesystem::remove_all(file)};
-		pass = pass && tmp > 0;
-	}
 
 	// test pass or fail
 	if (pass)

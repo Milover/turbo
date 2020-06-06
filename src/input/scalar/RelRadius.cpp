@@ -8,15 +8,13 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "StaticPressureDifference.h"
+#include "RelRadius.h"
 
-#include "AerodynamicEfficiency.h"
-#include "BladeVelocity.h"
-#include "Density.h"
 #include "General.h"
-#include "InitialDesign.h"
-#include "InletVelocity.h"
-#include "OutletVelocity.h"
+#include "HubRadius.h"
+#include "Radius.h"
+#include "ShroudRadius.h"
+#include "TipClearance.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -27,38 +25,31 @@ namespace input
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-StaticPressureDifference::StaticPressureDifference(const Float f)
+RelRadius::RelRadius(const Float f)
 :
-	PVBase {f}
+	LVBase {f}
 {}
 
 
-StaticPressureDifference::StaticPressureDifference
+RelRadius::RelRadius
 (
-	const InletVelocity& c_1,
-	const OutletVelocity& c_2,
-	const BladeVelocity& U,
-	const AerodynamicEfficiency& eta,
-	const Density& rho
+	const Radius& r,
+	const HubRadius& r_h,
+	const ShroudRadius& r_s,
+	const TipClearance& z_tip
 )
 :
-	StaticPressureDifference
+	RelRadius
 	{
-		compute::computeStaticPressureDifference
-		(
-			c_1.value(),
-			c_2.value(),
-			U.value(),
-			eta.value(),
-			rho.value()
-		)
+		(r.value() - r_h.value())
+	  / (r_s.value() - z_tip.value() - r_h.value())
 	}
 {}
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-String StaticPressureDifference::getName() const
+String RelRadius::getName() const
 {
 	return name;
 }

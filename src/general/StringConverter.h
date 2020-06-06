@@ -22,6 +22,7 @@ Description
 
 #include "Error.h"
 #include "General.h"
+#include "List.h"
 #include "Utility.h"
 #include "Vector.h"
 
@@ -50,6 +51,11 @@ struct isConvertible<Integer> : std::true_type {};
 // We know how to convert from String to Float
 template<>
 struct isConvertible<Float> : std::true_type {};
+
+
+// We know how to convert from String to List of T
+template<typename U>
+struct isConvertible<List<U>> : std::bool_constant<isConvertible_v<U>> {};
 
 
 // We know how to convert from String to Vector
@@ -125,6 +131,28 @@ void StringConverter<T>::check(const String& s) const noexcept(ndebug)
 	else if (!stream_.eof())
 		error(FUNC_INFO, "Partial match: ", s);
 }
+
+
+template<typename T>
+T StringConverter<T>::convert(const String& s [[maybe_unused]])
+{
+	// this is our generic, one-size-fits-all implementation,
+	// some specializations are in the source file
+	T t;
+
+	this->stream_ >> t;
+
+	return t;
+}
+
+
+// * * * * * * * * * * * * * * Specializations * * * * * * * * * * * * * * * //
+
+template<>
+Float StringConverter<Float>::convert(const String& s);
+
+template<>
+Integer StringConverter<Integer>::convert(const String& s);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

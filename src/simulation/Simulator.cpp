@@ -187,7 +187,7 @@ R"(FoamFile
 		data_->cref<input::KinematicViscosity>(),
 		data_->cref<input::BladeVelocity>(),
 		data_->cref<input::InletRelativeVelocity>(),
-		data_->cref<input::StaticPressureDifference>(),
+		data_->cref<input::KinematicPressureDifference>(),
 		// turbulence
 		data_->cref<input::TurbulenceIntensity>(),
 		data_->cref<input::TurbulenceReferenceLengthScale>(),
@@ -196,7 +196,7 @@ R"(FoamFile
 		data_->cref<input::TurbulenceSpecificDissipationRate>(),
 		data_->cref<input::TurbulenceViscosity>(),
 		// postprocessing
-		data_->cref<input::TEMonitoringPlane>(),
+		data_->cref<input::LEMonitoringPlane>(),
 		data_->cref<input::TEMonitoringPlane>()
 	);
 

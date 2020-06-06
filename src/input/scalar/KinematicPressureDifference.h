@@ -7,70 +7,71 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::design::ConstantDistribution
+	turbo::input::KinematicPressureDifference
 
 Description
-	Class ConstantDistribution
+	Class KinematicPressureDifference.
 
 SourceFiles
-	ConstantDistribution.cpp
+	KinematicPressureDifference.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef DESIGN_CONSTANT_DISTRIBUTION_H
-#define DESIGN_CONSTANT_DISTRIBUTION_H
+#ifndef INPUT_KINEMATIC_PRESSURE_DIFFERENCE_H
+#define INPUT_KINEMATIC_PRESSURE_DIFFERENCE_H
 
-#include "DistributionGeneratorBase.h"
-#include "Error.h"
+#include "Density.h"
 #include "General.h"
-#include "Variables.h"
+#include "PositiveValue.h"
+#include "StaticPressureDifference.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace turbo
 {
-namespace design
+namespace input
 {
 
 /*---------------------------------------------------------------------------*\
-				Class ConstantDistribution Declaration
+				Class KinematicPressureDifference Declaration
 \*---------------------------------------------------------------------------*/
 
-class ConstantDistribution final
+class KinematicPressureDifference final
 :
-	public DistributionGeneratorBase
+	public PositiveValue<Float>
 {
-private:
-
-	// Private data
-
-		input::MaxProfileThickness max_;
-
-
 public:
 
-	// Private data
+	// Public static data
 
-		inline static const String name {"ConstantDistribution"};
+		inline static const String name {"KinematicPressureDifference"};
 
 
 	// Constructors
 
-		//- Defaul constructor
-		ConstantDistribution();
+		//- Construct from a Float,
+		//  no aditional checking required
+		explicit KinematicPressureDifference(const Float f);
+
+		//- Compute and construct
+		KinematicPressureDifference
+		(
+			const StaticPressureDifference& dp,
+			const Density& rho
+		);
 
 
 	// Member functions
 
-		//- Get thickness at 'x' (half of total thickness)
-		Float thickness(const Float x) const noexcept(ndebug) override;
+		//- Get object name
+		String getName() const override;
 
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace design
+} // End namespace input
 } // End namespace turbo
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

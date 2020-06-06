@@ -14,12 +14,12 @@ License
 #include "ProfileGenerator.h"
 
 #include "CircularArcCamber.h"
-#include "ConstantDistribution.h"
+#include "ConstantThickness.h"
 #include "Error.h"
 #include "General.h"
 #include "InputRegistry.h"
 #include "Naca2DigitCamber.h"
-#include "Naca4DigitDistribution.h"
+#include "Naca4DigitThickness.h"
 #include "NoCamber.h"
 #include "Registry.h"
 
@@ -70,35 +70,35 @@ void ProfileGenerator::createCamberGenerator(const input::Registry& reg)
 }
 
 
-void ProfileGenerator::createDistributionGenerator()
+void ProfileGenerator::createDistributionGenerator(const input::Registry& reg)
 {
 	if
 	(
-		!input::InputRegistry::has("Distribution")
+		!input::InputRegistry::has("Thickness")
 	)
-		dGen_.reset
+		tGen_.reset
 		(
-			new Naca4DigitDistribution {}
+			new Naca4DigitThickness {reg}
 		);
 	else
 	{
 		auto type
 		{
-			input::InputRegistry::get("Distribution")
+			input::InputRegistry::get("Thickness")
 		};
 
-		if (type == ConstantDistribution::name)
-			dGen_.reset
+		if (type == ConstantThickness::name)
+			tGen_.reset
 			(
-				new ConstantDistribution {}
+				new ConstantThickness {reg}
 			);
-		else if (type == Naca4DigitDistribution::name)
-			dGen_.reset
+		else if (type == Naca4DigitThickness::name)
+			tGen_.reset
 			(
-				new Naca4DigitDistribution {}
+				new Naca4DigitThickness {reg}
 			);
 		else
-			error(FUNC_INFO, "unknown Distribution: ", type);
+			error(FUNC_INFO, "unknown Thickness: ", type);
 	}
 }
 
@@ -133,7 +133,7 @@ Vectorpair<ProfileGenerator::Point> ProfileGenerator::generate() const
 		x = p.x();
 		y = p.y();
 
-		thickness = dGen_->thickness(x);
+		thickness = tGen_->thickness(x);
 		inclination = cGen_->inclination(x);
 
 		dx = thickness * std::sin(inclination);
@@ -170,7 +170,7 @@ Float ProfileGenerator::inclination(const Float x) const noexcept
 void ProfileGenerator::reset(const input::Registry& reg)
 {
 	createCamberGenerator(reg);
-	createDistributionGenerator();
+	createDistributionGenerator(reg);
 }
 
 

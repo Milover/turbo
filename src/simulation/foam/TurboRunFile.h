@@ -68,6 +68,9 @@ runParallel $application >> log.turbo
 
 # reconstruct
 runApplication reconstructPar -latestTime >> log.turbo
+
+# cleanup
+rm -rf processor*
 )"
 };
 

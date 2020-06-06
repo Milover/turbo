@@ -7,12 +7,12 @@ License
 	See the LICENSE file for license information.
 
 Description
-	system/controlDict file contents
+	system/turbo_post/patchSurfaceFieldValue file contents
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef SIMULATION_FOAM_FOAM_CONTROL_DICT_FILE_H
-#define SIMULATION_FOAM_FOAM_CONTROL_DICT_FILE_H
+#ifndef SIMULATION_FOAM_FOAM_PATCH_SURFACE_FIELD_VALUE_H
+#define SIMULATION_FOAM_FOAM_PATCH_SURFACE_FIELD_VALUE_H
 
 #include "General.h"
 
@@ -27,58 +27,46 @@ namespace foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-inline static const String foamControlDictFile
+inline static const String foamPatchSurfaceFieldValueFile
 {
-R"(FoamFile
+R"(
+__patchSurfaceFieldValue
 {
-    version     2.0;
-    format      ascii;
-    class       dictionary;
-    location    "system";
-    object      controlDict;
+        type            surfaceFieldValue;
+        libs            ( "libfieldFunctionObjects.so" );
+        writeControl    onEnd;
+        log             false;
+        writeFields     true;
+        surfaceFormat   none;
+
+        regionType      patch;
+        operation       areaAverage;
+
+        fields          ( p U );
 }
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include                "../turbo_values"
-
-application       simpleFoam;
-
-startFrom         startTime;
-
-startTime         0;
-
-stopAt            endTime;
-
-endTime           2000;
-
-deltaT            1;
-
-writeControl      timeStep;
-
-writeInterval     50;
-
-purgeWrite        3;
-
-writeFormat       binary;
-
-writePrecision    12;
-
-writeCompression  false;
-
-timeFormat        general;
-
-timePrecision     8;
-
-runTimeModifiable false;
-
-functions
+turbo_patchSurfaceFieldValue_inlet
 {
-    #include      "turbo_post/forces"
-    #include      "turbo_post/patchSurfaceFieldValue"
-    #include      "turbo_post/sampledSurfaceFieldValue"
-    #include      "turbo_post/yPlus"
+        ${__patchSurfaceFieldValue}
+
+        name            inlet;
 }
 
+
+turbo_patchSurfaceFieldValue_outlet
+{
+        ${__patchSurfaceFieldValue}
+
+        name            outlet;
+}
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#remove "__.*"
 
 // ************************************************************************* //
 )"

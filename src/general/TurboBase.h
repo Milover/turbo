@@ -151,6 +151,9 @@ public:
 		//- Get the working directory
 		[[nodiscard]] Path cwd() const;
 
+		//- Dump registry data to file (cwd_/filename)
+		void dumpData() const;
+
 		//- Access data
 		template<typename T, typename R = NoRecurse>
 		std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, T>
@@ -168,7 +171,7 @@ public:
 		void printAll
 		(
 			std::ostream& os,
-			const String::size_type width = 0,
+			const String::size_type width = 40,		// generally enough
 			const String& delimiter = " ",
 			const String& terminator = ";\n"
 		) const;

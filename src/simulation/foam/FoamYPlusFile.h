@@ -7,36 +7,46 @@ License
 	See the LICENSE file for license information.
 
 Description
-	Highly advanced debugging tools and utilities.
+	system/turbo_post/yPlus file contents
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef DEBUG_DEBUG_H
-#define DEBUG_DEBUG_H
+#ifndef SIMULATION_FOAM_FOAM_Y_PLUS_FILE_H
+#define SIMULATION_FOAM_FOAM_Y_PLUS_FILE_H
 
-#include <iomanip>
-#include <iostream>
-#include <utility>
+#include "General.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace turbo
 {
-namespace debug
+namespace simulation
 {
-
-// * * * * * * * * * * * * * * Functions * * * * * * * * * * * * * * * * * * //
-
-template<typename... Ts>
-inline void echo(Ts&&... ts)
+namespace foam
 {
-    (std::cerr << ... << std::forward<Ts>(ts)) << '\n';
-}
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace debug
+inline static const String foamYPlusFile
+{
+R"(
+turbo_yPlus
+{
+    type            yPlus;
+    libs            ( "libfieldFunctionObjects.so" );
+    writeControl    onEnd;
+    log             false;
+}
+
+
+// ************************************************************************* //
+)"
+};
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace foam
+} // End namespace simulation
 } // End namespace turbo
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

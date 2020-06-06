@@ -4,7 +4,7 @@
 
 # add all subdirectories
 add_subdirectory(camber)
-add_subdirectory(distribution)
+add_subdirectory(thickness)
 
 # add sources
 set(SRC

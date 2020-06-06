@@ -10,14 +10,13 @@ License
 
 #include "RootOutletVelocity.h"
 
-#include "Density.h"
+#include "AerodynamicEfficiency.h"
 #include "Error.h"
 #include "General.h"
 #include "HubRadius.h"
 #include "InitialDesign.h"
 #include "InletVelocity.h"
 #include "Rps.h"
-#include "StaticPressureDifference.h"
 #include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -38,10 +37,9 @@ RootOutletVelocity::RootOutletVelocity(const Vector& v) noexcept(ndebug)
 RootOutletVelocity::RootOutletVelocity
 (
 	const InletVelocity& c_1,
-	const StaticPressureDifference& dp,
-	const Rps& rps,
-	const HubRadius& r_h,
-	const Density& rho
+	const AerodynamicEfficiency& eta,
+	const Rps& N,
+	const HubRadius& r_h
 ) noexcept(ndebug)
 :
 	RootOutletVelocity
@@ -52,12 +50,11 @@ RootOutletVelocity::RootOutletVelocity
 			compute::computeRootOutletVelocity
 			(
 				c_1.value(),
-				dp.value(),
-				rps.value(),
-				r_h.value(),
-				rho.value()
+				eta.value(),
+				N.value(),
+				r_h.value()
 			),
-			rps.value(),
+			N.value(),
 			r_h.value()
 		)
 	}

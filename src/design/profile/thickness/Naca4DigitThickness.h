@@ -7,18 +7,26 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::design::DistributionGeneratorBase
+	turbo::design::Naca4DigitThickness
 
 Description
-	Abstract base class for distribution generator classes
+	Class Naca4DigitThickness
+	For more information on the generation procedure see \cite{}.
+
+SourceFiles
+	Naca4DigitThickness.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef DESIGN_DISTRIBUTION_GENERATOR_BASE_H
-#define DESIGN_DISTRIBUTION_GENERATOR_BASE_H
+#ifndef DESIGN_PROFILE_THICKNESS_NACA_4_DIGIT_THICKNESS_H
+#define DESIGN_PROFILE_THICKNESS_NACA_4_DIGIT_THICKNESS_H
 
+#include <array>
+
+#include "ThicknessGeneratorBase.h"
 #include "Error.h"
 #include "General.h"
+#include "Registry.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -28,53 +36,45 @@ namespace design
 {
 
 /*---------------------------------------------------------------------------*\
-					Class DistributionGeneratorBase Declaration
+				Class Naca4DigitThickness Declaration
 \*---------------------------------------------------------------------------*/
 
-class DistributionGeneratorBase
+class Naca4DigitThickness final
+:
+	public ThicknessGeneratorBase
 {
-protected:
+private:
 
-	// Constructors
+	// Private data
 
-		//- Default constructor
-		DistributionGeneratorBase() = default;
+		static constexpr Float scale_ {5.0};
+		std::array<Float, 5> a_
+		{
+			0.2969,
+		   -0.1260,
+		   -0.3516,
+			0.2843,
+		   -0.1015
+		};
 
 
 public:
 
+	// Public data
+
+		inline static const String name {"Naca4DigitThickness"};
+
+
 	// Constructors
 
-		//- Copy constructor
-		DistributionGeneratorBase(const DistributionGeneratorBase&) = delete;
-
-		//- Move constructor
-		DistributionGeneratorBase(DistributionGeneratorBase&&) = default;
-
-
-	//- Destructor
-	virtual ~DistributionGeneratorBase() = default;
+		//- Default constructor
+		Naca4DigitThickness(const input::Registry& reg);
 
 
 	// Member functions
 
 		//- Get thickness at 'x' (half of total thickness)
-		virtual Float thickness(const Float x) const noexcept(ndebug) = 0;
-
-
-	// Member operators
-
-		//- Copy assignment operator
-		DistributionGeneratorBase& operator=
-		(
-			const DistributionGeneratorBase&
-		) = delete;
-
-		//- Move assignment operator
-		DistributionGeneratorBase& operator=
-		(
-			DistributionGeneratorBase&&
-		) = default;
+		Float thickness(const Float x) const noexcept(ndebug) override;
 
 };
 

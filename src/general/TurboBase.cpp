@@ -9,6 +9,8 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include <filesystem>
+#include <fstream>
+#include <iostream>
 #include <ostream>
 
 #include "TurboBase.h"
@@ -118,6 +120,21 @@ void TurboBase::activate() const
 Path TurboBase::cwd() const
 {
 	return cwd_;
+}
+
+
+void TurboBase::dumpData() const
+{
+	Path file {cwd_ / filename.stem()};
+
+	if (std::filesystem::exists(file))
+	{
+		std::cerr << "WARNING: "
+				  << "overwriting file: " << file << "\n";
+	}
+
+	std::ofstream ofs {file};
+	printAll(ofs);
 }
 
 
