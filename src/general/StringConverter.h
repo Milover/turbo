@@ -23,6 +23,7 @@ Description
 #include "Error.h"
 #include "General.h"
 #include "List.h"
+#include "Polyline.h"
 #include "Utility.h"
 #include "Vector.h"
 
@@ -56,6 +57,14 @@ struct isConvertible<Float> : std::true_type {};
 // We know how to convert from String to List of T
 template<typename U>
 struct isConvertible<List<U>> : std::bool_constant<isConvertible_v<U>> {};
+
+
+// We know how to convert from String to Polyline of T
+template<typename U>
+struct isConvertible<math::Polyline<U>>
+:
+	std::bool_constant<isConvertible_v<U>>
+{};
 
 
 // We know how to convert from String to Vector
@@ -117,7 +126,7 @@ T StringConverter<T>::operator()(const String& s)
 	this->stream_ << str;
 
 	// need 's' to print out where the error occured
-	return T {this->convert(s)};
+	return this->convert(s);
 }
 
 

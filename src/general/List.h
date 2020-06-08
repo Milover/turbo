@@ -70,14 +70,20 @@ class List
 {
 public:
 
-	using type = std::vector<T>;
-	using value_type = T;
+	using value_type		= T;
+	using container_type	= std::vector<T>;
+	using size_type			= typename container_type::size_type;
+	using iterator			= typename container_type::iterator;
+	using const_iterator	= typename container_type::const_iterator;
+	using reference			= typename container_type::reference;
+	using const_reference	= typename container_type::const_reference;
 
 private:
 
 	// Private data
 
-		type data_;
+		container_type data_;
+
 
 public:
 
@@ -102,9 +108,12 @@ public:
 		template
 		<
 			typename U,
-			typename = std::enable_if_t<std::is_same_v<type, removeCVRef_t<U>>>
+			typename = std::enable_if_t
+			<
+				std::is_same_v<container_type, removeCVRef_t<U>>
+			>
 		>
-		List(U&& u);
+		explicit List(U&& u);
 
 		//- Copy constructor
 		List(const List&) = default;
@@ -130,11 +139,23 @@ public:
 			typename U,
 			typename = std::enable_if_t
 			<
-				std::is_same_v<type, removeCVRef_t<U>>
+				std::is_same_v<container_type, removeCVRef_t<U>>
 			 || std::is_same_v<List<T>, removeCVRef_t<U>>
 			>
 		>
 		void append(U&& u);
+
+		//- Get reference to last element
+		[[nodiscard]] const_reference back() const;
+
+		//- Get reference to last element
+		[[nodiscard]] reference back();
+
+		//- Get iterator to beginning
+		[[nodiscard]] const_iterator begin() const noexcept;
+
+		//- Get iterator to beginning
+		[[nodiscard]] iterator begin() noexcept;
 
 		//- Clear
 		void clear() noexcept;
@@ -142,14 +163,35 @@ public:
 		//- Check if empty
 		[[nodiscard]] bool empty() const noexcept;
 
-		//- Get data
-		const type& get() const noexcept;
+		//- Get iterator to end
+		[[nodiscard]] const_iterator end() const noexcept;
+
+		//- Get iterator to end
+		[[nodiscard]] iterator end() noexcept;
+
+		//- Get reference to first element
+		[[nodiscard]] const_reference front() const;
+
+		//- Get reference to first element
+		[[nodiscard]] reference front();
 
 		//- Get data
-		type& get() noexcept;
+		[[nodiscard]] const container_type& get() const noexcept;
+
+		//- Get data
+		[[nodiscard]] container_type& get() noexcept;
+
+		//- Get size
+		[[nodiscard]] size_type size() const noexcept;
 
 
 	// Member operators
+
+		//- Access operator
+		[[nodiscard]] const_reference operator[](size_type pos) const;
+
+		//- Access operator
+		[[nodiscard]] reference operator[](size_type pos);
 
 		//- Copy assignment operator
 		List& operator=(const List&) = default;
@@ -158,13 +200,13 @@ public:
 		List& operator=(List&&) = default;
 
 		//- Equality operator
-		bool operator==(const List& l) const noexcept;
+		[[nodiscard]] bool operator==(const List& l) const noexcept;
 
 };
 
 // * * * * * * * * * * * * * * Global Operators  * * * * * * * * * * * * * * //
 
-//- stream output operator
+//- Input stream output operator, appends to List
 template
 <
 	typename T,
@@ -220,7 +262,7 @@ std::istream& operator>>(std::istream& is, List<T>& l)
 }
 
 
-//- stream input operator
+//- Output stream input operator
 template<typename T>
 std::ostream& operator<<(std::ostream& os, const List<T>& l)
 {
@@ -303,6 +345,34 @@ void List<T>::append(U&& u)
 
 
 template<typename T>
+typename List<T>::const_reference List<T>::back() const
+{
+	return this->data_.back();
+}
+
+
+template<typename T>
+typename List<T>::reference List<T>::back()
+{
+	return this->data_.back();
+}
+
+
+template<typename T>
+typename List<T>::const_iterator List<T>::begin() const noexcept
+{
+	return this->data_.begin();
+}
+
+
+template<typename T>
+typename List<T>::iterator List<T>::begin() noexcept
+{
+	return this->data_.begin();
+}
+
+
+template<typename T>
 void List<T>::clear() noexcept
 {
 	this->data_.clear();
@@ -316,22 +386,70 @@ bool List<T>::empty() const noexcept
 }
 
 
+template<typename T>
+typename List<T>::const_iterator List<T>::end() const noexcept
+{
+	return this->data_.end();
+}
+
 
 template<typename T>
-const typename List<T>::type& List<T>::get() const noexcept
+typename List<T>::iterator List<T>::end() noexcept
+{
+	return this->data_.end();
+}
+
+
+template<typename T>
+typename List<T>::const_reference List<T>::front() const
+{
+	return this->data_.front();
+}
+
+
+template<typename T>
+typename List<T>::reference List<T>::front()
+{
+	return this->data_.front();
+}
+
+
+template<typename T>
+const typename List<T>::container_type& List<T>::get() const noexcept
 {
 	return this->data_;
 }
 
 
 template<typename T>
-typename List<T>::type& List<T>::get() noexcept
+typename List<T>::container_type& List<T>::get() noexcept
 {
 	return this->data_;
+}
+
+
+template<typename T>
+typename List<T>::size_type List<T>::size() const noexcept
+{
+	return this->data_.size();
 }
 
 
 // * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
+
+template<typename T>
+typename List<T>::const_reference List<T>::operator[](size_type pos) const
+{
+	return this->data_[pos];
+}
+
+
+template<typename T>
+typename List<T>::reference List<T>::operator[](size_type pos)
+{
+	return this->data_[pos];
+}
+
 
 template<typename T>
 bool List<T>::operator==(const List<T>& l) const noexcept

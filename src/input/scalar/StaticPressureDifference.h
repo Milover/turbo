@@ -20,7 +20,6 @@ SourceFiles
 #ifndef INPUT_STATIC_PRESSURE_DIFFERENCE_H
 #define INPUT_STATIC_PRESSURE_DIFFERENCE_H
 
-#include "AerodynamicEfficiency.h"
 #include "BladeVelocity.h"
 #include "Density.h"
 #include "General.h"
@@ -65,7 +64,6 @@ public:
 			const InletVelocity& c_1,
 			const OutletVelocity& c_2,
 			const BladeVelocity& U,
-			const AerodynamicEfficiency& eta,
 			const Density& rho
 		);
 

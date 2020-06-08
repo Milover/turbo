@@ -8,14 +8,9 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "StaticPressureDifference.h"
+#include "MaxPassageWidthDistribution.h"
 
-#include "BladeVelocity.h"
-#include "Density.h"
 #include "General.h"
-#include "InitialDesign.h"
-#include "InletVelocity.h"
-#include "OutletVelocity.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -24,38 +19,9 @@ namespace turbo
 namespace input
 {
 
-// * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
-
-StaticPressureDifference::StaticPressureDifference(const Float f)
-:
-	PVBase {f}
-{}
-
-
-StaticPressureDifference::StaticPressureDifference
-(
-	const InletVelocity& c_1,
-	const OutletVelocity& c_2,
-	const BladeVelocity& U,
-	const Density& rho
-)
-:
-	StaticPressureDifference
-	{
-		compute::computeStaticPressureDifference
-		(
-			c_1.value(),
-			c_2.value(),
-			U.value(),
-			rho.value()
-		)
-	}
-{}
-
-
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-String StaticPressureDifference::getName() const
+String MaxPassageWidthDistribution::getName() const
 {
 	return name;
 }

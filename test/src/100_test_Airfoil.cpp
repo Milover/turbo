@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
 			{"NumberOfStations",			"1"},				// default
 			{"ShroudRadius",				"0.075"},
 			{"TipClearance",				"0"},				// default
-			{"Solidity",					"1.0"},				// default
+			{"SolidityDistribution",		"(1)"},				// default
 			// airfoil
 			{"Thickness",			"Naca4DigitThickness"},		// default
 			{"DeviationAngle",				"0"},				// default

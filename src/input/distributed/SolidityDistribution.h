@@ -7,27 +7,27 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::input::RootOutletVelocity
+	turbo::input::SolidityDistribution
 
 Description
-	Class RootOutletVelocity.
+	Class SolidityDistribution.
 
-	Swirl velocity at mean radius, used to prescribe the swirl distribution.
+	Defaults to 1.0.
 
 SourceFiles
-	RootOutletVelocity.cpp
+	SolidityDistribution.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef INPUT_ROOT_OUTLET_VELOCITY_H
-#define INPUT_ROOT_OUTLET_VELOCITY_H
+#ifndef INPUT_SOLIDITY_DISTRIBUTION_H
+#define INPUT_SOLIDITY_DISTRIBUTION_H
+
+#include <utility>
 
 #include "Error.h"
-#include "HubRadius.h"
-#include "InletVelocity.h"
-#include "RegistryObject.h"
-#include "Rps.h"
-#include "Vector.h"
+#include "General.h"
+#include "DistributedValue.h"
+#include "Solidity.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -36,38 +36,37 @@ namespace turbo
 namespace input
 {
 
-// Forward declarations
-class StaticPressureDifference;
-
 /*---------------------------------------------------------------------------*\
-					Class RootOutletVelocity Declaration
+					Class SolidityDistribution Declaration
 \*---------------------------------------------------------------------------*/
 
-class RootOutletVelocity final
+class SolidityDistribution final
 :
-	public RegistryObject<Vector>
+	public DistributedValue<Solidity>
 {
 public:
 
 	// Public static data
 
-		inline static const String name {"RootOutletVelocity"};
+		inline static const String name {"SolidityDistribution"};
 
 
 	// Constructors
 
-		//- Construct from a Vector,
-		//  no aditional checking required
-		explicit RootOutletVelocity(const Vector& v) noexcept(ndebug);
+		//- Default constructor
+		SolidityDistribution() noexcept;
 
-		//- Compute and apply the de Haller criterion and construct,
-		//	computed by requiring the root pressure rise to be maximal
-		RootOutletVelocity
-		(
-			const InletVelocity& c_1,
-			const Rps& N,
-			const HubRadius& r_h
-		) noexcept(ndebug);
+		//- Construct from a Polyline,
+		//	no additional checking required
+		template
+		<
+			typename T,
+			typename = std::enable_if_t
+			<
+				std::is_same_v<typename RegBase::type, removeCVRef_t<T>>
+			>
+		>
+		explicit SolidityDistribution(T&& t);
 
 
 	// Member functions
@@ -76,6 +75,15 @@ public:
 		String getName() const override;
 
 };
+
+
+// * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
+
+template<typename T, typename>
+SolidityDistribution::SolidityDistribution(T&& t)
+:
+	DVBase {std::forward<T>(t)}
+{}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

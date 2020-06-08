@@ -52,15 +52,20 @@ void Blade::construct()
 		c_1,
 		data_->cref<input::TurbulenceIntensity>()
 	};
+	input::SolidityDistribution solidityDistr
+	{
+		data_->cref<input::SolidityDistribution>()
+	};
 	input::storeAll
 	(
 		*data_,
 		std::move(c_1),
 		std::move(k),
-		std::move(nu)
+		std::move(nu),
+		std::move(solidityDistr)
 	);
 
-	// we allow this to be user input
+	// we allow these to be user input
 	if
 	(
 		!data_->storeFromInput<input::RootOutletVelocity>()
@@ -70,12 +75,10 @@ void Blade::construct()
 			input::RootOutletVelocity
 			{
 				c_1,
-				data_->cref<input::AerodynamicEfficiency>(),
 				data_->cref<input::Rps>(),
 				data_->cref<input::HubRadius>()
 			}
 		);
-	// we allow this to be user input
 	if
 	(
 		!data_->storeFromInput<input::VortexDistributionExponent>()
@@ -86,13 +89,16 @@ void Blade::construct()
 			{
 				data_->cref<input::RootOutletVelocity>(),
 				data_->cref<input::StaticPressureDifference>(),
-				data_->cref<input::AerodynamicEfficiency>(),
 				data_->cref<input::Rps>(),
 				data_->cref<input::HubRadius>(),
 				data_->cref<input::ShroudRadius>(),
 				data_->cref<input::Density>()
 			}
 		);
+
+	// these are optional
+	data_->storeFromInput<input::MaxAbsBladeThicknessDistribution>();
+	data_->storeFromInput<input::MaxPassageWidthDistribution>();
 
 	// build airfoils
 	std::size_t numStations
@@ -285,7 +291,6 @@ void Blade::build()
 			}
 		}
 	);
-
 }
 
 

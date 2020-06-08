@@ -152,7 +152,6 @@ Float computeStaticPressureDifference
 	const Vector& c_1,		// abs. fluid inlet velocity
 	const Vector& c_2,		// abs. fluid outlet velocity
 	const Vector& U,		// blade velocity
-	const Float eta,		// aerodynamic efficiency
 	const Float rho			// density
 ) noexcept;
 
@@ -161,7 +160,6 @@ Float computeStaticPressureDifference
 Vector computeRootOutletVelocity
 (
 	const Vector& c_1,		// abs. fluid inlet velocity
-	const Float eta,		// aerodynamic efficiency
 	const Float N,			// rev. per second
 	const Float r_h			// hub radius
 ) noexcept;
@@ -174,7 +172,7 @@ Vector computeRootOutletVelocity_depr
 (
 	const Vector& c_1,		// abs. fluid inlet velocity
 	const Float dp,			// (requested total) static pressure difference
-	const Float eta,		// aerodynamic efficiency
+	const Float eta,		// total to total efficiency
 	const Float N,			// rev. per second
 	const Float n,			// vortex distribution coefficient
 	const Float r_h,		// hub radius
@@ -189,7 +187,6 @@ Float computeVortexDistributionExponent
 (
 	const Vector& c_2_h,	// abs. root (hub) fluid outlet velocity
 	const Float dp,			// (requested total) static pressure difference
-	const Float eta,		// hydraulic efficiency
 	const Float N,			// rev. per second
 	const Float r_h,		// hub radius
 	const Float r_s,		// shroud radius

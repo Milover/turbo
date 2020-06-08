@@ -45,12 +45,33 @@ solvers
 {
     p
     {
-        solver          PCG;
-        preconditioner  DIC;
+        solver              GAMG;
+        smoother            FDIC;
 
-        minIter         3;
-        tolerance       1e-7;
-        relTol          0;
+        minIter             3;
+        maxIter             100;
+        nPreSweeps          1;
+        nPostSweeps         2;
+        nFinestSweeps       2;
+
+        scaleCorrection     true;
+        directSolverCoarsestLevel false;
+
+        agglomerator        faceAreaPair;
+        cacheAgglomeration  true;
+        nCellsCoarsestLevel 250;
+        mergeLevels         1;
+
+        coarsestLevelCorr
+        {
+            solver          PCG;
+            preconditioner  DIC;
+
+            relTol          0.05;
+        }
+
+        tolerance           1e-7;
+        relTol              0;
     }
 
     U

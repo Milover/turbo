@@ -113,6 +113,9 @@ public:
 		//- Build geometry
 		void build();
 
+		//- Create an Airfoil that satisfies requirements
+		void design();
+
 		//- Build mesh
 		Sptr<mesh::ProfileMesh> mesh(const bool writeMesh = false) const;
 

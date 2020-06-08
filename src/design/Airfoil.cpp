@@ -20,6 +20,7 @@ License
 #include "Registry.h"
 #include "Simulator.h"
 #include "TurboBase.h"
+#include "Utility.h"
 #include "Variables.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -66,7 +67,6 @@ void Airfoil::construct
 		data_->cref<input::InletVelocity>(),
 		c_2,
 		U,
-		data_->cref<input::AerodynamicEfficiency>(),
 		data_->cref<input::Density>()
 	};
 	input::KinematicPressureDifference dp_kin
@@ -89,14 +89,15 @@ void Airfoil::construct
 		data_->cref<input::NumberOfBlades>(),
 		radius
 	};
-	// NOTE: placeholders untill distributions are implemented
-	data_->storeFromInput<input::MaxAbsBladeThickness>();
-	data_->storeFromInput<input::MaxPassageWidth>();
-	data_->storeFromInput<input::Solidity>();
+	// these might change after building
+	input::Solidity solidity
+	{
+		data_->cref<input::SolidityDistribution>().valueAt(r_rel)
+	};
 	input::Chord chord
 	{
 		pitch,
-		data_->cref<input::Solidity>()
+		solidity
 	};
 
 	// store
@@ -112,9 +113,29 @@ void Airfoil::construct
 		std::move(pitch),
 		radius,
 		std::move(r_rel),
+		std::move(solidity),
 		std::move(U),
 		std::move(w_1)
 	);
+
+	// optional
+	if (data_->has<input::MaxAbsBladeThicknessDistribution>())
+		data_->store
+		(
+			input::MaxAbsBladeThickness
+			{
+				data_->
+				cref<input::MaxAbsBladeThicknessDistribution>().valueAt(r_rel)
+			}
+		);
+	if (data_->has<input::MaxPassageWidthDistribution>())
+		data_->store
+		(
+			input::MaxPassageWidth
+			{
+				data_->cref<input::MaxPassageWidthDistribution>().valueAt(r_rel)
+			}
+		);
 }
 
 
@@ -203,6 +224,34 @@ void Airfoil::build()
 		std::move(nut),
 		std::move(omega)
 	);
+}
+
+
+void Airfoil::design()
+{
+	// first simple design loop
+	// loop
+	// 		run sim
+	// 		compute stagger angle correction
+	// 		rebuild
+
+	auto& xi {data_->ref<input::StaggerAngle>()};
+	input::StaggerAngle xi_new {xi.value()};	// dummy
+	while
+	(
+		isGreaterOrEqual
+		(
+			std::abs
+			(
+				xi_new.value() - data_->cref<input::StaggerAngle>().value()
+			),
+			eps
+		)
+	)
+	{
+		data_->cref<input = ;
+
+	}
 }
 
 

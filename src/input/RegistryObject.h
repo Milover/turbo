@@ -32,6 +32,7 @@ Description
 #include "Error.h"
 #include "InputRegistry.h"
 #include "StringConverter.h"
+#include "Polyline.h"
 #include "RegistryObjectBase.h"
 #include "Vector.h"
 
@@ -58,6 +59,7 @@ protected:
 		std::is_arithmetic_v<T>
 	 || std::is_enum_v<T>
 	 || std::is_same_v<Vector, T>
+	 || math::isPolyline_v<T>
 	);
 
 	using RegBase = RegistryObject<T>;
@@ -203,15 +205,25 @@ RegistryObject<T>::RegistryObject(U&& u) noexcept(ndebug)
 template<typename T>
 void RegistryObject<T>::check() const noexcept(ndebug)
 {
-	if constexpr (std::is_floating_point_v<T>)
+	// XXX: why don't we check integral values?
+	//if constexpr (std::is_floating_point_v<T>)
+	if constexpr (std::is_arithmetic_v<T>)
 	{
 		if (std::isnan(this->value_))
 			error(FUNC_INFO, "value of is NaN");
 	}
-	else if constexpr (std::is_same_v<Vector, T>)
+	else if constexpr
+	(
+		std::is_same_v<Vector, T>
+	 || math::isPolyline_v<T>
+	)
 	{
 		if (isNan(this->value_))
 			error(FUNC_INFO, "value is NaN");
+	}
+	else if constexpr (!std::is_enum_v<T>)
+	{
+		error(FUNC_INFO, "value type check not implemented");
 	}
 }
 

@@ -118,7 +118,7 @@ public:
 
 		//- Generate a mesh
 		//	NOTE: activates the (local) model
-		//	XXX: no error handling/quality checks
+		//	WARNING: no error handling/quality checks
 		void build(const Geometry& geometry);
 
 		//- Check if empty

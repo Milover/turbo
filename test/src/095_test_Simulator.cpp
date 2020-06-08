@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 			{"Camber",					"CircularArcCamber"},	// default
 			{"NumberOfCamberPoints",				"150"},		// default
 			{"MaxProfileThickness",					"0.1"},
-			{"Solidity",							"1"},		// default
+			{"SolidityDistribution",				"(1)"},		// default
 			// mesh
 			{"ProfileMeshGenerator","ProfileTetMeshGenerator"},	// default
 			{"RelMeshSize",							"0.01"},	// default

@@ -212,7 +212,6 @@ Float computeStaticPressureDifference
 	const Vector& c_1,		// abs. fluid inlet velocity
 	const Vector& c_2,		// abs. fluid outlet velocity
 	const Vector& U,		// blade velocity
-	const Float eta,		// aerodynamic efficiency
 	const Float rho			// density
 ) noexcept
 {
@@ -221,21 +220,20 @@ Float computeStaticPressureDifference
 		0.5 * (std::pow(mag(c_2), 2) - std::pow(mag(c_1), 2))
 	};
 
-	return rho * (eta * U.y() * c_2.y() - e_k);
+	return rho * (U.y() * c_2.y() - e_k);
 }
 
 
 Vector computeRootOutletVelocity
 (
 	const Vector& c_1,		// abs. fluid inlet velocity
-	const Float eta,		// aerodynamic efficiency
 	const Float N,			// rev. per second
 	const Float r_h			// hub radius
 ) noexcept
 {
 	Float c_2_h_y
 	{
-		eta * N * pi * r_h
+		N * pi * r_h
 	};
 
 	return Vector {c_1.x(), -c_2_h_y};	// rotation is counterclockwise
@@ -247,7 +245,7 @@ Vector computeRootOutletVelocity_depr
 (
 	const Vector& c_1,		// abs. fluid inlet velocity
 	const Float dp,			// (requested total) static pressure difference
-	const Float eta,		// aerodynamic efficiency
+	const Float eta,		// total to total efficiency
 	const Float N,			// rev. per second
 	const Float n,			// vortex distribution coefficient
 	const Float r_h,		// hub radius
@@ -334,7 +332,6 @@ Float computeVortexDistributionExponent
 (
 	const Vector& c_2_h,	// abs. root (hub) fluid outlet velocity
 	const Float dp,			// (requested total) static pressure difference
-	const Float eta,		// hydraulic efficiency
 	const Float N,			// rev. per second
 	const Float r_h,		// hub radius
 	const Float r_s,		// shroud radius
@@ -352,7 +349,7 @@ Float computeVortexDistributionExponent
 	};
 	Float K_3	// we didn't keep track of signs => |c_2_h.y()|
 	{
-		-2.0 * eta * N * pi * std::abs(c_2_h.y()) * r_h
+		-2.0 * N * pi * std::abs(c_2_h.y()) * r_h
 	};
 
 	auto f = [&](const auto& n)
@@ -383,10 +380,18 @@ Float computeVortexDistributionExponent
 	// we have to check if the shroud swirl is physically achievable
 	Float n_max
 	{
-		std::log(eta * N * pi * r_s) / std::log(c_2_h.y() * D)
+		std::log(N * pi * r_s) / std::log(std::abs(c_2_h.y()) * D)
 	};
 	if (!isLessOrEqual(n, n_max))
+	{
+		if constexpr (ndebug)
+		{
+			std::cerr << "WARNING: "
+						 "limited vortex distribution exponent: "
+					  << n_max << '\n';
+		}
 		n = n_max;
+	}
 
 	return n;
 }

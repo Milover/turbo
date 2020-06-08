@@ -3,14 +3,12 @@
 # See the LICENSE file for license information
 
 # add all subdirectories
-add_subdirectory(distributed)
-add_subdirectory(scalar)
-add_subdirectory(vector)
 
 # add sources
 set(SRC
-	InputRegistry.cpp
-	Registry.cpp
+	MaxAbsBladeThicknessDistribution.cpp
+	MaxPassageWidthDistribution.cpp
+	SolidityDistribution.cpp
 	)
 
 # append to sources

@@ -51,7 +51,7 @@ public:
 	// Member functions
 
 		//- Return synchronization state
-		static bool sync() noexcept;
+		[[nodiscard]] static bool sync() noexcept;
 
 		//- Synchronize if unsynchronized
 		static void synchronize() noexcept;

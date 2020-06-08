@@ -47,46 +47,46 @@ int main(int argc, char* argv[])
 		HashMap<String>
 		{
 			// general
-			{"AerodynamicEfficiency",		"0.85"},			// nondefault
-			{"Density",						"1.2"},
-			{"DynamicViscosity",			"1.8206e-5"},
-			{"Rps",							"11.83334"},
-			{"StaticPressureDifference",	"160"},
-			{"VolumeFlowRate",				"4.16667"},
+			{"Density",								"1.2"},
+			{"DynamicViscosity",					"1.8206e-5"},
+			{"Rps",									"11.83334"},
+			{"StaticPressureDifference",			"155"},
+			{"VolumeFlowRate",						"4.16667"},
 			{"TurbulenceReferenceLengthScaleRatio",	"0.1"},		// default
-			{"TurbulenceIntensity",			"0.05"},			// default
-			{"VortexDistributionExponent",	"1.0"},				// nondefault
+			{"TurbulenceIntensity",					"0.05"},	// default
 			// blade
-			{"HubRadius",					"0.075"},
-			{"IncidenceAngle",				"0"},				// default
-			{"MaxAbsBladeThickness",		"0.008"},			// optional
-			{"MaxPassageWidth",				"0.1"},				// optional
-			{"NumberOfBlades",				"7"},
-			{"NumberOfStations",			"3"},
-			{"ShroudRadius",				"0.3975"},
-			{"TipClearance",				"0"},				// default
-			{"Solidity",					"1"},				// default
-			{"SkewDistribution",			"BezierTangential"},
-			{"HubSkewAngle",				"0.0"},				// default
-			{"ShroudSkewAngle",				"0.5236"},	// ~30°
-			{"BezierSkewRelativeRadius",	"0.5"},				// default
+			{"HubRadius",							"0.075"},
+			{"IncidenceAngle",						"0"},		// default
+			{"MaxAbsBladeThicknessDistribution","(0.0095 0.008)"},	// optional
+			{"MaxPassageWidthDistribution",			"(0.1)"},	// optional
+			{"NumberOfBlades",						"7"},
+			{"NumberOfStations",					"3"},
+			{"ShroudRadius",						"0.3975"},
+			{"TipClearance",						"0"},		// default
+			{"SolidityDistribution",			"(1.2 0.5)"},	// nondefault
+			{"SkewDistribution",					"BezierTangential"},
+			{"HubSkewAngle",						"0.0"},		// default
+			{"ShroudSkewAngle",						"0.5236"},	// ~30°
+			{"BezierSkewRelativeRadius",			"0.5"},		// default
+			//{"VortexDistributionExponent",			"1.3"},		// optional
+			{"RootOutletVelocity",			"(8.70378 -1.68 0)"},	// optional
 			// airfoil
 			{"Thickness",				"Naca4DigitThickness"},	// default
-			{"DeviationAngle",				"0"},				// default
-			{"MaxProfileThickness",			"0.1"},
-			{"MonitoringPlaneOffset",		"0.05"},			// default
+			{"DeviationAngle",						"0"},		// default
+			{"MaxProfileThickness",					"0.1"},
+			{"MonitoringPlaneOffset",				"0.05"},	// default
 			{"Camber",					"CircularArcCamber"},	// default
-			{"CamberPointSpacing",			"Cosine"},			// default
-			{"NumberOfCamberPoints",		"150"},				// default
+			{"CamberPointSpacing",					"Cosine"},	// default
+			{"NumberOfCamberPoints",				"150"},		// nondefault
 			// mesh
 			{"ProfileMeshGenerator","ProfileTetMeshGenerator"},	// default
-			{"RelMeshSize",					"0.01"},			// default
-			{"SectionExtensionFactor",		"1.0"},				// default
-			//{"BLNumberOfLayers",			"5"},				// disabled
-			{"BLGrowthRate",				"1.2"},				// default
-			{"BLTransitionRatio",			"0.75"},			// default
-			{"ProfileBumpFactor",			"0.25"},			// default
-			{"YPlus",						"1"}
+			{"RelMeshSize",							"0.01"},	// default
+			{"SectionExtensionFactor",				"1.0"},		// default
+			//{"BLNumberOfLayers",					"5"},		// disabled
+			{"BLGrowthRate",						"1.2"},		// default
+			{"BLTransitionRatio",					"0.75"},	// default
+			{"ProfileBumpFactor",					"0.25"},	// default
+			{"YPlus",								"1"}		// nondefault
 		}
 	);
 
@@ -108,8 +108,6 @@ int main(int argc, char* argv[])
 		airfoil->dumpData();
 	}
 	blade.dumpData();
-
-	updateAndWait(1);
 
 	// build the blade
 	blade.build();

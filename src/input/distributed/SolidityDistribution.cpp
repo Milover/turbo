@@ -8,16 +8,9 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "VortexDistributionExponent.h"
+#include "SolidityDistribution.h"
 
-#include "Density.h"
 #include "General.h"
-#include "InitialDesign.h"
-#include "HubRadius.h"
-#include "RootOutletVelocity.h"
-#include "Rps.h"
-#include "ShroudRadius.h"
-#include "StaticPressureDifference.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -28,39 +21,15 @@ namespace input
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-VortexDistributionExponent::VortexDistributionExponent(const Float f)
+SolidityDistribution::SolidityDistribution() noexcept
 :
-	LVBase {f}
-{}
-
-VortexDistributionExponent::VortexDistributionExponent
-(
-	const RootOutletVelocity& c_2_h,
-	const StaticPressureDifference& dp,
-	const Rps& rps,
-	const HubRadius& r_h,
-	const ShroudRadius& r_s,
-	const Density& rho
-)
-:
-	VortexDistributionExponent
-	{
-		compute::computeVortexDistributionExponent
-		(
-			c_2_h.value(),
-			dp.value(),
-			rps.value(),
-			r_h.value(),
-			r_s.value(),
-			rho.value()
-		)
-	}
+	DVBase {1.0}
 {}
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-String VortexDistributionExponent::getName() const
+String SolidityDistribution::getName() const
 {
 	return name;
 }

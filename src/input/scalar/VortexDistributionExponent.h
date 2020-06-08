@@ -29,7 +29,6 @@ SourceFiles
 
 #include <limits>
 
-#include "AerodynamicEfficiency.h"
 #include "Density.h"
 #include "General.h"
 #include "HubRadius.h"
@@ -77,7 +76,6 @@ public:
 		(
 			const RootOutletVelocity& c_2_h,
 			const StaticPressureDifference& dp,
-			const AerodynamicEfficiency& eta,
 			const Rps& rps,
 			const HubRadius& r_h,
 			const ShroudRadius& r_s,

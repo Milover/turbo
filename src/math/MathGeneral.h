@@ -14,8 +14,8 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef COMPUTE_GENERAL_H
-#define COMPUTE_GENERAL_H
+#ifndef MATH_GENERAL_H
+#define MATH_GENERAL_H
 
 #include <limits>
 #include <type_traits>

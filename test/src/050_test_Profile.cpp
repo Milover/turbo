@@ -50,6 +50,7 @@ int main(int argc, char* argv[])
 			// precomputed values, because 'Airfoil' is not present
 			{"CamberAngle",				std::to_string(0.25 * M_PI)},
 			{"Chord",					"0.5"},
+			{"Pitch",					"0.5"},
 			{"Radius",					"1.0"},
 			{"StaggerAngle",			std::to_string(0.5 * M_PI)}
 		}

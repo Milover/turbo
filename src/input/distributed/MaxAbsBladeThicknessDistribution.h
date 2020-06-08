@@ -7,27 +7,25 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::input::RootOutletVelocity
+	turbo::input::MaxAbsBladeThicknessDistribution
 
 Description
-	Class RootOutletVelocity.
-
-	Swirl velocity at mean radius, used to prescribe the swirl distribution.
+	Class MaxAbsBladeThicknessDistribution.
 
 SourceFiles
-	RootOutletVelocity.cpp
+	MaxAbsBladeThicknessDistribution.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef INPUT_ROOT_OUTLET_VELOCITY_H
-#define INPUT_ROOT_OUTLET_VELOCITY_H
+#ifndef INPUT_MAX_ABS_BLADE_THICKNESS_DISTRIBUTION_H
+#define INPUT_MAX_ABS_BLADE_THICKNESS_DISTRIBUTION_H
+
+#include <utility>
 
 #include "Error.h"
-#include "HubRadius.h"
-#include "InletVelocity.h"
-#include "RegistryObject.h"
-#include "Rps.h"
-#include "Vector.h"
+#include "General.h"
+#include "DistributedValue.h"
+#include "MaxAbsBladeThickness.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -36,38 +34,34 @@ namespace turbo
 namespace input
 {
 
-// Forward declarations
-class StaticPressureDifference;
-
 /*---------------------------------------------------------------------------*\
-					Class RootOutletVelocity Declaration
+			Class MaxAbsBladeThicknessDistribution Declaration
 \*---------------------------------------------------------------------------*/
 
-class RootOutletVelocity final
+class MaxAbsBladeThicknessDistribution final
 :
-	public RegistryObject<Vector>
+	public DistributedValue<MaxAbsBladeThickness>
 {
 public:
 
 	// Public static data
 
-		inline static const String name {"RootOutletVelocity"};
+		inline static const String name {"MaxAbsBladeThicknessDistribution"};
 
 
 	// Constructors
 
-		//- Construct from a Vector,
-		//  no aditional checking required
-		explicit RootOutletVelocity(const Vector& v) noexcept(ndebug);
-
-		//- Compute and apply the de Haller criterion and construct,
-		//	computed by requiring the root pressure rise to be maximal
-		RootOutletVelocity
-		(
-			const InletVelocity& c_1,
-			const Rps& N,
-			const HubRadius& r_h
-		) noexcept(ndebug);
+		//- Construct from a Polyline,
+		//	no additional checking required
+		template
+		<
+			typename T,
+			typename = std::enable_if_t
+			<
+				std::is_same_v<typename RegBase::type, removeCVRef_t<T>>
+			>
+		>
+		explicit MaxAbsBladeThicknessDistribution(T&& t);
 
 
 	// Member functions
@@ -76,6 +70,15 @@ public:
 		String getName() const override;
 
 };
+
+
+// * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
+
+template<typename T, typename>
+MaxAbsBladeThicknessDistribution::MaxAbsBladeThicknessDistribution(T&& t)
+:
+	DVBase {std::forward<T>(t)}
+{}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

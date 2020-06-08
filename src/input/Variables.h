@@ -72,6 +72,11 @@ Description
 #include "VortexDistributionExponent.h"
 #include "YPlus.h"
 
+// distributed
+#include "MaxAbsBladeThicknessDistribution.h"
+#include "MaxPassageWidthDistribution.h"
+#include "SolidityDistribution.h"
+
 // vectors
 #include "BladeVelocity.h"
 #include "InletVelocity.h"
