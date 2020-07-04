@@ -24,6 +24,7 @@ SourceFiles
 #include "Error.h"
 #include "HubRadius.h"
 #include "InletVelocity.h"
+#include "OutletRelativeVelocity.h"
 #include "Radius.h"
 #include "RegistryObject.h"
 #include "RootOutletVelocity.h"
@@ -69,6 +70,13 @@ public:
 			const VortexDistributionExponent& n,
 			const Radius& r,
 			const HubRadius& r_h
+		) noexcept(ndebug);
+
+		//- Compute and construct
+		OutletVelocity
+		(
+			const OutletRelativeVelocity& w_2,
+			const BladeVelocity& U
 		) noexcept(ndebug);
 
 

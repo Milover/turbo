@@ -43,6 +43,33 @@ namespace turbo
 namespace input
 {
 
+// Forward declarations
+template<typename T>
+class RegistryObject;
+
+// * * * * * * * * * * * * * * * Type Traits * * * * * * * * * * * * * * * * //
+
+//- Check if a type is a RegistryObject
+template<typename T, typename Value = void>
+struct isRegistryObject : std::false_type {};
+
+template<typename T>
+struct isRegistryObject<T, std::void_t<typename removeCVRef_t<T>::type>>
+:
+	std::bool_constant
+	<
+		std::is_base_of_v
+		<
+			RegistryObject<typename removeCVRef_t<T>::type>,
+			removeCVRef_t<T>
+		>
+	>
+{};
+
+template<typename T>
+inline constexpr bool isRegistryObject_v = isRegistryObject<T>::value;
+
+
 /*---------------------------------------------------------------------------*\
 					Class RegistryObject Definition
 \*---------------------------------------------------------------------------*/
@@ -112,7 +139,8 @@ public:
 			std::ostream& os,
 			const String::size_type width = 0,
 			const String& delimiter = " ",
-			const String& terminator = ";\n"
+			const String& terminator = ";\n",
+			const Integer precision = 9
 		) const override;
 
 		//- Set value
@@ -181,10 +209,7 @@ read()
 	if constexpr (isConvertible_v<typename T::type>)
 		error(FUNC_INFO, T::name, " undefined");
 	else
-	{
 		error(FUNC_INFO, "conversion for '", T::name, "' unimplemented");
-		__builtin_unreachable();
-	}
 }
 
 
@@ -236,10 +261,12 @@ void RegistryObject<T>::print
 	std::ostream& os,
 	const String::size_type width,
 	const String& delimiter,
-	const String& terminator
+	const String& terminator,
+	const Integer precision
 ) const
 {
 	std::stringstream ss;
+	ss << std::fixed << std::setprecision(precision);
 	if constexpr (std::is_enum_v<T>)
 	{
 		ss << static_cast<std::underlying_type_t<T>>(this->value());

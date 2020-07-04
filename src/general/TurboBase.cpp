@@ -39,13 +39,16 @@ void TurboBase::handleCwd
 	{
 		setCwd(parentCwd / filename.stem());
 
-		if (std::filesystem::exists(cwd_))
-			error
-			(
-				FUNC_INFO, "directory: ", cwd_, " already exists"
-			);
+		if (!std::filesystem::exists(cwd_))
+			std::filesystem::create_directory(cwd_);
+		else
+		{
+			restart_ = true;
 
-		std::filesystem::create_directory(cwd_);
+			// FIXME: implement a dedicated messaging system
+			//if constexpr (ndebug)
+				std::cout << "restarting: " << filename.stem() << '\n';
+		}
 	}
 	else
 		setCwd(parentCwd);
@@ -123,17 +126,22 @@ Path TurboBase::cwd() const
 }
 
 
-void TurboBase::dumpData() const
+void TurboBase::dumpData(const Path& file) const
 {
-	Path file {cwd_ / filename.stem()};
+	Path outfile;
+
+	if (file.empty())
+		outfile = cwd_ / filename.stem();
+	else
+		outfile = file;
 
 	if (std::filesystem::exists(file))
 	{
 		std::cerr << "WARNING: "
-				  << "overwriting file: " << file << "\n";
+				  << "overwriting file: " << outfile << "\n";
 	}
 
-	std::ofstream ofs {file};
+	std::ofstream ofs {outfile};
 	printAll(ofs);
 }
 
@@ -148,10 +156,17 @@ void TurboBase::printAll
 	std::ostream& os,
 	const String::size_type width,
 	const String& delimiter,
-	const String& terminator
+	const String& terminator,
+	const Integer precision
 ) const
 {
-	data_->printAll(os, width, delimiter, terminator);
+	data_->printAll(os, width, delimiter, terminator, precision);
+}
+
+
+bool TurboBase::restarted() const noexcept
+{
+	return restart_;
 }
 
 

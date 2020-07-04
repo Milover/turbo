@@ -29,6 +29,7 @@ SourceFiles
 
 #include <limits>
 
+#include "BladeEfficiency.h"
 #include "Density.h"
 #include "General.h"
 #include "HubRadius.h"
@@ -36,7 +37,7 @@ SourceFiles
 #include "RootOutletVelocity.h"
 #include "Rps.h"
 #include "ShroudRadius.h"
-#include "StaticPressureDifference.h"
+#include "TargetStaticPressureDifference.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -46,7 +47,6 @@ namespace input
 {
 
 // Forward declarations
-class StaticPressureDifference;
 class RootOutletVelocity;
 
 /*---------------------------------------------------------------------------*\
@@ -75,7 +75,8 @@ public:
 		VortexDistributionExponent
 		(
 			const RootOutletVelocity& c_2_h,
-			const StaticPressureDifference& dp,
+			const TargetStaticPressureDifference& dp_req,
+			const BladeEfficiency& eta,
 			const Rps& rps,
 			const HubRadius& r_h,
 			const ShroudRadius& r_s,

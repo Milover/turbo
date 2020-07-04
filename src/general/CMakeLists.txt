@@ -6,7 +6,9 @@
 
 # add sources
 set(SRC
+	CsvWriter.cpp
 	StringConverter.cpp
+	Timer.cpp
 	TurboBase.cpp
 	turbo.cpp
 	)

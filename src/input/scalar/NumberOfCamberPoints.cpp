@@ -23,7 +23,7 @@ namespace input
 
 NumberOfCamberPoints::NumberOfCamberPoints() noexcept
 :
-	PVBase {150}
+	PVBase {250}
 {}
 
 

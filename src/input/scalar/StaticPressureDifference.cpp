@@ -10,12 +10,14 @@ License
 
 #include "StaticPressureDifference.h"
 
+#include "BladeEfficiency.h"
 #include "BladeVelocity.h"
 #include "Density.h"
 #include "General.h"
 #include "InitialDesign.h"
 #include "InletVelocity.h"
 #include "OutletVelocity.h"
+#include "Utility.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -37,6 +39,7 @@ StaticPressureDifference::StaticPressureDifference
 	const InletVelocity& c_1,
 	const OutletVelocity& c_2,
 	const BladeVelocity& U,
+	const BladeEfficiency& eta,
 	const Density& rho
 )
 :
@@ -47,6 +50,7 @@ StaticPressureDifference::StaticPressureDifference
 			c_1.value(),
 			c_2.value(),
 			U.value(),
+			eta.value(),
 			rho.value()
 		)
 	}

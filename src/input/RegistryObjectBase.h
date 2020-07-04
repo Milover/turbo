@@ -76,7 +76,8 @@ public:
 			std::ostream& os,
 			const String::size_type width = 0,
 			const String& delimiter = " ",
-			const String& terminator = ";"
+			const String& terminator = ";",
+			const Integer precision = 9
 		) const = 0;
 
 

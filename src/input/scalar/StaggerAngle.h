@@ -21,11 +21,12 @@ SourceFiles
 #define INPUT_STAGGER_ANGLE_H
 
 #include "BladeVelocity.h"
+#include "CorrectedValue.h"
 #include "General.h"
-#include "IncidenceAngle.h"
 #include "InclinationAngle.h"
 #include "InletVelocity.h"
 #include "RegistryObject.h"
+#include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -40,9 +41,14 @@ namespace input
 
 class StaggerAngle final
 :
-	public RegistryObject<Float>
+	public RegistryObject<Float>,
+	public CorrectedValue<Float, StaggerAngle>
 {
 public:
+
+	friend CVBase;
+	using CVBase::correct;
+
 
 	// Public static data
 
@@ -55,15 +61,6 @@ public:
 		//  no aditional checking required
 		explicit StaggerAngle(const Float f);
 
-		//- Compute and construct
-		StaggerAngle
-		(
-			const InletVelocity& c_1,
-			const BladeVelocity& U,
-			const InclinationAngle& zeta,
-			const IncidenceAngle& i
-		);
-
 		//- Compute assuming zero incidence and construct
 		StaggerAngle
 		(
@@ -74,6 +71,14 @@ public:
 
 
 	// Member functions
+
+		//- Compute and add correction
+		void correct
+		(
+			const Vector& stagnationPt,
+			const Vector& leadingEdgePt,
+			const Vector& profileCentroid
+		);
 
 		//- Get object name
 		String getName() const override;

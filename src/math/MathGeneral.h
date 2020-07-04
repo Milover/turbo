@@ -69,6 +69,23 @@ inline constexpr auto lerp
 }
 
 
+//- Linear interpolate
+template<typename T>
+inline constexpr auto interpolate
+(
+	const T x,
+	const T x1,
+	const T x2,
+	const T y1,
+	const T y2
+)
+{
+	return y1 + (x - x1) * (y2 - y1) / (x2 - x1);
+}
+
+
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace math

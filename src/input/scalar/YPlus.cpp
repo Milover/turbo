@@ -23,7 +23,7 @@ namespace input
 
 YPlus::YPlus() noexcept
 :
-	PVBase {150.0}
+	PVBase {1.0}
 {}
 
 

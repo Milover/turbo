@@ -29,10 +29,13 @@ namespace mesh
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-BoxField::BoxField(const input::Registry& reg)
+BoxField::BoxField
+(
+	const input::Registry& reg,
+	const Float factor
+)
 {
 	auto returnTag {interface::GmshAddField {}(this)};
-
 	assert(returnTag == tag());
 
 	input::MeshCellSize size
@@ -50,13 +53,13 @@ BoxField::BoxField(const input::Registry& reg)
 		static_cast<Float>(std::numeric_limits<Integer>::max())
 	};
 
-	setValue("VIn",		size.value());
-	setValue("XMin",	min);
-	setValue("YMin",	min);
-	setValue("ZMin",	min);
-	setValue("XMax",	max);
-	setValue("YMax",	max);
-	setValue("ZMax",	max);
+	setValue("VIn",			factor * size.value());
+	setValue("XMin",		min);
+	setValue("YMin",		min);
+	setValue("ZMin",		min);
+	setValue("XMax",		max);
+	setValue("YMax",		max);
+	setValue("ZMax",		max);
 }
 
 

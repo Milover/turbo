@@ -13,8 +13,9 @@ License
 
 #include <gmsh.h>
 
-#include "General.h"
 #include "Model.h"
+
+#include "General.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -120,6 +121,19 @@ std::size_t Model::id() const noexcept
 String Model::name() const noexcept
 {
 	return std::to_string(id_);
+}
+
+
+void Model::purge() const noexcept
+{
+	if (id_ != 0)
+	{
+		activate();
+
+		gmsh::model::remove();
+		gmsh::model::add(name());
+		gmsh::model::setCurrent(name());
+	}
 }
 
 

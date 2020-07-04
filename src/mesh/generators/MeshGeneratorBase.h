@@ -119,6 +119,10 @@ MeshGeneratorBase<T>::MeshGeneratorBase(const input::Registry& reg)
 	pitch_
 	{
 		reg.cref<input::Pitch>()
+	},
+	extension_
+	{
+		reg.cref<input::SectionExtensionFactor>()
 	}
 {}
 

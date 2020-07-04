@@ -7,7 +7,9 @@ License
 	See the LICENSE file for license information.
 
 Description
-	Testing Airfoil class functionality.
+	Testing Blade class functionality.
+	
+	Running simple Airfoil simulations.
 
 	TODO: some numeric (comparison) tests would be nice,
 		  mostly visuals checks for now

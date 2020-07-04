@@ -106,7 +106,7 @@ potentialFlow
     nNonOrthogonalCorrectors 50;
 
     PhiRefValue         0;
-    PhiRefPoint         $InletRefPoint;
+    PhiRefCell          0;
 }
 
 
@@ -120,7 +120,7 @@ SIMPLE
     }
 
     pRefValue           0;
-    pRefPoint           $InletRefPoint;
+    pRefCell            0;
 }
 
 
@@ -128,11 +128,11 @@ relaxationFactors
 {
     fields
     {
-        p               0.25;
+        p               0.225;
     }
     equations
     {
-        U               0.7;
+        U               0.65;
         "(k|omega)"     0.7;
     }
 }

@@ -48,6 +48,19 @@ Integer StringConverter<Integer>::convert(const String& s)
 }
 
 
+template<>
+std::size_t StringConverter<std::size_t>::convert(const String& s)
+{
+	std::size_t i;
+
+	this->stream_ >> i;
+
+	this->check(s);
+
+	return i;
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace turbo

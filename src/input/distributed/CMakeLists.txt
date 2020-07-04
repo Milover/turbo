@@ -6,6 +6,7 @@
 
 # add sources
 set(SRC
+	CamberAngleScalingFactorDistribution.cpp
 	MaxAbsBladeThicknessDistribution.cpp
 	MaxPassageWidthDistribution.cpp
 	SolidityDistribution.cpp

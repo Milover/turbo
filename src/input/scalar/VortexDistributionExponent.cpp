@@ -10,6 +10,7 @@ License
 
 #include "VortexDistributionExponent.h"
 
+#include "BladeEfficiency.h"
 #include "Density.h"
 #include "General.h"
 #include "InitialDesign.h"
@@ -17,7 +18,7 @@ License
 #include "RootOutletVelocity.h"
 #include "Rps.h"
 #include "ShroudRadius.h"
-#include "StaticPressureDifference.h"
+#include "TargetStaticPressureDifference.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -36,7 +37,8 @@ VortexDistributionExponent::VortexDistributionExponent(const Float f)
 VortexDistributionExponent::VortexDistributionExponent
 (
 	const RootOutletVelocity& c_2_h,
-	const StaticPressureDifference& dp,
+	const TargetStaticPressureDifference& dp_req,
+	const BladeEfficiency& eta,
 	const Rps& rps,
 	const HubRadius& r_h,
 	const ShroudRadius& r_s,
@@ -48,7 +50,8 @@ VortexDistributionExponent::VortexDistributionExponent
 		compute::computeVortexDistributionExponent
 		(
 			c_2_h.value(),
-			dp.value(),
+			dp_req.value(),
+			eta.value(),
 			rps.value(),
 			r_h.value(),
 			r_s.value(),

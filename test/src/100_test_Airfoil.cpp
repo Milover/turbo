@@ -189,7 +189,7 @@ int main(int argc, char* argv[])
 	airfoil.dumpData();
 
 	// make a new mesh
-	auto caseDir {airfoil.simulate()};
+	auto simData {airfoil.simulate()};
 
 	// check if the airfoil cwd was properly built
 	test::compareTest
@@ -207,7 +207,7 @@ int main(int argc, char* argv[])
 	(
 		pass,
 		(
-			std::filesystem::exists(caseDir)
+			std::filesystem::exists(simData.simDir)
 		),
 		output,
 		"Checking case directory"

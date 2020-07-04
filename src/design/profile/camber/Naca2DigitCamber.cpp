@@ -50,9 +50,9 @@ Float Naca2DigitCamber::computeY(const Float x) const noexcept
 				2.0 * pos_.value() * x - std::pow(x, 2)
 			);
 	else
-		return max_.value() / std::pow((1.0 - pos_.value()), 2) *
+		return max_.value() / std::pow(1.0 - pos_.value(), 2) *
 			(
-				1.0 - 2.0 * pos_.value() * (1.0 + x) - std::pow(x, 2)
+				1.0 + 2.0 * pos_.value() * (x - 1.0) - std::pow(x, 2)
 			);
 }
 
@@ -88,7 +88,7 @@ Float Naca2DigitCamber::inclination(const Float x) const noexcept(ndebug)
 			 * (pos_.value() - x);
 	else
 		dydx = 2.0 * max_.value()
-			 / std::pow((1.0 - pos_.value()), 2)
+			 / std::pow(1.0 - pos_.value(), 2)
 			 * (pos_.value() - x);
 
 	return std::atan(dydx);

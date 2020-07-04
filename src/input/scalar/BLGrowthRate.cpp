@@ -23,7 +23,7 @@ namespace input
 
 BLGrowthRate::BLGrowthRate() noexcept
 :
-	PVBase {1.2}
+	PVBase {1.15}
 {}
 
 

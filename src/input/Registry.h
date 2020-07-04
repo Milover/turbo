@@ -167,6 +167,10 @@ public:
 		>
 		[[nodiscard]] T& ref();
 
+		//- Remove a registry object
+		// FIXME: implement
+		// void remove();
+
 		//- Store (insert or assign) a registry object (locally)
 		template<typename T>
 		[[maybe_unused]] Pair<Data::iterator, bool> store(T&& t) const;
@@ -180,9 +184,10 @@ public:
 		void printAll
 		(
 			std::ostream& os,
-			const String::size_type width = 0,
+			const String::size_type width = 50,		// generally enough
 			const String& delimiter = " ",
-			const String& terminator = ";\n"
+			const String& terminator = ";\n",
+			const Integer precision = 9
 		) const;
 
 

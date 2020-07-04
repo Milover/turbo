@@ -61,7 +61,7 @@ private:
 
 		// contour discretization / fan points per 2*pi
 		// NOTE: guesstimate
-		inline static constexpr Float fanFactor_ {10.0};
+		inline static constexpr Float fanFactor_ {2.5};
 
 
 public:

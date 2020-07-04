@@ -58,6 +58,11 @@ private:
 	 || std::is_same_v<geometry::Model, T>;
 
 
+	// Private data
+
+		bool restart_ {false};
+
+
 	// Member functions
 
 		//- Handle cwd creation
@@ -148,33 +153,62 @@ public:
 		//- Activate local model
 		void activate() const;
 
+		//- Access data by cref
+		template
+		<
+			typename T,
+			typename R = Recurse,
+			typename = std::enable_if_t<std::is_base_of_v<RecursionFlag, R>>
+		>
+		[[nodiscard]] const T& cref() const;
+
 		//- Get the working directory
 		[[nodiscard]] Path cwd() const;
 
-		//- Dump registry data to file (cwd_/filename)
-		void dumpData() const;
+		//- Dump registry data to file (default: cwd_/filename)
+		void dumpData(const Path& file = Path {}) const;
 
 		//- Access data
-		template<typename T, typename R = NoRecurse>
-		std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, T>
-		get() const;
+		template
+		<
+			typename T,
+			typename R = Recurse,
+			typename = std::enable_if_t<std::is_base_of_v<RecursionFlag, R>>
+		>
+		[[nodiscard]] T get() const;
 
 		//- Querry data
-		template<typename R = NoRecurse>
-		std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, bool>
-		has(const String& key) const;
+		template
+		<
+			typename R = Recurse,
+			typename = std::enable_if_t<std::is_base_of_v<RecursionFlag, R>>
+		>
+		[[nodiscard]] bool has(const String& key) const;
 
 		//- Get id
-		std::size_t id() const noexcept;
+		[[nodiscard]] std::size_t id() const noexcept;
 
 		//- Print all data from local registry (formatted)
 		void printAll
 		(
 			std::ostream& os,
-			const String::size_type width = 40,		// generally enough
+			const String::size_type width = 50,		// generally enough
 			const String& delimiter = " ",
-			const String& terminator = ";\n"
+			const String& terminator = ";\n",
+			const Integer precision = 9
 		) const;
+
+		//- Access data by ref
+		template
+		<
+			typename T,
+			typename R = Recurse,
+			typename = std::enable_if_t<std::is_base_of_v<RecursionFlag, R>>
+		>
+		[[nodiscard]] T& ref();
+
+		//- Return restarted state
+		[[nodiscard]] bool restarted() const noexcept;
 
 		//- Set the working directory,
 		//	NOTE: no checking whatsoever
@@ -238,19 +272,31 @@ TurboBase::TurboBase
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-template<typename T, typename R>
-std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, T>
-TurboBase::get() const
+template<typename T, typename R, typename>
+const T& TurboBase::cref() const
+{
+	return data_->cref<T, R>();
+}
+
+
+template<typename T, typename R, typename>
+T TurboBase::get() const
 {
 	return data_->get<T, R>();
 }
 
 
-template<typename R>
-std::enable_if_t<std::is_base_of_v<RecursionFlag, R>, bool>
-TurboBase::has(const String& key) const
+template<typename R, typename>
+bool TurboBase::has(const String& key) const
 {
 	return data_->has<R>(key);
+}
+
+
+template<typename T, typename R, typename>
+T& TurboBase::ref()
+{
+	return data_->ref<T, R>();
 }
 
 

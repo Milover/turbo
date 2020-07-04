@@ -53,11 +53,11 @@ divSchemes
 {
     default         none;
 
-    div(phi,U)      Gauss linearUpwind grad(U);
+    div(phi,U)      bounded Gauss linearUpwind grad(U);
     div(div(phi,U)) Gauss linear;
 
-    div(phi,k)      Gauss upwind;
-    div(phi,omega)  Gauss upwind;
+    div(phi,k)      bounded Gauss upwind;
+    div(phi,omega)  bounded Gauss upwind;
 
     div((nuEff*dev2(T(grad(U))))) Gauss linear;
 }

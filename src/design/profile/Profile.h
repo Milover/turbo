@@ -15,6 +15,9 @@ Description
 	NOTE:
 		We seem to be introducing a fair bit of numerical error,
 		should check ourselves at some point.
+	FIXME:
+		Functions expecting an unwrapped profile should handle wrapped
+		profiles properly (eg. throw, unwrap then execute...).
 
 SourceFiles
 	Profile.cpp
@@ -25,6 +28,7 @@ SourceFiles
 #define DESIGN_PROFILE_H
 
 #include <cmath>
+#include <ostream>
 
 #include "Curve.h"
 #include "Error.h"
@@ -53,11 +57,11 @@ public:
 
 	using Point				= Vector;
 	using Data				= Vectorpair<Point>;
-	using Iterator			= Data::iterator;
-	using Constiterator		= Data::const_iterator;
-	using Sizetype			= Data::size_type;
-	using Reference			= Data::reference;
-	using Constreference	= Data::const_reference;
+	using iterator			= Data::iterator;
+	using const_iterator	= Data::const_iterator;
+	using size_type			= Data::size_type;
+	using reference			= Data::reference;
+	using const_reference	= Data::const_reference;
 
 private:
 
@@ -74,15 +78,6 @@ private:
 		//- Enforce constraints if any
 		void constrain(const input::Registry& reg);
 
-		//- Constrain max thickness
-		void constrainMaxThickness(const Float maxAbsBladeThickness) noexcept;
-
-		//- Constrain passage width
-		void constrainPassageWidth(const Float maxPassageWidth) noexcept;
-
-		//- Recompute Registry values
-		void recompute(const input::Registry& reg);
-
 		//- Rotate around an axis
 		//	perm = 0 == x-axis
 		//	perm = 1 == y-axis
@@ -93,22 +88,44 @@ private:
 
 public:
 	
+	// Constructors
+
+		//- Default constructor
+		Profile() = default;
+
+		//- Construct from a .csv file containing contour coordinates
+		//	ordered from top (upper) TE to bot (lower) TE. The profile
+		//	can be unwrapped or wrapped.
+		Profile
+		(
+			const Path& file,
+			const char delimiter = '\t',
+			const char comment = '#'
+		);
+
+		//- Copy constructor
+		Profile(const Profile&) = default;
+
+		//- Move constructor
+		Profile(Profile&&) = default;
+
+
 	// Member functions
 
 		//- Get axial chord length
 		[[nodiscard]] Float axialChord() const noexcept(ndebug);
 
 		//- Get TE point pair
-		[[nodiscard]] Reference back();
+		[[nodiscard]] reference back();
 
 		//- Get TE point pair
-		[[nodiscard]] Constreference back() const;
+		[[nodiscard]] const_reference back() const;
 
 		//- Get iterator to beginning
-		[[nodiscard]] Iterator begin();
+		[[nodiscard]] iterator begin();
 
 		//- Get const iterator to beginning
-		[[nodiscard]] Constiterator begin() const;
+		[[nodiscard]] const_iterator begin() const;
 
 		//- Build geometry
 		void build
@@ -117,8 +134,13 @@ public:
 			const input::Registry& reg
 		);
 
-		//- Get the camber line
-		[[nodiscard]] std::vector<Point> camberLine() const noexcept(ndebug);
+		//- Get camber angle in radians
+		[[nodiscard]] Float camberAngle() const noexcept(ndebug);
+
+		//- Get camber line points,
+		//	ordered from LE to TE
+		[[nodiscard]] std::vector<Point>
+		camberLinePoints() const noexcept(ndebug);
 
 		//- Center on point 'p'
 		void centerOn(const Point& p) noexcept;
@@ -129,20 +151,30 @@ public:
 		//- Get chord length
 		[[nodiscard]] Float chord() const noexcept(ndebug);
 
+		//- Constrain max thickness
+		void constrainMaxThickness(const Float thickness) noexcept;
+
+		//- Constrain passage width
+		void constrainPassageWidth(const Float width) noexcept;
+
 		//- Check if empty
 		[[nodiscard]] bool empty() const noexcept;
 
 		//- Get iterator to end
-		[[nodiscard]] Iterator end();
+		[[nodiscard]] iterator end();
 
 		//- Get const iterator to end
-		[[nodiscard]] Constiterator end() const;
+		[[nodiscard]] const_iterator end() const;
 
 		//- Get LE point pair
-		[[nodiscard]] Reference front();
+		[[nodiscard]] reference front();
 
 		//- Get LE point pair
-		[[nodiscard]] Constreference front() const;
+		[[nodiscard]] const_reference front() const;
+
+		//- Get the camber line geometry,
+		//	oriented from LE to TE
+		[[nodiscard]] geometry::Spline getCamberLine() const noexcept(ndebug);
 
 		//- Get contour in the form of a single spline
 		//	made from top/bot curves ordered as 'getOrderedPoints()'.
@@ -166,6 +198,9 @@ public:
 		//- Scale thickness by factor
 		void inflate(const Float factor) noexcept(ndebug);
 
+		//- Get inlet metal angle in radians
+		[[nodiscard]] Float inletAngle() const noexcept(ndebug);
+
 		//- Get the unit direction vector
 		//	of the camberline tangent at
 		//	the leading edge.
@@ -182,6 +217,9 @@ public:
 		//- Get raw points ordered from top (upper) TE
 		//	to bot (lower) TE
 		[[nodiscard]] std::vector<Point> orderedPoints() const noexcept;
+
+		//- Get outlet metal angle in radians
+		[[nodiscard]] Float outletAngle() const noexcept(ndebug);
 
 		//- Get passage width
 		[[nodiscard]] Float passageWidth() const noexcept(ndebug);
@@ -208,7 +246,10 @@ public:
 		void scale(const Point& p, const Float factor) noexcept;
 
 		//- Get size
-		[[nodiscard]] Sizetype size() const noexcept;
+		[[nodiscard]] size_type size() const noexcept;
+
+		//- Get stagger angle in radians
+		[[nodiscard]] Float staggerAngle() const noexcept(ndebug);
 
 		//- Get the unit direction vector
 		//	of the camberline tangent at
@@ -223,20 +264,38 @@ public:
 		//- Translate by vector 'v'
 		void translate(const Vector& v) noexcept;
 
+		//- Unwrap from cylinder
+		void unwrap() noexcept;
+
+		//- Check whether all points lie on the x-y plane if the profile
+		//	is unwrapped, or whether all points are at the same radius
+		//	if the profile is wrapped
+		[[nodiscard]] bool valid() const;
+
 		//- Wrap to cylinder
 		void wrap() noexcept;
 
 		//- Return wrapped state
 		[[nodiscard]] bool wrapped() const noexcept;
 
+		//- Write point coordinates ordered from top (upper) TE
+		//	to bot (lower) TE to a csv file
+		void writeCsv(const Path& file) const;
+
 
 	// Member operators
 
 		//- Access operator
-		[[nodiscard]] Reference operator[](Sizetype pos);
+		[[nodiscard]] reference operator[](size_type pos);
 
 		//- Access operator
-		[[nodiscard]] Constreference operator[](Sizetype pos) const;
+		[[nodiscard]] const_reference operator[](size_type pos) const;
+
+		//- Copy assignment operator
+		Profile& operator=(const Profile&) = default;
+
+		//- Move assignment operator
+		Profile& operator=(Profile&&) = default;
 
 };
 

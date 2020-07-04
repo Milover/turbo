@@ -6,18 +6,21 @@
 
 # add sources
 set(SRC
-	AerodynamicEfficiency.cpp
+	AirfoilEfficiency.cpp
 	BezierSkewRelativeRadius.cpp
 	BLFirstCellHeight.cpp
 	BLGrowthRate.cpp
 	BLNumberOfLayers.cpp
 	BLThickness.cpp
 	BLTransitionRatio.cpp
+	BladeEfficiency.cpp
 	CamberAngle.cpp
+	CamberAngleScalingFactor.cpp
 	CamberPointSpacing.cpp
 	Chord.cpp
 	Density.cpp
 	DeviationAngle.cpp
+	DesignPressureRelTolerance.cpp
 	DynamicViscosity.cpp
 	HubRadius.cpp
 	HubSkewAngle.cpp
@@ -28,6 +31,7 @@ set(SRC
 	MaxAbsBladeThickness.cpp
 	MaxCamber.cpp
 	MaxCamberPosition.cpp
+	MaxDesignIter.cpp
 	MaxPassageWidth.cpp
 	MaxProfileThickness.cpp
 	MeshCellSize.cpp
@@ -47,8 +51,12 @@ set(SRC
 	SmootherIter.cpp
 	Solidity.cpp
 	StaggerAngle.cpp
-	TipClearance.cpp
+	StaggerAngleDesignPrecision.cpp
 	StaticPressureDifference.cpp
+	TargetStaticPressureDifference.cpp
+	TargetTotalPressureDifference.cpp
+	TipClearance.cpp
+	TotalPressureDifference.cpp
 	TurbulenceKineticEnergy.cpp
 	TurbulenceIntensity.cpp
 	TurbulenceDissipationRate.cpp

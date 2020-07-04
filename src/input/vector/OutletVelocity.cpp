@@ -15,6 +15,7 @@ License
 #include "HubRadius.h"
 #include "InitialDesign.h"
 #include "InletVelocity.h"
+#include "OutletRelativeVelocity.h"
 #include "Radius.h"
 #include "RootOutletVelocity.h"
 #include "Vector.h"
@@ -52,6 +53,19 @@ OutletVelocity::OutletVelocity
 			r.value(),
 			r_h.value()
 		)
+	}
+{}
+
+
+OutletVelocity::OutletVelocity
+(
+	const OutletRelativeVelocity& w_2,
+	const BladeVelocity& U
+) noexcept(ndebug)
+:
+	OutletVelocity
+	{
+		w_2.value() + U.value()
 	}
 {}
 

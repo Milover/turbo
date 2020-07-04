@@ -51,9 +51,13 @@ public:
 
 	// Constructors
 
-		//- Construct form a registry
-		BoxField(const input::Registry& reg);
-
+		//- Construct from a registry,
+		//	scale computed mesh size by factor
+		BoxField
+		(
+			const input::Registry& reg,
+			const Float factor = 1.0
+		);
 
 	// Member functions
 

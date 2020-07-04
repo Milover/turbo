@@ -22,6 +22,7 @@ SourceFiles
 #ifndef INPUT_ROOT_OUTLET_VELOCITY_H
 #define INPUT_ROOT_OUTLET_VELOCITY_H
 
+#include "BladeEfficiency.h"
 #include "Error.h"
 #include "HubRadius.h"
 #include "InletVelocity.h"
@@ -35,9 +36,6 @@ namespace turbo
 {
 namespace input
 {
-
-// Forward declarations
-class StaticPressureDifference;
 
 /*---------------------------------------------------------------------------*\
 					Class RootOutletVelocity Declaration
@@ -65,6 +63,7 @@ public:
 		RootOutletVelocity
 		(
 			const InletVelocity& c_1,
+			const BladeEfficiency& eta,
 			const Rps& N,
 			const HubRadius& r_h
 		) noexcept(ndebug);

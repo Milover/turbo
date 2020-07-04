@@ -22,8 +22,12 @@ SourceFiles
 #ifndef INPUT_DEVIATION_ANGLE_H
 #define INPUT_DEVIATION_ANGLE_H
 
+#include "BladeVelocity.h"
 #include "General.h"
+#include "OutletVelocity.h"
+#include "OutletRelativeVelocity.h"
 #include "RegistryObject.h"
+#include "Vector.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -55,6 +59,14 @@ public:
 		//- Construct from a Float,
 		//  no aditional checking required
 		explicit DeviationAngle(const Float f);
+
+		//- Compute and construct
+		DeviationAngle
+		(
+			const OutletVelocity& c_2,
+			const BladeVelocity& U,
+			const OutletRelativeVelocity& w_2_real
+		);
 
 
 	// Member functions

@@ -271,11 +271,7 @@ std::istream& operator>>(std::istream& is, Vector& v)
 
 std::ostream& operator<<(std::ostream& os, const Vector& v)
 {
-	// so we don't mess up any formatting
-	std::stringstream ss;
-	ss << "(" << v.x() << " " << v.y() << " " << v.z() << ")";
-
-	os << ss.str();
+	os << "(" << v.x() << " " << v.y() << " " << v.z() << ")";
 
 	return os;
 }
@@ -339,6 +335,39 @@ Vector midpoint(const Vector& v1, const Vector& v2) noexcept
 }
 
 
+Vector projection(const Vector& a, const Vector& b) noexcept
+{
+	return b * dot(a, b) / dot(b, b);
+}
+
+
+Vector projectionXY(Vector v) noexcept
+{
+	v.z() = 0.0;
+	return v;
+}
+
+
+Vector projectionYZ(Vector v) noexcept
+{
+	v.x() = 0.0;
+	return v;
+}
+
+
+Vector projectionZX(Vector v) noexcept
+{
+	v.y() = 0.0;
+	return v;
+}
+
+
+Vector rejection(const Vector& a, const Vector& b) noexcept
+{
+	return a - projection(a, b);
+}
+
+
 Vector rotateX(Vector v, const Float angle) noexcept
 {
 	v.rotateX(angle);
@@ -357,6 +386,12 @@ Vector rotateZ(Vector v, const Float angle) noexcept
 {
 	v.rotateZ(angle);
 	return v;
+}
+
+
+Float scalarProjection(const Vector& a, const Vector& b) noexcept
+{
+	return dot(a, b) / mag(b);
 }
 
 

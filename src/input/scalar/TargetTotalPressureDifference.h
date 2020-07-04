@@ -7,25 +7,25 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::input::AerodynamicEfficiency
+	turbo::input::TargetTotalPressureDifference
 
 Description
-	Class AerodynamicEfficiency.
-
-	Guesstimate for the initial design, corrected after simulations are run.
-
-	Defaults to 0.6.
+	Class TargetTotalPressureDifference.
 
 SourceFiles
-	AerodynamicEfficiency.cpp
+	TargetTotalPressureDifference.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef INPUT_AERODYNAMIC_EFFICIENCY_H
-#define INPUT_AERODYNAMIC_EFFICIENCY_H
+#ifndef INPUT_TARGET_TOTAL_PRESSURE_DIFFERENCE_H
+#define INPUT_TARGET_TOTAL_PRESSURE_DIFFERENCE_H
 
+#include "BladeEfficiency.h"
+#include "BladeVelocity.h"
+#include "Density.h"
 #include "General.h"
-#include "LimitedValue.h"
+#include "PositiveValue.h"
+#include "OutletVelocity.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -34,29 +34,38 @@ namespace turbo
 namespace input
 {
 
+// Forward declarations
+class OutletVelocity;
+
 /*---------------------------------------------------------------------------*\
-				Class AerodynamicEfficiency Declaration
+				Class TargetTotalPressureDifference Declaration
 \*---------------------------------------------------------------------------*/
 
-class AerodynamicEfficiency final
+class TargetTotalPressureDifference final
 :
-	public LimitedValue<Float, 0, 1>
+	public PositiveValue<Float>
 {
 public:
 
 	// Public static data
 
-		inline static const String name {"AerodynamicEfficiency"};
+		inline static const String name {"TargetTotalPressureDifference"};
 
 
 	// Constructors
 
-		//- Default constructor
-		AerodynamicEfficiency() noexcept;
-
 		//- Construct from a Float,
 		//  no aditional checking required
-		explicit AerodynamicEfficiency(const Float f);
+		explicit TargetTotalPressureDifference(const Float f);
+
+		//- Compute and construct
+		TargetTotalPressureDifference
+		(
+			const OutletVelocity& c_2,
+			const BladeVelocity& U,
+			const BladeEfficiency& eta,
+			const Density& rho
+		);
 
 
 	// Member functions

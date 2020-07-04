@@ -7,79 +7,67 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::Underlying
+	turbo::input::MaxDesignIter
 
 Description
-	A helper class for implementing CRTP properly
+	Class MaxDesignIter.
+
+	Defaults to 100.
+
+SourceFiles
+	MaxDesignIter.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef UNDERLYING_H
-#define UNDERLYING_H
+#ifndef INPUT_MAX_DESIGN_ITER_H
+#define INPUT_MAX_DESIGN_ITER_H
+
+#include "General.h"
+#include "PositiveValue.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace turbo
 {
+namespace input
+{
 
 /*---------------------------------------------------------------------------*\
-						Class Underlying Definition
+					Class MaxDesignIter Declaration
 \*---------------------------------------------------------------------------*/
 
-template<typename T>
-class Underlying
+class MaxDesignIter final
+:
+	public PositiveValue<std::size_t>
 {
-protected:
-
-	// Constructors
-
-		// Default constructor
-		Underlying() = default;
-
-
 public:
 
+	// Public static data
+
+		inline static const String name {"MaxDesignIter"};
+
+
 	// Constructors
 
-		// Copy constructor
-		Underlying(const Underylying&) = default;
+		//- Default constructor
+		MaxDesignIter() noexcept;
 
-		// Move constructor
-		Underlying(Underlying&&) = default;
-
-
-	// Destructor
-	virtual ~Underlying() = default;
+		//- Construct from a Integer,
+		//  no aditional checking required
+		explicit MaxDesignIter(const std::size_t i);
 
 
 	// Member functions
 
-		// Return reference to underlying type
-		T& cast() noexcept
-		{
-			return static_cast<T&>(*this);
-		}
-
-		// Return const reference to underlying type
-		const T& cast() const noexcept
-		{
-			return static_cast<const T&>(*this);
-		}
-
-
-	// Member operators
-
-		// Copy assignment
-		Underlying& operator=(const Underlying&) = default;
-
-		// Move assignment
-		Underlying& operator=(Underlying&&) = default;
+		//- Get object name
+		String getName() const override;
 
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+} // End namespace input
 } // End namespace turbo
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

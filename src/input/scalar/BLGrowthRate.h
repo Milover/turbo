@@ -12,7 +12,7 @@ Class
 Description
 	Class BLGrowthRate.
 
-	Defaults to 1.2.
+	Defaults to 1.15.
 
 SourceFiles
 	BLGrowthRate.cpp

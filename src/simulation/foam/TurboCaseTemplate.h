@@ -20,10 +20,12 @@ Description
 #include "FoamCreatePatchDictFile.h"
 #include "FoamDecomposeParDictFile.h"
 #include "FoamEpsilonFile.h"
+#include "FoamFieldMinMaxFile.h"
 #include "FoamForcesFile.h"
 #include "FoamFvSchemesFile.h"
 #include "FoamFvSolutionFile.h"
 #include "FoamKFile.h"
+#include "FoamMapFieldsDictFile.h"
 #include "FoamNutFile.h"
 #include "FoamOmegaFile.h"
 #include "FoamPatchSurfaceFieldValueFile.h"
@@ -52,7 +54,7 @@ namespace detail
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-inline static const std::array<detail::ps, 24> turboCaseTemplateArray
+inline static const std::array<detail::ps, 26> turboCaseTemplateArray
 {
 	detail::ps {turboCaseTemplatePath,			""},
 	detail::ps {foam0origPath,					""},
@@ -74,10 +76,12 @@ inline static const std::array<detail::ps, 24> turboCaseTemplateArray
 	detail::ps {foamControlDictPath,			foamControlDictFile},
 	detail::ps {foamCreatePatchDictPath,		foamCreatePatchDictFile},
 	detail::ps {foamDecomposeParDictPath,		foamDecomposeParDictFile},
-	detail::ps {foamfvSchemesPath,				foamFvSchemesFile},
+	detail::ps {foamFvSchemesPath,				foamFvSchemesFile},
 	detail::ps {foamFvSolutionPath,				foamFvSolutionFile},
+	detail::ps {foamMapFieldsDictPath,			foamMapFieldsDictFile},
 	detail::ps {foamSetSetbatchPath,			foamSetSetbatchFile},
 
+	detail::ps {foamFieldMinMaxFilePath,			foamFieldMinMaxFile},
 	detail::ps {foamForcesFilePath,					foamForcesFile},
 	detail::ps {foamPatchSurfaceFieldValuePath,		foamPatchSurfaceFieldValueFile},
 	detail::ps {foamSampledSurfaceFieldValuePath,	foamSampledSurfaceFieldValueFile},

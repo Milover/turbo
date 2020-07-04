@@ -40,7 +40,7 @@ Path Simulator::createCase(const Path& parentCwd)
 
 	String caseName
 	{
-		"case_" + std::to_string(simId)
+		"case." + std::to_string(simId)
 	};
 	Path caseDir {parentCwd / caseName};
 

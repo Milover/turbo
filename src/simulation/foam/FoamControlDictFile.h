@@ -55,7 +55,7 @@ deltaT            1;
 
 writeControl      timeStep;
 
-writeInterval     50;
+writeInterval     500;
 
 purgeWrite        3;
 
@@ -69,10 +69,11 @@ timeFormat        general;
 
 timePrecision     8;
 
-runTimeModifiable false;
+runTimeModifiable true;
 
 functions
 {
+    #include      "turbo_post/fieldMinMax"
     #include      "turbo_post/forces"
     #include      "turbo_post/patchSurfaceFieldValue"
     #include      "turbo_post/sampledSurfaceFieldValue"

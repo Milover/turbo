@@ -20,6 +20,7 @@ Description
 #include <limits>
 #include <type_traits>
 
+#include "Error.h"
 #include "General.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -33,14 +34,14 @@ inline static constexpr Float pi {M_PI};
 
 inline static constexpr Float eps {1e-15};
 
-inline static constexpr char filenameSeparator {'_'};
+inline static constexpr char suffixSeparator {'.'};
 
 
 // * * * * * * * * * * * * * Arithmetic Functions  * * * * * * * * * * * * * //
 
 //- Compare two numbers (up to ``about'' machine precision)
 template<typename T>
-std::enable_if_t<std::is_floating_point_v<T>, bool>
+[[nodiscard]] std::enable_if_t<std::is_floating_point_v<T>, bool>
 isEqual
 (
 	T x,
@@ -60,7 +61,7 @@ isEqual
 
 //- Check if 'x' is less or equal to 'y'
 template<typename T>
-std::enable_if_t<std::is_floating_point_v<T>, bool>
+[[nodiscard]] std::enable_if_t<std::is_floating_point_v<T>, bool>
 isLessOrEqual
 (
 	T x,
@@ -74,7 +75,7 @@ isLessOrEqual
 
 //- Check if 'x' is greater or equal to 'y'
 template<typename T>
-std::enable_if_t<std::is_floating_point_v<T>, bool>
+[[nodiscard]] std::enable_if_t<std::is_floating_point_v<T>, bool>
 isGreaterOrEqual
 (
 	T x,
@@ -88,7 +89,7 @@ isGreaterOrEqual
 
 //- Check if 'x' is in range [min, max] (inclusive)
 template<typename T>
-std::enable_if_t<std::is_floating_point_v<T>, bool>
+[[nodiscard]] std::enable_if_t<std::is_floating_point_v<T>, bool>
 isInRange
 (
 	T x,
@@ -102,9 +103,49 @@ isInRange
 }
 
 
+//- Check if tolerance 'tol' is satisfied i.e. |a - sign(a)*b| <= tol
+template<typename T>
+[[nodiscard]] std::enable_if_t<std::is_floating_point_v<T>, bool>
+tolerance
+(
+	T a,
+	T b,
+	T tol,
+	Integer ulp = 2
+) noexcept
+{
+	return isLessOrEqual
+	(
+		std::abs(a - std::copysign(b, a)),
+		tol,
+		ulp
+	);
+}
+
+
+//- Check if rel. tolerance 'tol' is satisfied i.e. |1 - |a/b|| <= tol
+template<typename T>
+[[nodiscard]] std::enable_if_t<std::is_floating_point_v<T>, bool>
+relTolerance
+(
+	T a,
+	T b,
+	T tol,
+	Integer ulp = 2
+) noexcept
+{
+	return isLessOrEqual
+	(
+		std::abs(1.0 - std::abs(a / b)),
+		tol,
+		ulp
+	);
+}
+
+
 //- Convert radians to degrees
 template<typename T>
-std::enable_if_t<std::is_floating_point_v<T>, T>
+[[nodiscard]] std::enable_if_t<std::is_floating_point_v<T>, T>
 radToDeg(const T t)
 {
 	static constexpr Float radDeg {180.0 / pi};
@@ -115,7 +156,7 @@ radToDeg(const T t)
 
 //- Convert degrees to radians
 template<typename T>
-std::enable_if_t<std::is_floating_point_v<T>, T>
+[[nodiscard]] std::enable_if_t<std::is_floating_point_v<T>, T>
 degToRad(const T t)
 {
 	static constexpr Float degRad {pi / 180.0};
@@ -168,7 +209,7 @@ inline void trimWhiteLR(String& s)
 
 //- Add a suffix to a filename, retains the extension
 template<typename T>
-inline Path addFilenameSuffix
+[[nodiscard]] inline Path addFilenameSuffix
 (
 	const Path& path,
 	T&& suffix
@@ -181,18 +222,66 @@ inline Path addFilenameSuffix
 	if constexpr (std::is_integral_v<removeCVRef_t<T>>)
 	{
 		filename = filename
-				 + filenameSeparator
+				 + suffixSeparator
 				 + std::to_string(std::forward<T>(suffix));
 	}
 	else
 	{
-		filename = filename + filenameSeparator + suffix;
+		filename = filename + suffixSeparator + suffix;
 	}
 	tmp.replace_filename(filename + extension);
 
 	return tmp;
 }
 
+
+//- Flag an existing file or directory by adding an extension i.e.
+//	rename 'path' to 'path[extension]'
+template<typename T>
+inline void flagPath
+(
+	Path& path,
+	T&& extension
+)
+{
+	if (!std::filesystem::exists(path))
+		error(FUNC_INFO, "path: ", path, " doesn't exist");
+
+	Path tmp {path};
+	path.replace_extension(extension);
+	std::filesystem::rename(tmp, path);
+}
+
+
+// * * * * * * * * * * * * * * Input Functions * * * * * * * * * * * * * * * //
+
+//- Read a string, (contiguous block of non-whitespace characters)
+[[nodiscard]] inline String readString(std::istream& is)
+{
+	String s {""};
+
+	while (is)
+	{
+		char c;
+		is.get(c);
+
+		if
+		(
+			std::iswspace(c)
+		 && !s.empty()
+		)
+			break;
+		else if (std::iswspace(c))
+			continue;
+
+		s += c;
+
+		if (is.fail())
+			error(FUNC_INFO, "error while parsing string");
+	};
+
+	return s;
+}
 
 // * * * * * * * * * * * * * * Output Functions  * * * * * * * * * * * * * * //
 

@@ -117,6 +117,10 @@ public:
 		//- Get name (string id)
 		String name() const noexcept;
 
+		//- Purge all geometry from model, godspeed
+		//	activates the model
+		void purge() const noexcept;
+
 		//- Write the model data (geometry) to a file,
 		//	activates the model. 'extension' determines the filetype,
 		//	see gmsh documentation for supported filetypes.

@@ -35,7 +35,6 @@ namespace mesh
 BoundaryLayerField::BoundaryLayerField(const input::Registry& reg)
 {
 	auto returnTag {interface::GmshAddField {}(this)};
-
 	assert(returnTag == tag());
 
 	// set characteristics

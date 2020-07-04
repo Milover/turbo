@@ -31,6 +31,17 @@ namespace compute
 
 // * * * * * * * * * * * * * * Functions * * * * * * * * * * * * * * * * * * //
 
+//- Compute the chord for a given axial chord and stagger angle,
+//	returns min[chord, chord_lim]
+[[deprecated("we're not using this anymore")]]
+Float computeAxialLimitedChord
+(
+	const Float c,			// chord
+	const Float b,			// axial chord (passage width)
+	const Float xi			// stagger angle
+) noexcept;
+
+
 //- Compute the max (rel) profile thickness such that
 //	the requested max abs. blade thickness is satisfied
 //	NOTE: we assume a symmetric thickness distribution
@@ -40,17 +51,6 @@ Float computeBladeThicknessForcedMaxProfileThickness
 	const Float c,			// chord
 	const Float r,			// (profile section) radius
 	const Float t_abs		// max abs. blade thickness
-) noexcept;
-
-
-//- Compute the chord for a given axial chord and stagger angle,
-//	returns min[chord, chord_lim]
-[[deprecated("we're not using this anymore")]]
-Float computeAxialLimitedChord
-(
-	const Float c,			// chord
-	const Float b,			// axial chord (passage width)
-	const Float xi			// stagger angle
 ) noexcept;
 
 
@@ -67,9 +67,10 @@ Float computeCamberAngle
 (
 	const Vector& c_1,			// abs. fluid inlet velocity
 	const Vector& c_2,			// abs. fluid outlet velocity
-	const Vector& U,  			// blade velocity
-	const Float i = 0.0,		// incidence angle
-	const Float delta = 0.0		// deviation angle
+	const Vector& U, 			// blade velocity
+	const Float& coeff = 1.0	// camber angle scaling factor
+	//const Float i = 0.0,		// incidence angle
+	//const Float delta = 0.0		// deviation angle
 ) noexcept;
 
 
@@ -130,8 +131,19 @@ Float computeStaggerAngle
 (
 	const Vector& c_1,		// abs. fluid inlet velocity
 	const Vector& U,  		// blade velocity
-	const Float zeta,		// leading edge inclination
-	const Float i = 0.0		// incidence angle
+	const Float zeta		// leading edge inclination
+	//const Float i = 0.0		// incidence angle
+) noexcept;
+
+
+//- Compute static pressure difference (for a given airfoil/station)
+Float computeStaticPressureDifference
+(
+	const Vector& c_1,		// abs. fluid inlet velocity
+	const Vector& c_2,		// abs. fluid outlet velocity
+	const Vector& U,		// blade velocity
+	const Float eta,		// (blade) efficiency
+	const Float rho			// density
 ) noexcept;
 
 
@@ -146,12 +158,12 @@ Float computeStationRadius
 ) noexcept;
 
 
-//- Compute total pressure difference
-Float computeStaticPressureDifference
+//- Compute target total pressure difference (for a given airfoil/station)
+Float computeTargetTotalPressureDifference
 (
-	const Vector& c_1,		// abs. fluid inlet velocity
 	const Vector& c_2,		// abs. fluid outlet velocity
 	const Vector& U,		// blade velocity
+	const Float eta,		// (blade) efficiency
 	const Float rho			// density
 ) noexcept;
 
@@ -160,6 +172,7 @@ Float computeStaticPressureDifference
 Vector computeRootOutletVelocity
 (
 	const Vector& c_1,		// abs. fluid inlet velocity
+	const Float eta,		// (blade) efficiency
 	const Float N,			// rev. per second
 	const Float r_h			// hub radius
 ) noexcept;
@@ -186,7 +199,8 @@ Vector computeRootOutletVelocity_depr
 Float computeVortexDistributionExponent
 (
 	const Vector& c_2_h,	// abs. root (hub) fluid outlet velocity
-	const Float dp,			// (requested total) static pressure difference
+	const Float dp_req,		// (requested) static pressure difference
+	const Float eta,		// total to total efficiency
 	const Float N,			// rev. per second
 	const Float r_h,		// hub radius
 	const Float r_s,		// shroud radius

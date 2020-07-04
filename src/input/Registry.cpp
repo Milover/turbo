@@ -8,8 +8,10 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include <algorithm>
 #include <memory>
 #include <ostream>
+#include <sstream>
 
 #include "Registry.h"
 
@@ -79,11 +81,24 @@ void Registry::printAll
 	std::ostream& os,
 	const String::size_type width,
 	const String& delimiter,
-	const String& terminator
+	const String& terminator,
+	const Integer precision
 ) const
 {
+	std::vector<String> lines;
+	lines.reserve(data_->size());
+
 	for (auto& [name, obj] : *data_)
-		obj->print(os, width, delimiter, terminator);
+	{
+		std::stringstream ss;
+
+		obj->print(ss, width, delimiter, terminator, precision);
+		lines.emplace_back(ss.str());
+	}
+
+	std::sort(lines.begin(), lines.end());
+	for (auto& l : lines)
+		os << l;
 }
 
 

@@ -50,6 +50,7 @@ private:
 
 		input::HubRadius r_h_;
 		input::ShroudRadius r_s_;
+		input::TipClearance z_tip_;
 
 		Uptr<math::BezierCurve<2>> bc_;
 

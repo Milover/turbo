@@ -41,13 +41,11 @@ void BezierTangential::construct
 		return Point {0.0, 0.0, z};
 	};
 
-	Point hub		{atZ(r_h_.value())};
-	Point shroud	{atZ(r_s_.value())};
-	Point mid
-	{
-		atZ(rho * (r_s_.value() - r_h_.value()))
-	};
-	shroud.rotateX(d_s);
+	Point hub {atZ(r_h_.value())};
+	Point tip {atZ(r_s_.value() - z_tip_.value())};
+	Point mid {rho * (tip - hub)};
+
+	tip.rotateX(d_s);
 	mid.rotateX(d_h);
 
 	mid += hub;
@@ -58,7 +56,7 @@ void BezierTangential::construct
 		{
 			std::move(hub),
 			std::move(mid),
-			std::move(shroud)
+			std::move(tip)
 		}
 	);
 }
@@ -68,17 +66,18 @@ void BezierTangential::construct
 BezierTangential::BezierTangential(const input::Registry& reg)
 :
 	r_h_ {reg.cref<input::HubRadius>()},
-	r_s_ {reg.cref<input::ShroudRadius>()}
+	r_s_ {reg.cref<input::ShroudRadius>()},
+	z_tip_ {reg.cref<input::TipClearance>()}
 {
 	Float d_h {reg.cref<input::HubSkewAngle>().value()};
 	Float d_s;
 	if
 	(
-		!input::InputRegistry::has(input::ShroudSkewAngle::name)
+		input::InputRegistry::has(input::ShroudSkewAngle::name)
 	)
-		d_s = d_h;
-	else
 		d_s = reg.cref<input::ShroudSkewAngle>().value();
+	else
+		d_s = d_h;
 
 	construct
 	(
@@ -95,23 +94,15 @@ void BezierTangential::skew(Profile& profile) const
 {
 	assert(!profile.wrapped());
 
-	// floating point shennanigans
-	Float rho;
-	auto r {profile.centroid().z()};
-	if
-	(
-		isLessOrEqual(std::abs(r - r_h_.value()), eps)
-	)
-		rho = 0.0;
-	else if
-	(
-		isLessOrEqual(std::abs(r - r_s_.value()), eps)
-	)
-		rho = 1.0;
-	else
-		rho = (r - r_h_.value()) / (r_s_.value() - r_h_.value());
+	rRel input::RelRadius
+	{
+		input::Radius {profile.radius()},
+		r_h_,
+		r_s_,
+		z_tip
+	};
 
-	profile.centerOn((*bc_)(rho));
+	profile.centerOn((*bc_)(rRel.value()));
 }
 
 

@@ -49,6 +49,11 @@ template<>
 struct isConvertible<Integer> : std::true_type {};
 
 
+// We know how to convert from String to std::size_t
+template<>
+struct isConvertible<std::size_t> : std::true_type {};
+
+
 // We know how to convert from String to Float
 template<>
 struct isConvertible<Float> : std::true_type {};

@@ -10,6 +10,7 @@ License
 
 #include "RootOutletVelocity.h"
 
+#include "BladeEfficiency.h"
 #include "Error.h"
 #include "General.h"
 #include "HubRadius.h"
@@ -36,6 +37,7 @@ RootOutletVelocity::RootOutletVelocity(const Vector& v) noexcept(ndebug)
 RootOutletVelocity::RootOutletVelocity
 (
 	const InletVelocity& c_1,
+	const BladeEfficiency& eta,
 	const Rps& N,
 	const HubRadius& r_h
 ) noexcept(ndebug)
@@ -48,6 +50,7 @@ RootOutletVelocity::RootOutletVelocity
 			compute::computeRootOutletVelocity
 			(
 				c_1.value(),
+				eta.value(),
 				N.value(),
 				r_h.value()
 			),

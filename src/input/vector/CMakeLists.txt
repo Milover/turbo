@@ -6,12 +6,14 @@
 
 # add sources
 set(SRC
+	AirfoilTotalForce.cpp
 	BladeVelocity.cpp
 	InletVelocity.cpp
 	InletRefPoint.cpp
 	InletRelativeVelocity.cpp
 	LEMonitoringPlane.cpp
 	OutletVelocity.cpp
+	OutletRelativeVelocity.cpp
 	RootOutletVelocity.cpp
 	TranslationPerBot.cpp
 	TranslationPerTop.cpp

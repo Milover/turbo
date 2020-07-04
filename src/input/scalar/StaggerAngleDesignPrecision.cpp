@@ -8,7 +8,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "AerodynamicEfficiency.h"
+#include "StaggerAngleDesignPrecision.h"
 
 #include "General.h"
 
@@ -21,21 +21,21 @@ namespace input
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-AerodynamicEfficiency::AerodynamicEfficiency() noexcept
+StaggerAngleDesignPrecision::StaggerAngleDesignPrecision() noexcept
 :
-	LVBase {0.6}
+	PVBase {1e-3}
 {}
 
 
-AerodynamicEfficiency::AerodynamicEfficiency(const Float f)
+StaggerAngleDesignPrecision::StaggerAngleDesignPrecision(const Float f)
 :
-	LVBase {f}
+	PVBase {f}
 {}
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-String AerodynamicEfficiency::getName() const
+String StaggerAngleDesignPrecision::getName() const
 {
 	return name;
 }

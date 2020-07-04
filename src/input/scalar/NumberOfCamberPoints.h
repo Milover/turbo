@@ -15,7 +15,7 @@ Description
 SourceFiles
 	NumberOfCamberPoints.cpp
 
-	Defaults to 150.
+	Defaults to 250.
 
 \*---------------------------------------------------------------------------*/
 

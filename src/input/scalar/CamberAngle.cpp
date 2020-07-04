@@ -11,8 +11,8 @@ License
 #include "CamberAngle.h"
 
 #include "BladeVelocity.h"
+#include "CamberAngleScalingFactor.h"
 #include "General.h"
-#include "IncidenceAngle.h"
 #include "InitialDesign.h"
 #include "InletVelocity.h"
 #include "OutletVelocity.h"
@@ -37,8 +37,7 @@ CamberAngle::CamberAngle
 	const InletVelocity& c_1,
 	const OutletVelocity& c_2,
 	const BladeVelocity& U,
-	const IncidenceAngle& i,
-	const DeviationAngle& delta
+	const CamberAngleScalingFactor& coeff
 )
 :
 	CamberAngle
@@ -48,8 +47,7 @@ CamberAngle::CamberAngle
 			c_1.value(),
 			c_2.value(),
 			U.value(),
-			i.value(),
-			delta.value()
+			coeff.value()
 		)
 	}
 {}

@@ -67,7 +67,7 @@ private:
 
 public:
 
-		//- Create an lofted surface
+		//- Create a lofted surface
 		template
 		<
 			typename... Curves,
@@ -75,7 +75,7 @@ public:
 		>
 		[[nodiscard]] Surface operator()(Curves&&... cs) const;
 
-		//- Create an lofted surface
+		//- Create a lofted surface
 		template
 		<
 			typename Curves,

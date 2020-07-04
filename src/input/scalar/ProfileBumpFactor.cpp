@@ -23,7 +23,7 @@ namespace input
 
 ProfileBumpFactor::ProfileBumpFactor() noexcept
 :
-	LVBase {0.25}
+	LVBase {0.05}
 {}
 
 

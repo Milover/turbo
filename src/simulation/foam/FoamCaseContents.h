@@ -114,7 +114,7 @@ inline static const Path foamDecomposeParDictPath
 	foamSystemPath / "decomposeParDict"
 };
 
-inline static const Path foamfvSchemesPath
+inline static const Path foamFvSchemesPath
 {
 	foamSystemPath / "fvSchemes"
 };
@@ -124,11 +124,21 @@ inline static const Path foamFvSolutionPath
 	foamSystemPath / "fvSolution"
 };
 
+inline static const Path foamMapFieldsDictPath
+{
+	foamSystemPath / "mapFieldsDict"
+};
+
 inline static const Path foamSetSetbatchPath
 {
 	foamSystemPath / "setSet.batch"
 };
 
+
+inline static const Path foamFieldMinMaxFilePath
+{
+	turboPostPath / "fieldMinMax"
+};
 
 inline static const Path foamForcesFilePath
 {

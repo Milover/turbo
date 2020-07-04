@@ -15,7 +15,7 @@ Description
 	Number of chord lengths in the streamwise direction from the LE/TE point
 	at which to place the inlet/outlet.
 
-	Defaults to 1.0.
+	Defaults to 1.5.
 
 SourceFiles
 	SectionExtensionFactor.cpp

@@ -54,8 +54,9 @@ boundaryField
 
     outlet
     {
-        type            fixedValue;
-        value           $internalField;
+        type            zeroGradient;
+//        type            fixedValue;
+//        value           $internalField;
     }
 
     ".*wall.*"

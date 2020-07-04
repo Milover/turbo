@@ -10,10 +10,13 @@ License
 
 #include <algorithm>
 #include <cassert>
+#include <ostream>
 #include <vector>
 
 #include "Profile.h"
 
+#include "CsvWriter.h"
+#include "CsvReader.h"
 #include "Curve.h"
 #include "Error.h"
 #include "General.h"
@@ -52,7 +55,7 @@ void Profile::constrain(const input::Registry& reg)
 }
 
 
-void Profile::constrainMaxThickness(const Float maxAbsBladeThickness) noexcept
+void Profile::constrainMaxThickness(const Float thickness) noexcept
 {
 	// we have to find the thickness after wrapping
 	Float tMax {0.0};
@@ -80,40 +83,93 @@ void Profile::constrainMaxThickness(const Float maxAbsBladeThickness) noexcept
 
 	if
 	(
-		isGreaterOrEqual(tMax, maxAbsBladeThickness)
+		isGreaterOrEqual(tMax, thickness)
 	)
 		inflate
 		(
-			radius_ * std::asin(0.5 * maxAbsBladeThickness / radius_) / aMax
+			radius_ * std::asin(0.5 * thickness / radius_) / aMax
 		);
 }
 
 
-void Profile::constrainPassageWidth(const Float maxPassageWidth) noexcept
+void Profile::constrainPassageWidth(const Float width) noexcept
 {
 	Float pw {passageWidth()};
 	if
 	(
-		isGreaterOrEqual(pw, maxPassageWidth)
+		isGreaterOrEqual(pw, width)
 	)
-		scale(maxPassageWidth / pw);
+		scale(width / pw);
 }
 
 
-void Profile::recompute(const input::Registry& reg)
+// * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
+
+Profile::Profile
+(
+	const Path& file,
+	const char delimiter,
+	const char comment
+)
 {
-	reg.store
-	(
-		input::Chord {chord()}
-	);
-	reg.store
-	(
-		input::Solidity
-		{
-			reg.cref<input::Chord>(),
-			reg.cref<input::Pitch>()
-		}
-	);
+	input::CsvReader<Float, Float, Float> csv {delimiter, comment};
+	csv.read(file);
+
+	const auto& xCoords {csv.cref<0>()};
+	const auto& yCoords {csv.cref<1>()};
+	const auto& zCoords {csv.cref<2>()};
+
+	if (xCoords.empty())
+		error(FUNC_INFO, "profile point coordinate list empty");
+	else if (xCoords.size() % 2 == 0)
+		error
+		(
+			FUNC_INFO,
+			"even number of profile point coordinates given, should be odd"
+		);
+
+	auto numPoints {xCoords.size() / 2 + 1};
+	points_.reserve(numPoints);
+
+	auto topCount {numPoints - 1};
+	auto botCount {numPoints - 1};
+
+	for (auto i {0ul}; i < numPoints; ++i)
+	{
+		points_.emplace_back
+		(
+			Point
+			{
+				xCoords[topCount],
+				yCoords[topCount],
+				zCoords[topCount]
+			},
+			Point
+			{
+				xCoords[botCount],
+				yCoords[botCount],
+				zCoords[botCount]
+			}
+		);
+
+		--topCount;
+		++botCount;
+	}
+
+	// check and get radius
+	auto le {lePoint()};
+
+	if (!valid())
+	{
+		wrapped_ = true;
+
+		if (!valid())
+			error(FUNC_INFO, "invalid profile");
+
+		radius_ = std::hypot(le.y(), le.z());
+	}
+	else
+		radius_ = le.z();
 }
 
 
@@ -130,25 +186,25 @@ Float Profile::axialChord() const noexcept(ndebug)
 }
 
 
-Profile::Reference Profile::back()
+Profile::reference Profile::back()
 {
 	return points_.back();
 }
 
 
-Profile::Constreference Profile::back() const
+Profile::const_reference Profile::back() const
 {
 	return points_.back();
 }
 
 
-Profile::Iterator Profile::begin()
+Profile::iterator Profile::begin()
 {
 	return points_.begin();
 }
 
 
-Profile::Constiterator Profile::begin() const
+Profile::const_iterator Profile::begin() const
 {
 	return points_.begin();
 }
@@ -182,11 +238,19 @@ void Profile::build
 	rotateZ(0.5 * pi - stagger.value());
 
 	constrain(reg);
-	recompute(reg);
 }
 
 
-std::vector<Profile::Point> Profile::camberLine() const noexcept(ndebug)
+Float Profile::camberAngle() const noexcept(ndebug)
+{
+	if (empty())
+		error(FUNC_INFO, "profile not built");
+
+	return outletAngle() - inletAngle();
+}
+
+
+std::vector<Profile::Point> Profile::camberLinePoints() const noexcept(ndebug)
 {
 	if (empty())
 		error(FUNC_INFO, "profile not built");
@@ -194,11 +258,32 @@ std::vector<Profile::Point> Profile::camberLine() const noexcept(ndebug)
 	std::vector<Profile::Point> camberLine;
 	camberLine.reserve(points_.size());
 
-	for (auto& [top, bot] : points_)
-		camberLine.emplace_back
-		(
-			midpoint(top, bot)
-		);
+	if (!wrapped_)
+		for (const auto& [top, bot] : points_)
+			camberLine.emplace_back
+			(
+				midpoint(top, bot)
+			);
+	else
+	{
+		for (const auto& [top, bot] : points_)
+		{
+			auto tmp {projectionYZ(top)};
+			auto ang
+			{
+				0.5 * angleBetween(tmp, projectionYZ(bot))
+			};
+
+			tmp.rotateX(ang);
+
+			camberLine.emplace_back
+			(
+				0.5 * (top.x() + bot.x()),
+				tmp.y(),
+				tmp.z()
+			);
+		}
+	}
 
 	return camberLine;
 }
@@ -241,27 +326,33 @@ bool Profile::empty() const noexcept
 }
 
 
-Profile::Iterator Profile::end()
+Profile::iterator Profile::end()
 {
 	return points_.end();
 }
 
 
-Profile::Constiterator Profile::end() const
+Profile::const_iterator Profile::end() const
 {
 	return points_.end();
 }
 
 
-Profile::Reference Profile::front()
+Profile::reference Profile::front()
 {
 	return points_.front();
 }
 
 
-Profile::Constreference Profile::front() const
+Profile::const_reference Profile::front() const
 {
 	return points_.front();
+}
+
+
+geometry::Spline Profile::getCamberLine() const noexcept(ndebug)
+{
+	return geometry::Spline {camberLinePoints()};
 }
 
 
@@ -373,6 +464,15 @@ void Profile::inflate(const Float factor) noexcept(ndebug)
 }
 
 
+Float Profile::inletAngle() const noexcept(ndebug)
+{
+	if (empty())
+		error(FUNC_INFO, "profile not built");
+
+	return pi - angleBetween(leDirection(), Vector::yAxis());
+}
+
+
 Vector Profile::leDirection() const noexcept(ndebug)
 {
 	if (empty())
@@ -442,6 +542,15 @@ std::vector<Profile::Point> Profile::orderedPoints() const noexcept
 		points.push_back(p.second);
 
 	return points;
+}
+
+
+Float Profile::outletAngle() const noexcept(ndebug)
+{
+	if (empty())
+		error(FUNC_INFO, "profile not built");
+
+	return angleBetween(teDirection(), Vector::yAxis());
 }
 
 
@@ -515,9 +624,19 @@ void Profile::scale(const Point& p, const Float factor) noexcept
 }
 
 
-Profile::Sizetype Profile::size() const noexcept
+Profile::size_type Profile::size() const noexcept
 {
 	return points_.size();
+}
+
+
+
+Float Profile::staggerAngle() const noexcept(ndebug)
+{
+	if (empty())
+		error(FUNC_INFO, "profile not built");
+
+	return angleBetween(tePoint() - lePoint(), Vector::yAxis());
 }
 
 
@@ -563,6 +682,51 @@ void Profile::translate(const Vector& v) noexcept
 }
 
 
+void Profile::unwrap() noexcept
+{
+	if (!wrapped_)
+		return;
+
+	for (auto& [top, bot] : points_)
+	{
+		Float aTop {top.y() / radius_};
+		Float aBot {bot.y() / radius_};
+
+		top.y() = radius_ * std::asin(aTop);
+		top.z() = radius_ * std::acos(aTop);
+		bot.y() = radius_ * std::asin(aBot);
+		bot.z() = radius_ * std::acos(aBot);
+	}
+
+	wrapped_ = false;
+}
+
+
+bool Profile::valid() const
+{
+	if (empty())
+		error(FUNC_INFO, "profile not built");
+
+	bool check {true};
+
+	if (!wrapped_)
+		for (const auto& [top, bot] : points_)
+			check = check && tolerance(top.z(), bot.z(), eps);
+	else
+	{
+		auto le {lePoint()};
+		auto radius {std::hypot(le.y(), le.z())};
+
+		for (const auto& [top, bot] : points_)
+			check = check
+				 && tolerance(radius, std::hypot(top.y(), top.z()), eps)
+				 && tolerance(radius, std::hypot(bot.y(), bot.z()), eps);
+	}
+
+	return check;
+}
+
+
 void Profile::wrap() noexcept
 {
 	if (wrapped_)
@@ -589,15 +753,26 @@ bool Profile::wrapped() const noexcept
 }
 
 
+void Profile::writeCsv(const Path& file) const
+{
+	CsvWriter csv {file};
+	csv.writeComment("ordering: TE (top) - LE - TE (bot)");
+	csv.writeHeader("x", "y", "z");
+
+	for (const auto& p : orderedPoints())
+		csv.write(p.x(), p.y(), p.z());
+}
+
+
 // * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
 
-Profile::Reference Profile::operator[](Sizetype pos)
+Profile::reference Profile::operator[](size_type pos)
 {
 	return points_[pos];
 }
 
 
-Profile::Constreference Profile::operator[](Sizetype pos) const
+Profile::const_reference Profile::operator[](size_type pos) const
 {
 	return points_[pos];
 }

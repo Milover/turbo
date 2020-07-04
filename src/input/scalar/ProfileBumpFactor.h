@@ -19,7 +19,7 @@ SourceFiles
 	in a uniform 1D mesh, while smaller values result in more points towards
 	the ends of the profile.
 
-	Defaults to 0.25.
+	Defaults to 0.05.
 
 \*---------------------------------------------------------------------------*/
 

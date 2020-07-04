@@ -26,17 +26,6 @@ namespace compute
 
 // * * * * * * * * * * * * * * Functions * * * * * * * * * * * * * * * * * * //
 
-Float computeBladeThicknessForcedMaxProfileThickness
-(
-	const Float c,			// chord
-	const Float r,			// (profile section) radius
-	const Float t_abs		// max abs. blade thickness
-) noexcept
-{
-	return 2.0 * r * std::asin(0.5 * t_abs / r) / c;
-}
-
-
 Float computeAxialLimitedChord
 (
 	const Float c,			// chord
@@ -56,6 +45,17 @@ Float computeAxialLimitedChord
 }
 
 
+Float computeBladeThicknessForcedMaxProfileThickness
+(
+	const Float c,			// chord
+	const Float r,			// (profile section) radius
+	const Float t_abs		// max abs. blade thickness
+) noexcept
+{
+	return 2.0 * r * std::asin(0.5 * t_abs / r) / c;
+}
+
+
 Vector computeBladeVelocity 
 (
 	const Float N,			// rev. per second
@@ -66,7 +66,7 @@ Vector computeBladeVelocity
 	return Vector
 	{
 		0.0,
-		-pi * N * r
+		-N * 2.0 * pi * r
 	};
 }
 
@@ -76,8 +76,9 @@ Float computeCamberAngle
 	const Vector& c_1,		// abs. fluid inlet velocity
 	const Vector& c_2,		// abs. fluid outlet velocity
 	const Vector& U,  		// blade velocity
-	const Float i,			// incidence angle
-	const Float delta		// deviation angle
+	//const Float i,			// incidence angle
+	//const Float delta		// deviation angle
+	const Float& coeff		// camber angle scaling factor
 ) noexcept
 {
 	Float beta_1			// rel. fluid inlet angle
@@ -89,7 +90,9 @@ Float computeCamberAngle
 		computeFluidAngle(c_2, U)
 	};
 
-	return delta + beta_2 - (i + beta_1);
+	//return delta + beta_2 - (i + beta_1);
+	//return beta_2 - beta_1;
+	return coeff * (beta_2 - beta_1);			// XXX: testing, remove after
 }
 
 
@@ -161,79 +164,17 @@ Float computePitch
 }
 
 
-//- Compute blade span
-Float computeSpan
-(
-	const Float r_h,		// hub radius
-	const Float r_s,		// shroud radius
-	const Float z_tip		// tip gap (clearance)
-) noexcept
-{
-	return r_s - r_h - z_tip;
-}
-
-
-Float computeStaggerAngle 
-(
-	const Vector& c_1,		// abs. fluid inlet velocity
-	const Vector& U,  		// blade velocity
-	const Float zeta,		// leading edge inclination
-	const Float i			// incidence angle
-) noexcept
-{
-	return i + computeFluidAngle(c_1, U) + zeta;
-}
-
-
-//- Compute radius for an airfoil station
-Float computeStationRadius 
-(
-	const Integer i_s,		// station number (0, 1, 2...)
-	const Integer N_s,		// number of stations
-	const Float r_h,		// hub radius
-	const Float r_s,		// shroud radius
-	const Float z_tip		// tip gap (clearance)
-) noexcept
-{
-	if (N_s == 1)
-		return 0.5 * (r_h + r_s);
-
-	Float l			// increment
-	{
-		computeSpan(r_h, r_s, z_tip) / static_cast<Float>(N_s - 1)
-	};
-
-	return r_h + l * static_cast<Float>(i_s);
-}
-
-
-Float computeStaticPressureDifference 
-(
-	const Vector& c_1,		// abs. fluid inlet velocity
-	const Vector& c_2,		// abs. fluid outlet velocity
-	const Vector& U,		// blade velocity
-	const Float rho			// density
-) noexcept
-{
-	Float e_k
-	{
-		0.5 * (std::pow(mag(c_2), 2) - std::pow(mag(c_1), 2))
-	};
-
-	return rho * (U.y() * c_2.y() - e_k);
-}
-
-
 Vector computeRootOutletVelocity
 (
 	const Vector& c_1,		// abs. fluid inlet velocity
+	const Float eta,		// (blade) efficiency
 	const Float N,			// rev. per second
 	const Float r_h			// hub radius
 ) noexcept
 {
 	Float c_2_h_y
 	{
-		N * pi * r_h
+		eta * N * 2.0 * pi * r_h
 	};
 
 	return Vector {c_1.x(), -c_2_h_y};	// rotation is counterclockwise
@@ -245,7 +186,7 @@ Vector computeRootOutletVelocity_depr
 (
 	const Vector& c_1,		// abs. fluid inlet velocity
 	const Float dp,			// (requested total) static pressure difference
-	const Float eta,		// total to total efficiency
+	const Float eta,		// (blade) efficiency
 	const Float N,			// rev. per second
 	const Float n,			// vortex distribution coefficient
 	const Float r_h,		// hub radius
@@ -260,7 +201,7 @@ Vector computeRootOutletVelocity_depr
 	};
 	Float K_2
 	{
-		-2.0 * eta * N * pi * r_h * (std::pow(D, n + 3.0) - 1.0) / (n + 3.0)
+		-2.0 * eta * N * 2.0 * pi * r_h * (std::pow(D, n + 3.0) - 1.0) / (n + 3.0)
 	};
 
 	// check max requested pressure
@@ -309,7 +250,7 @@ Vector computeRootOutletVelocity_depr
 	// check swirl
 	Float c_max
 	{
-		eta * N * pi * r_h
+		eta * N * 2.0 * pi * r_h
 	};
 	if (isLessOrEqual(c_max, c))
 	{
@@ -328,10 +269,86 @@ Vector computeRootOutletVelocity_depr
 }
 
 
+Float computeSpan
+(
+	const Float r_h,		// hub radius
+	const Float r_s,		// shroud radius
+	const Float z_tip		// tip gap (clearance)
+) noexcept
+{
+	return r_s - r_h - z_tip;
+}
+
+
+Float computeStaggerAngle 
+(
+	const Vector& c_1,		// abs. fluid inlet velocity
+	const Vector& U,  		// blade velocity
+	const Float zeta		// leading edge inclination
+	//const Float i			// incidence angle
+) noexcept
+{
+	//return i + computeFluidAngle(c_1, U) + zeta;
+	return computeFluidAngle(c_1, U) + zeta;
+}
+
+
+Float computeStaticPressureDifference 
+(
+	const Vector& c_1,		// abs. fluid inlet velocity
+	const Vector& c_2,		// abs. fluid outlet velocity
+	const Vector& U,		// blade velocity
+	const Float eta,		// (blade) efficiency
+	const Float rho			// density
+) noexcept
+{
+	Float e_k
+	{
+		0.5 * (std::pow(mag(c_2), 2) - std::pow(mag(c_1), 2))
+	};
+
+	return rho * (eta * U.y() * c_2.y() - e_k);
+}
+
+
+Float computeStationRadius 
+(
+	const Integer i_s,		// station number (0, 1, 2...)
+	const Integer N_s,		// number of stations
+	const Float r_h,		// hub radius
+	const Float r_s,		// shroud radius
+	const Float z_tip		// tip gap (clearance)
+) noexcept
+{
+	if (N_s == 1)
+		return 0.5 * (r_h + r_s);
+
+	Float l			// increment
+	{
+		computeSpan(r_h, r_s, z_tip) / static_cast<Float>(N_s - 1)
+	};
+
+	return r_h + l * static_cast<Float>(i_s);
+}
+
+
+Float computeTargetTotalPressureDifference 
+(
+	const Vector& c_2,		// abs. fluid outlet velocity
+	const Vector& U,		// blade velocity
+	const Float eta,		// (blade) efficiency
+	const Float rho			// density
+) noexcept
+{
+	return eta * rho * U.y() * c_2.y();
+}
+
+
 Float computeVortexDistributionExponent
 (
 	const Vector& c_2_h,	// abs. root (hub) fluid outlet velocity
-	const Float dp,			// (requested total) static pressure difference
+	const Float dp_req,		// (requested) static pressure difference
+	const Float eta,		// (blade) efficiency
 	const Float N,			// rev. per second
 	const Float r_h,		// hub radius
 	const Float r_s,		// shroud radius
@@ -341,7 +358,7 @@ Float computeVortexDistributionExponent
 	Float D {r_s / r_h};
 	Float K_1
 	{
-		(std::pow(D, 2) - 1.0) * dp / rho
+		(std::pow(D, 2) - 1.0) * dp_req / rho
 	};
 	Float K_2
 	{
@@ -349,7 +366,7 @@ Float computeVortexDistributionExponent
 	};
 	Float K_3	// we didn't keep track of signs => |c_2_h.y()|
 	{
-		-2.0 * N * pi * std::abs(c_2_h.y()) * r_h
+		-2.0 * eta * N * 2.0 * pi * std::abs(c_2_h.y()) * r_h
 	};
 
 	auto f = [&](const auto& n)
@@ -380,7 +397,7 @@ Float computeVortexDistributionExponent
 	// we have to check if the shroud swirl is physically achievable
 	Float n_max
 	{
-		std::log(N * pi * r_s) / std::log(std::abs(c_2_h.y()) * D)
+		std::log(eta * N * 2.0 * pi * r_s) / std::log(std::abs(c_2_h.y()) * D)
 	};
 	if (!isLessOrEqual(n, n_max))
 	{

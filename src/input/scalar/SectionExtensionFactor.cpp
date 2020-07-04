@@ -23,7 +23,7 @@ namespace input
 
 SectionExtensionFactor::SectionExtensionFactor() noexcept
 :
-	PVBase {1.0}
+	PVBase {1.5}
 {}
 
 

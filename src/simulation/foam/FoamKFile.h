@@ -62,8 +62,8 @@ boundaryField
 
     ".*wall.*"
     {
-        type            kqRWallFunction;
-		value			$internalField;
+        type            fixedValue;
+		value			uniform 1e-10;
     }
 
     ".*periodic.*"

@@ -4,10 +4,12 @@
 
 # add sources
 set(SRC
-	SizeField.cpp
-	SizeFieldBase.cpp
 	BoundaryLayerField.cpp
 	BoxField.cpp
+	ConeField.cpp
+	MinField.cpp
+	SizeField.cpp
+	SizeFieldBase.cpp
 	)
 
 # append to sources

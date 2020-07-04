@@ -293,6 +293,27 @@ Float mag(const Vector& v) noexcept;
 Vector midpoint(const Vector& v1, const Vector& v2) noexcept;
 
 
+//- Vector projection of a to b
+Vector projection(const Vector& a, const Vector& b) noexcept;
+
+
+//- Project to x-y plane
+Vector projectionXY(Vector v) noexcept;
+
+
+//- Project to y-z plane
+Vector projectionYZ(Vector v) noexcept;
+
+
+//- Project to z-x plane
+Vector projectionZX(Vector v) noexcept;
+
+
+//- Vector rejection of a to b i.e. projection of a onto a plane
+//	perpendicular to b
+Vector rejection(const Vector& a, const Vector& b) noexcept;
+
+
 //- Rotate around x-axis by 'angle' radians
 Vector rotateX(Vector v, const Float angle) noexcept;
 
@@ -303,6 +324,10 @@ Vector rotateY(Vector v, const Float angle) noexcept;
 
 //- Rotate around z-axis by 'angle' radians
 Vector rotateZ(Vector v, const Float angle) noexcept;
+
+
+//- Scalar projection of a to b
+Float scalarProjection(const Vector& a, const Vector& b) noexcept;
 
 
 //- Normalize (to unit vector)

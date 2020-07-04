@@ -8,12 +8,14 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include <sstream>
 #include <utility>
 #include <vector>
 
 #include "Blade.h"
 
 #include "Airfoil.h"
+#include "CsvWriter.h"
 #include "FilledSurface.h"
 #include "General.h"
 #include "InputRegistry.h"
@@ -24,6 +26,8 @@ License
 #include "Surface.h"
 #include "TurboBase.h"
 #include "Variables.h"
+
+#include <gmsh.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -56,10 +60,15 @@ void Blade::construct()
 	{
 		data_->cref<input::SolidityDistribution>()
 	};
+	input::CamberAngleScalingFactorDistribution camberScaleDistr
+	{
+		data_->cref<input::CamberAngleScalingFactorDistribution>()
+	};
 	input::storeAll
 	(
 		*data_,
 		std::move(c_1),
+		std::move(camberScaleDistr),
 		std::move(k),
 		std::move(nu),
 		std::move(solidityDistr)
@@ -75,6 +84,7 @@ void Blade::construct()
 			input::RootOutletVelocity
 			{
 				c_1,
+				data_->cref<input::BladeEfficiency>(),
 				data_->cref<input::Rps>(),
 				data_->cref<input::HubRadius>()
 			}
@@ -88,7 +98,8 @@ void Blade::construct()
 			input::VortexDistributionExponent
 			{
 				data_->cref<input::RootOutletVelocity>(),
-				data_->cref<input::StaticPressureDifference>(),
+				data_->cref<input::TargetStaticPressureDifference>(),
+				data_->cref<input::BladeEfficiency>(),
 				data_->cref<input::Rps>(),
 				data_->cref<input::HubRadius>(),
 				data_->cref<input::ShroudRadius>(),
@@ -106,7 +117,7 @@ void Blade::construct()
 		static_cast<std::size_t>(data_->cref<input::NumberOfStations>().value())
 	};
 	airfoils_.reserve(numStations);
-	for (std::size_t station {0}; station < numStations; ++station)
+	for (auto station {0ul}; station < numStations; ++station)
 	{
 		input::Radius radius
 		{
@@ -116,14 +127,12 @@ void Blade::construct()
 			data_->cref<input::ShroudRadius>(),
 			data_->cref<input::TipClearance>()
 		};
-
 		airfoils_.emplace_back
 		(
 			new Airfoil
 			{
 				radius,
 				*data_,
-				input::DeviationAngle {},	// we're probably never using this
 				cwd_,
 				station
 			}
@@ -191,22 +200,10 @@ void Blade::build()
 {
 	model_->activate();
 
-	// create hub/shroud airfoils if airfoils_.size() == 1
+	auto profiles {prepProfiles()};
 
-	// get profiles
-	std::vector<Profile> profiles;
-	profiles.reserve(airfoils_.size());
-
-	for (auto& a : airfoils_)
-		profiles.emplace_back(a->profile);
-
-	// wrap and apply skew
-	SkewDistribution sd {*data_};
-	for (auto& p : profiles)
-	{
-		sd.skew(p);
-		p.wrap();
-	}
+	if (profiles.empty())
+		return;
 
 	// make main surface splines
 	Sptrvector<geometry::Curve> topSplines;				// suction
@@ -294,9 +291,148 @@ void Blade::build()
 }
 
 
+Sptr<geometry::Surface> Blade::midPlane() const
+{
+	auto profiles {prepProfiles()};
+
+	if (profiles.empty())
+		return nullptr;
+
+	std::vector<std::vector<Profile::Point>> points;
+	points.reserve(profiles.size());
+
+	for (const auto& p : profiles)
+		points.emplace_back(p.camberLinePoints());
+
+	Sptrvector<geometry::Curve> curves;
+	std::vector<Profile::Point> tmp;
+
+	curves.reserve(profiles.size());
+	tmp.reserve(profiles.front().size());
+
+	for (auto i {0ul}; i < profiles.front().size(); ++i)
+	{
+		tmp.clear();
+		for (const auto& camberline : points)
+			tmp.emplace_back(camberline[i]);
+
+		curves.emplace_back
+		(
+			new geometry::Spline {tmp}
+		);
+	}
+
+	return Sptr<geometry::Surface>
+	{
+		new geometry::Surface
+		{
+			geometry::operators::Loft {}(std::move(curves))
+		}
+	};
+}
+
+
 Sptr<geometry::Volume> Blade::geometry() const noexcept
 {
 	return geometry_;
+}
+
+
+std::vector<Profile> Blade::prepProfiles() const
+{
+	// handle case when airfoils_.size() == 1
+
+	// get profiles
+	std::vector<Profile> profiles;
+	profiles.reserve(airfoils_.size());
+
+	for (auto& a : airfoils_)
+		profiles.emplace_back(a->profile);
+
+	// wrap and apply skew
+	SkewDistribution sd {*data_};
+	for (auto& p : profiles)
+	{
+		sd.skew(p);
+		p.wrap();
+	}
+
+	return profiles;
+}
+
+
+void Blade::writeStationData(const Path& file) const
+{
+	bool designed {true};
+	for (auto& a : airfoils_)
+		designed = designed
+				&& a->designed();
+
+	CsvWriter bladeCsv {file};
+	if (designed)
+		bladeCsv.writeHeader
+		(
+			"id",
+			"target tot. pressure",
+			"tot. pressure",
+			"eta",
+			"pressure",
+			"swirl_2",
+			"f_x",
+			"f_y",
+			"radius",
+			"chord",
+			"beta_1'",
+			"beta_2'",
+			"camber",
+			"stagger"
+		);
+	else
+		bladeCsv.writeHeader
+		(
+			"id",
+			"radius",
+			"chord",
+			"beta_1'",
+			"beta_2'",
+			"camber",
+			"stagger"
+		);
+
+	for (auto& a : airfoils_)
+	{
+		const auto& p {a->profile};
+
+		if (designed)
+			bladeCsv.write
+			(
+				a->id(),
+				a->cref<input::TargetTotalPressureDifference>().value(),
+				a->cref<input::TotalPressureDifference>().value(),
+				a->cref<input::AirfoilEfficiency>().value(),
+				a->cref<input::StaticPressureDifference>().value(),
+				a->cref<input::OutletVelocity>().value().y(),
+				a->cref<input::AirfoilTotalForce>().value().x(),
+				a->cref<input::AirfoilTotalForce>().value().y(),
+				p.radius(),
+				p.chord(),
+				p.inletAngle(),
+				p.outletAngle(),
+				p.camberAngle(),
+				p.staggerAngle()
+			);
+		else
+			bladeCsv.write
+			(
+				a->id(),
+				p.radius(),
+				p.chord(),
+				p.inletAngle(),
+				p.outletAngle(),
+				p.camberAngle(),
+				p.staggerAngle()
+			);
+	}
 }
 
 

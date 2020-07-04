@@ -166,7 +166,6 @@ ProfileTetMeshGenerator::Pointvector ProfileTetMeshGenerator::constructPoints
 	{
 		(points.emplace_back(std::forward<decltype(ps)>(ps)), ...);
 	};
-
 	massEmplace
 	(
 		plyEnd(profile.lePoint(), Vector::xAxis()),
@@ -224,7 +223,7 @@ Uptr<ProfileTetMeshGenerator::Region> ProfileTetMeshGenerator::generate
 		contour[2].get()	// trailing edge
 	);
 
-	// set global mesh field
+	// construct mesh fields
 	BoxField bgField {reg};
 	bgField.setField();
 

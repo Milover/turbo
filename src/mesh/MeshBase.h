@@ -131,7 +131,7 @@ public:
 		[[nodiscard]] Uptr<Region>& meshRef() noexcept;
 
 		//- Clear mesh and reset the mesh generator
-		//	NOTE: activates the (local) model
+		//	NOTE: activates and purges the (local) model
 		void reset();
 
 
@@ -243,7 +243,7 @@ MeshBase<Geometry>::meshRef() noexcept
 template<typename Geometry>
 void MeshBase<Geometry>::reset()
 {
-	this->model_->activate();
+	this->model_->purge();
 
 	this->mesh_.reset(nullptr);
 	this->mGen_.reset(nullptr);

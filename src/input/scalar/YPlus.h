@@ -12,7 +12,7 @@ Class
 Description
 	Class YPlus.
 
-	Defaults to 150.
+	Defaults to 1.
 
 SourceFiles
 	YPlus.cpp

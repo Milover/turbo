@@ -34,6 +34,7 @@ turbo_forces
 {
     type            forces;
     libs            ( "libforces.so" );
+    executeControl  onEnd;
     writeControl    onEnd;
     log             false;
     p               p;

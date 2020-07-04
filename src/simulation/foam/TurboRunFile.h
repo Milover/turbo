@@ -36,11 +36,26 @@ cd ${0%/*} || exit 1
 
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
+# exit on error
+set -e
+
+###############################################################################
+
+prep_mesh()
+{
+	runApplication decomposePar -force -latestTime >> log.turbo
+	runParallel renumberMesh -overwrite -latestTime >> log.turbo
+	runParallel checkMesh -latestTime -allTopology -allGeometry >> log.turbo
+}
+
+###############################################################################
+
 # get app and nproc
 application=$(getApplication)
 
-# exit on error
-set -e
+# get previous case
+prev_case_id=$(($(echo "$PWD" | sed -e 's!.*/!!' -e 's/.*\.//') - 1))
+prev_case=$(echo "$PWD" | sed "s/case\..*/case.$prev_case_id/")
 
 # reset
 cp -r 0.orig 0
@@ -55,13 +70,16 @@ runApplication createPatch -overwrite >> log.turbo
 # create sets
 runApplication setSet -latestTime -noVTK -batch ./system/setSet.batch >> log.turbo
 
-# prep mesh
-runApplication decomposePar -force -latestTime >> log.turbo
-runParallel renumberMesh -overwrite -latestTime >> log.turbo
-runParallel checkMesh -latestTime -allTopology -allGeometry >> log.turbo
-
 # initialize
-runParallel potentialFoam -writep -writePhi -initialiseUBCs >> log.turbo
+if [ -d $prev_case ]
+then
+	runApplication mapFields -noFunctionObjects -mapMethod 'mapNearest' \
+							 -sourceTime 'latestTime' $prev_case >> log.turbo
+	prep_mesh
+else
+	prep_mesh
+	#runParallel potentialFoam -writep -writePhi -initialiseUBCs >> log.turbo
+fi
 
 # run
 runParallel $application >> log.turbo

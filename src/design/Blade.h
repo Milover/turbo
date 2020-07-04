@@ -104,12 +104,24 @@ public:
 		//- Get a reference to airfoils
 		Uptrvector<Airfoil>& airfoilsRef();
 
-		//- Build blade geometry, doesn't build airfoils
+		//- Build blade geometry, doesn't build or modify airfoils
 		void build();
+
+		//- Build the blade mid plane (camberline plane),
+		//	doesn't build or modify airfoils
+		//	NOTE: outputs to current active model
+		Sptr<geometry::Surface> midPlane() const;
 
 		//- Get blade geometry
 		//	FIXME: see .cpp file
 		Sptr<geometry::Volume> geometry() const noexcept;
+
+		//- Get ready-to-build airfoil profiles,
+		//	doesn't build or modify the airfoils
+		std::vector<Profile> prepProfiles() const;
+
+		//- Write data for each station (airfoil)
+		void writeStationData(const Path& file) const;
 
 };
 

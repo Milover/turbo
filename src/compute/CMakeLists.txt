@@ -5,6 +5,7 @@
 # add sources
 set(SRC
 	ComputeGeneral.cpp
+	ComputeDesign.cpp
 	InitialDesign.cpp
 	)
 

@@ -41,14 +41,14 @@ R"(FoamFile
 
 numberOfSubdomains  16;
 
-constraints
-{
-    processors
-    {
-        type        singleProcessorFaceSets;
-        sets        ((f0 -1));
-    }
-}
+//constraints
+//{
+//    processors
+//    {
+//        type        singleProcessorFaceSets;
+//        sets        ((f0 -1));
+//    }
+//}
 
 method              scotch;
 
