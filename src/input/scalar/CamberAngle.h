@@ -21,7 +21,6 @@ Sourcefiles
 #define INPUT_CAMBER_ANGLE_H
 
 #include "BladeVelocity.h"
-#include "CamberAngleScalingFactor.h"
 #include "General.h"
 #include "InletVelocity.h"
 #include "OutletVelocity.h"
@@ -60,8 +59,7 @@ public:
 		(
 			const InletVelocity& c_1,
 			const OutletVelocity& c_2,
-			const BladeVelocity& U,
-			const CamberAngleScalingFactor& coeff
+			const BladeVelocity& U
 		);
 
 

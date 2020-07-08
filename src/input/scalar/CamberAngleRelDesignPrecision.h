@@ -7,22 +7,23 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::input::MaxDesignIter
+	turbo::input::CamberAngleRelDesignPrecision
 
 Description
-	Class MaxDesignIter.
+	Class CamberAngleRelDesignPrecision.
 
-	Maximum number of iterations per design algorithm.
+	Percent of initial camber angle (rad) used during the design process
+	to increment the camber angle.
 
-	Defaults to 100.
+	Defaults to 0.05.
 
 SourceFiles
-	MaxDesignIter.cpp
+	CamberAngleRelDesignPrecision.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef INPUT_MAX_DESIGN_ITER_H
-#define INPUT_MAX_DESIGN_ITER_H
+#ifndef INPUT_CAMBER_REL_ANGLE_DESIGN_PRECISION_H
+#define INPUT_CAMBER_REL_ANGLE_DESIGN_PRECISION_H
 
 #include "General.h"
 #include "PositiveValue.h"
@@ -35,28 +36,28 @@ namespace input
 {
 
 /*---------------------------------------------------------------------------*\
-					Class MaxDesignIter Declaration
+				Class CamberAngleRelDesignPrecision Declaration
 \*---------------------------------------------------------------------------*/
 
-class MaxDesignIter final
+class CamberAngleRelDesignPrecision final
 :
-	public PositiveValue<std::size_t>
+	public PositiveValue<Float>
 {
 public:
 
 	// Public static data
 
-		inline static const String name {"MaxDesignIter"};
+		inline static const String name {"CamberAngleRelDesignPrecision"};
 
 
 	// Constructors
 
 		//- Default constructor
-		MaxDesignIter() noexcept;
+		CamberAngleRelDesignPrecision() noexcept;
 
-		//- Construct from a Integer,
+		//- Construct from a Float,
 		//  no aditional checking required
-		explicit MaxDesignIter(const std::size_t i);
+		explicit CamberAngleRelDesignPrecision(const Float f);
 
 
 	// Member functions

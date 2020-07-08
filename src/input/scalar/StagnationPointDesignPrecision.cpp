@@ -8,13 +8,9 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "CamberAngle.h"
+#include "StagnationPointDesignPrecision.h"
 
-#include "BladeVelocity.h"
 #include "General.h"
-#include "InitialDesign.h"
-#include "InletVelocity.h"
-#include "OutletVelocity.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -25,34 +21,21 @@ namespace input
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-CamberAngle::CamberAngle(const Float f)
+StagnationPointDesignPrecision::StagnationPointDesignPrecision() noexcept
 :
-	RegBase {f}
+	PVBase {1e-3}
 {}
 
 
-CamberAngle::CamberAngle
-(
-	const InletVelocity& c_1,
-	const OutletVelocity& c_2,
-	const BladeVelocity& U
-)
+StagnationPointDesignPrecision::StagnationPointDesignPrecision(const Float f)
 :
-	CamberAngle
-	{
-		compute::computeCamberAngle
-		(
-			c_1.value(),
-			c_2.value(),
-			U.value()
-		)
-	}
+	PVBase {f}
 {}
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-String CamberAngle::getName() const
+String StagnationPointDesignPrecision::getName() const
 {
 	return name;
 }

@@ -75,10 +75,10 @@ Float computeCamberAngle
 (
 	const Vector& c_1,		// abs. fluid inlet velocity
 	const Vector& c_2,		// abs. fluid outlet velocity
-	const Vector& U,  		// blade velocity
-	//const Float i,			// incidence angle
+	const Vector& U  		// blade velocity
+	//const Float i			// incidence angle
 	//const Float delta		// deviation angle
-	const Float& coeff		// camber angle scaling factor
+	//const Float coeff		// camber angle scaling factor
 ) noexcept
 {
 	Float beta_1			// rel. fluid inlet angle
@@ -91,8 +91,8 @@ Float computeCamberAngle
 	};
 
 	//return delta + beta_2 - (i + beta_1);
-	//return beta_2 - beta_1;
-	return coeff * (beta_2 - beta_1);			// XXX: testing, remove after
+	return beta_2 - beta_1;
+	//return coeff * (beta_2 - beta_1);			// XXX: testing, remove after
 }
 
 

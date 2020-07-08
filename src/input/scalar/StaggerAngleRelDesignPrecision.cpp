@@ -8,13 +8,9 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "CamberAngle.h"
+#include "StaggerAngleRelDesignPrecision.h"
 
-#include "BladeVelocity.h"
 #include "General.h"
-#include "InitialDesign.h"
-#include "InletVelocity.h"
-#include "OutletVelocity.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -25,34 +21,21 @@ namespace input
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-CamberAngle::CamberAngle(const Float f)
+StaggerAngleRelDesignPrecision::StaggerAngleRelDesignPrecision() noexcept
 :
-	RegBase {f}
+	PVBase {0.05}
 {}
 
 
-CamberAngle::CamberAngle
-(
-	const InletVelocity& c_1,
-	const OutletVelocity& c_2,
-	const BladeVelocity& U
-)
+StaggerAngleRelDesignPrecision::StaggerAngleRelDesignPrecision(const Float f)
 :
-	CamberAngle
-	{
-		compute::computeCamberAngle
-		(
-			c_1.value(),
-			c_2.value(),
-			U.value()
-		)
-	}
+	PVBase {f}
 {}
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-String CamberAngle::getName() const
+String StaggerAngleRelDesignPrecision::getName() const
 {
 	return name;
 }

@@ -7,22 +7,23 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::input::MaxDesignIter
+	turbo::input::StaggerAngleRelDesignPrecision
 
 Description
-	Class MaxDesignIter.
+	Class StaggerAngleRelDesignPrecision.
 
-	Maximum number of iterations per design algorithm.
+	Percent of initial stagger angle (rad) used during the design process
+	to increment the stagger angle.
 
-	Defaults to 100.
+	Defaults to 0.05.
 
 SourceFiles
-	MaxDesignIter.cpp
+	StaggerAngleRelDesignPrecision.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef INPUT_MAX_DESIGN_ITER_H
-#define INPUT_MAX_DESIGN_ITER_H
+#ifndef INPUT_STAGGER_ANGLE_REL_DESIGN_PRECISION_H
+#define INPUT_STAGGER_ANGLE_REL_DESIGN_PRECISION_H
 
 #include "General.h"
 #include "PositiveValue.h"
@@ -35,28 +36,28 @@ namespace input
 {
 
 /*---------------------------------------------------------------------------*\
-					Class MaxDesignIter Declaration
+				Class StaggerAngleRelDesignPrecision Declaration
 \*---------------------------------------------------------------------------*/
 
-class MaxDesignIter final
+class StaggerAngleRelDesignPrecision final
 :
-	public PositiveValue<std::size_t>
+	public PositiveValue<Float>
 {
 public:
 
 	// Public static data
 
-		inline static const String name {"MaxDesignIter"};
+		inline static const String name {"StaggerAngleRelDesignPrecision"};
 
 
 	// Constructors
 
 		//- Default constructor
-		MaxDesignIter() noexcept;
+		StaggerAngleRelDesignPrecision() noexcept;
 
-		//- Construct from a Integer,
+		//- Construct from a Float,
 		//  no aditional checking required
-		explicit MaxDesignIter(const std::size_t i);
+		explicit StaggerAngleRelDesignPrecision(const Float f);
 
 
 	// Member functions

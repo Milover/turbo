@@ -8,6 +8,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include <filesystem>
 #include <sstream>
 #include <utility>
 #include <vector>
@@ -26,8 +27,6 @@ License
 #include "Surface.h"
 #include "TurboBase.h"
 #include "Variables.h"
-
-#include <gmsh.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -60,15 +59,10 @@ void Blade::construct()
 	{
 		data_->cref<input::SolidityDistribution>()
 	};
-	input::CamberAngleScalingFactorDistribution camberScaleDistr
-	{
-		data_->cref<input::CamberAngleScalingFactorDistribution>()
-	};
 	input::storeAll
 	(
 		*data_,
 		std::move(c_1),
-		std::move(camberScaleDistr),
 		std::move(k),
 		std::move(nu),
 		std::move(solidityDistr)
@@ -201,6 +195,21 @@ void Blade::build()
 	model_->activate();
 
 	auto profiles {prepProfiles()};
+
+// FIXME: should be added at some point
+// std::filesystem::create_directory(cwd_ / "profiles");
+// auto count {0};
+// for (auto& p : profiles)
+// {
+// 	String name {"profile."};
+// 	name += std::to_string(count);
+// 
+// 	Path tmp {cwd_ / "profiles" / name.c_str()};
+// 
+// 	p.writeCsv(tmp);
+// 
+// 	++count;
+// }
 
 	if (profiles.empty())
 		return;

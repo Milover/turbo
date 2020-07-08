@@ -94,12 +94,12 @@ void BezierTangential::skew(Profile& profile) const
 {
 	assert(!profile.wrapped());
 
-	rRel input::RelRadius
+	input::RelRadius rRel
 	{
 		input::Radius {profile.radius()},
 		r_h_,
 		r_s_,
-		z_tip
+		z_tip_
 	};
 
 	profile.centerOn((*bc_)(rRel.value()));

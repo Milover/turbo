@@ -8,8 +8,10 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include <cassert>
 #include <deque>
 #include <filesystem>
+#include <fstream>
 #include <utility>
 #include <vector>
 
@@ -37,181 +39,34 @@ namespace design
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
-void Airfoil::adjustCamberAngle()
+void Airfoil::alignStagnationPoint()
 {
+	DesignData dd;
 
+	alignStagnationPoint(dd, false);
 }
 
 
-void Airfoil::adjustStaggerAngle()
+// FIXME: we should rethink this
+void Airfoil::alignStagnationPoint
+(
+	DesignData& dd,
+	bool flagOnFinish
+)
 {
-	if (pressureCheck())
-		return;
-
-	// FIXME: if we're restarting we should grab 'delay' previous sim results
-	const auto delay {11ul};			// XXX: user input or something?
-	Float increment;
-
-	std::deque<Uptr<SimData>> simCache;
-	std::deque<input::StaggerAngle> xiCache;
-	while (true)
+	// use design data if available
+	if (!dd.empty)
 	{
 		build();
-
-		auto& dpReq {data_->ref<input::TargetTotalPressureDifference>()};
-		auto& xiStep {data_->ref<input::StaggerAngleDesignPrecision>()};
-		auto& xi {data_->ref<input::StaggerAngle>()};
-
-		xiCache.emplace_back(xi);
-		simCache.emplace_back
+		data_->ref<input::StaggerAngle>().correct
 		(
-			new SimData {simulate()}
+			dd.staggerAngleAlignment
 		);
-		postprocess(*simCache.back());
-
-		// stop if we've reached target pressure
-		if
-		(
-			pressureCheck
-			(
-				*simCache.back()->dpTot,
-				data_->cref<input::DesignPressureRelTolerance>()
-			)
-		)
-		{
-			writer_->writeComment("target pressure satisfied");
-			break;
-		}
-
-		bool lessThan
-		{
-			!isGreaterOrEqual
-			(
-				simCache.back()->dpTot->value(),
-				dpReq.value()
-			)
-		};
-
-		// start checking whether we've passed the min/max pressure after an
-		// initial delay, we require the pressure to be decreasing/increasing
-		// for 'delay - 1' consecutive iterations for us to stop searching
-		if (simCache.size() == delay)
-		{
-			bool decrIncr {true};
-
-			if (lessThan)
-				for (auto it {simCache.begin() + 1}; it != simCache.end(); ++it)
-				{
-					decrIncr = decrIncr
-							 && !isLessOrEqual
-							 	(
-									simCache.front()->dpTot->value(),
-									(*it)->dpTot->value()
-								);
-					++it;
-				}
-			else
-				for (auto it {simCache.begin() + 1}; it != simCache.end(); ++it)
-				{
-					decrIncr = decrIncr
-							 && !isGreaterOrEqual
-							 	(
-									simCache.front()->dpTot->value(),
-									(*it)->dpTot->value()
-								);
-					++it;
-				}
-
-			if (decrIncr)
-			{
-				// remove redundant cases
-				for (auto it {simCache.begin() + 1}; it != simCache.end(); ++it)
-					std::filesystem::remove_all((*it)->simDir);
-
-				simCache.back().reset
-				(
-					simCache.front().release()
-				);
-				xi = xiCache.front();
-				build();
-
-				if (lessThan)
-					writer_->writeComment
-					(
-						"target pressure not satisfied, "
-						"max pressure achieved in case: ",
-						simCache.back()->simId
-					);
-				else
-					writer_->writeComment
-					(
-						"target pressure not satisfied, "
-						"min pressure achieved in case: ",
-						simCache.back()->simId
-					);
-				break;
-			}
-
-			xiCache.pop_front();
-			simCache.pop_front();
-		}
-
-		// increment/decrement stagger and rerun
-		if (simCache.size() < 2)
-		{
-			if (lessThan)
-				increment = xiStep.value();
-			else
-				increment = -xiStep.value();
-		}
-		else
-		{
-			auto dp {(*simCache.rbegin())->dpTot->value()};
-			auto dpOld {(*(simCache.rbegin() + 1))->dpTot->value()};
-
-			if
-			(
-				lessThan && dpOld < dpReq.value()
-			)
-				increment = std::abs(increment);
-			else if
-			(
-				!lessThan && dpOld > dpReq.value()
-			)
-				increment = -std::abs(increment);
-			else
-			{
-				auto xiOld {(xiCache.rbegin() + 1)->value()};
-
-				increment = math::interpolate
-							(
-								dpReq.value(),
-								dpOld,
-								dp,
-								xiOld,
-								xi.value()
-							)
-						  - xi.value();
-			}
-		}
-
-		xi.set(xi.value() + increment);
 	}
 
-	postprocess(*simCache.back(), false, true);
-	writer_->flush();
-}
+	bool initialSign;
 
-
-void Airfoil::alignStagnationPoint(DesignData& dd)
-{
-	build();
-	data_->ref<input::StaggerAngle>().correct
-	(
-		dd.staggerAngleAlignment
-	);
-
-	while (true)
+	for (auto i {0ul}; i < data_->cref<input::MaxDesignIter>().value(); ++i)
 	{
 		build();
 		auto sd {simulate()};
@@ -227,26 +82,44 @@ void Airfoil::alignStagnationPoint(DesignData& dd)
 			profile.centroid()
 		);
 
+		// we'll stop once we overshoot
+		if (i == 0)
+			initialSign = std::signbit(xi.correction());
+
 		if
 		(
 			xi.tolerance
 			(
-				data_->cref<input::StaggerAngleDesignPrecision>().value()
+				data_->cref<input::StagnationPointDesignPrecision>().value()
 			)
+		 || initialSign != std::signbit(xi.correction())
 		)
 		{
 			xi.revert();
-			flagPath(sd.simDir, ".aligned");
-
-			designData.empty = false;
-			designData.totalStaggerCorr = xi.totalCorrection();
-
 			writer_->writeComment("alignment done");
-			writer_->flush();
 
 			break;
 		}
+		else if
+		(
+			i == data_->cref<input::MaxDesignIter>().value() - 1
+		)
+			writer_->writeComment
+			(
+				"alignment didn't finish, max iter reached"
+			);
 	}
+
+	// we generally don't want to run this more than once
+	// so we flag that we've done it already even if
+	// we haven't aligned properly
+	if (flagOnFinish)
+		std::ofstream {cwd_ / "ALIGNED"};
+
+	dd.empty = false;
+	dd.staggerAngleAlignment = data_->cref<input::StaggerAngle>().totalCorrection();
+
+	writer_->flush();
 }
 
 
@@ -310,16 +183,11 @@ void Airfoil::construct(const input::Radius& radius)
 		data_->cref<input::NumberOfBlades>(),
 		radius
 	};
-	input::CamberAngleScalingFactor camberScale
-	{
-		data_->cref<input::CamberAngleScalingFactorDistribution>().valueAt(rRel)
-	};
 	input::CamberAngle camber
 	{
 		data_->cref<input::InletVelocity>(),
 		c_2,
-		U,
-		camberScale
+		U
 	};
 
 	// store
@@ -328,7 +196,6 @@ void Airfoil::construct(const input::Radius& radius)
 		*data_,
 		std::move(c_2),
 		std::move(camber),
-		std::move(camberScale),
 		std::move(dp),
 		std::move(dpKin),
 		std::move(dpTotReq),
@@ -419,6 +286,8 @@ void Airfoil::postprocess
 		(
 			simData.simId,
 			*simData.time,
+			data_->cref<input::Chord>().value(),
+			data_->cref<input::CamberAngle>().value(),
 			data_->cref<input::StaggerAngle>().value(),
 			simData.c_2->value().y(),
 			simData.dp->value(),
@@ -520,6 +389,10 @@ void Airfoil::build(Profile&& p)
 		profile = std::move(p);
 		data_->store
 		(
+			input::CamberAngle {profile.camberAngle()}
+		);
+		data_->store
+		(
 			input::StaggerAngle {profile.staggerAngle()}
 		);
 	}
@@ -604,6 +477,8 @@ Airfoil::DesignData Airfoil::design(const DesignData& supplied)
 		(
 			"sim",
 			"iter",
+			"chord",
+			"camber",
 			"stagger",
 			"swirl_2",
 			"pressure",
@@ -612,6 +487,9 @@ Airfoil::DesignData Airfoil::design(const DesignData& supplied)
 		);
 		writer_->flush();
 	}
+
+	// dump the initial data
+	dumpData();
 
 	// design the airfoil
 	if (restarted())
@@ -624,17 +502,24 @@ Airfoil::DesignData Airfoil::design(const DesignData& supplied)
 		alignStagnationPoint(dd);
 	}
 
+	Pair<Float> limits;
+
 	// FIXME: implement a dedicated messaging system
 	std::cout << "adjusting camber angle: " << filename.stem() << '\n';
-	adjustCamberAngle();
+
+	limits.first = 0.0;
+	limits.second = data_->cref<input::CamberAngle>().value()
+				  * data_->cref<input::CamberAngleDesignLimit>().value();
+	adjustParameter<input::CamberAngle>(limits);
 
 	// FIXME: implement a dedicated messaging system
 	std::cout << "adjusting stagger angle: " << filename.stem() << '\n';
-	adjustStaggerAngle();
+
+	limits.first = 0.0;
+	limits.second = 0.5 * pi;
+	adjustParameter<input::StaggerAngle>(limits);
 
 	dumpData();
-	designed_ = true;
-	dd.empty = false;
 
 	return dd;
 }

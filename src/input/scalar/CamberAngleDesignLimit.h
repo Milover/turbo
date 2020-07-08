@@ -7,23 +7,23 @@ License
 	See the LICENSE file for license information.
 
 Class
-	turbo::input::StaggerAngleDesignPrecision
+	turbo::input::CamberAngleDesignLimit
 
 Description
-	Class StaggerAngleDesignPrecision.
+	Class CamberAngleDesignLimit.
 
-	Angle (rad) used during the pressure maximization step of the Airfoil
-	design procedure to increment the stagger angle;
+	Sets the limit (limit * analytical camber angle) to which the camber angle
+	can be increased during the design procedure. 
 
-	Defaults to 1e-3.
+	Defaults to 5.0.
 
 SourceFiles
-	StaggerAngleDesignPrecision.cpp
+	CamberAngleDesignLimit.cpp
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef INPUT_STAGGER_ANGLE_DESIGN_PRECISION_H
-#define INPUT_STAGGER_ANGLE_DESIGN_PRECISION_H
+#ifndef INPUT_CAMBER_ANGLE_DESIGN_LIMIT_H
+#define INPUT_CAMBER_ANGLE_DESIGN_LIMIT_H
 
 #include "General.h"
 #include "PositiveValue.h"
@@ -36,10 +36,10 @@ namespace input
 {
 
 /*---------------------------------------------------------------------------*\
-				Class StaggerAngleDesignPrecision Declaration
+				Class CamberAngleDesignLimit Declaration
 \*---------------------------------------------------------------------------*/
 
-class StaggerAngleDesignPrecision final
+class CamberAngleDesignLimit final
 :
 	public PositiveValue<Float>
 {
@@ -47,17 +47,17 @@ public:
 
 	// Public static data
 
-		inline static const String name {"StaggerAngleDesignPrecision"};
+		inline static const String name {"CamberAngleDesignLimit"};
 
 
 	// Constructors
 
 		//- Default constructor
-		StaggerAngleDesignPrecision() noexcept;
+		CamberAngleDesignLimit() noexcept;
 
 		//- Construct from a Float,
 		//  no aditional checking required
-		explicit StaggerAngleDesignPrecision(const Float f);
+		explicit CamberAngleDesignLimit(const Float f);
 
 
 	// Member functions

@@ -7,14 +7,12 @@ License
 	See the LICENSE file for license information.
 
 Description
-	Testing Blade class functionality.
-
-	Running simple Airfoil design loops.
+	Integrated design test.
 
 	TODO: some numeric (comparison) tests would be nice,
 		  mostly visuals checks for now
 
-	NOTE: Koncar MES VAAZ-C 800 redesign
+	NOTE: Generic axial fan design test case.
 
 
 \*---------------------------------------------------------------------------*/
@@ -54,28 +52,28 @@ int main(int argc, char* argv[])
 			{"Density",								"1.2"},
 			{"DynamicViscosity",					"1.8206e-5"},
 			{"BladeEfficiency",						"0.85"},
-			{"Rps",									"13.66667"},				// 820min-1, was 710min-1
-			{"TargetStaticPressureDifference",		"155"},
+			{"Rps",									"16.0"},	// 960 min-1
+			{"TargetStaticPressureDifference",		"200"},
 			{"TurbulenceReferenceLengthScaleRatio",	"0.1"},		// default
 			{"TurbulenceIntensity",					"0.05"},	// default
-			{"VolumeFlowRate",						"4.16667"},
+			{"VolumeFlowRate",						"7.37"},	// 20000 m3h-1
 			// blade
-			{"HubRadius",							"0.085"},
-			//{"IncidenceAngle",						"0"},	// disabled
-			{"MaxAbsBladeThicknessDistribution","(0.0095 0.008)"},	// optional
-			{"MaxPassageWidthDistribution",			"(0.1)"},		// optional
-			{"NumberOfBlades",						"7"},
-			{"NumberOfStations",					"9"},
-			{"ShroudRadius",						"0.3975"},
+			{"HubRadius",							"0.1"},
+			//{"IncidenceAngle",					"0"},		// disabled
+			{"MaxAbsBladeThicknessDistribution",	"(0.01 0.008)"},// optional
+			{"MaxPassageWidthDistribution",			"(0.15)"},		// optional
+			{"NumberOfBlades",						"8"},
+			{"NumberOfStations",					"5"},
+			{"ShroudRadius",						"0.5"},
 			{"TipClearance",						"0"},		// default
-			{"SolidityDistribution",			"(1.2 0.6)"},	// nondefault
-			{"CamberAngleScalingFactorDistribution","(1.0 3.0)"},		// temporary
-			{"SkewDistribution",					"BezierTangential"},
+			{"SolidityDistribution",			"(1.2 0.8)"},	// nondefault
+			//{"CamberAngleScalingFactorDistribution","(1.0 3.0)"},		// disabled
+			{"SkewDistribution",					"NoSkew"},	// deafult
 			{"HubSkewAngle",						"0.0"},		// default
-			{"ShroudSkewAngle",						"0.5236"},		// ~30°
+			{"ShroudSkewAngle",						"0.0"},		// default
 			{"BezierSkewRelativeRadius",			"0.5"},		// default
 			//{"VortexDistributionExponent",			"1.3"},		// optional
-			{"RootOutletVelocity",			"(8.79613 -1.68 0)"},	// optional
+			{"RootOutletVelocity",			"(9.77477 -2.56 0)"},	// optional
 			// airfoil
 			{"Thickness",				"Naca4DigitThickness"},	// default
 			//{"DeviationAngle",						"0"},	// disabled
@@ -83,10 +81,13 @@ int main(int argc, char* argv[])
 			{"MonitoringPlaneOffset",				"0.05"},	// default
 			{"Camber",					"CircularArcCamber"},	// default
 			{"CamberPointSpacing",					"Cosine"},	// default
-			{"NumberOfCamberPoints",				"250"},		// nondefault	// was 250
+			{"NumberOfCamberPoints",				"250"},		// nondefault
 			{"DesignPressureRelTolerance",			"0.025"},	// default
-			{"StaggerAngleDesignPrecision",			"0.02"},	// nondefault	// was 5e-3
-			//{"MaxDesignIter",						"100"},		// disabled
+			{"StagnationPointDesignPrecision",		"1e-4"},	// nondefault
+			{"StaggerAngleRelDesignPrecision",		"0.05"},	// default
+			{"CamberAngleRelDesignPrecision",		"0.2"},		// nondefault
+			{"CamberAngleDesignLimit",				"5.0"},		// default
+			{"MaxDesignIter",						"100"},		// default
 			// mesh
 			{"ProfileMeshGenerator","ProfileTetMeshGenerator"},	// default
 			{"RelMeshSize",							"0.01"},	// default
@@ -106,11 +107,17 @@ int main(int argc, char* argv[])
 	// make Blade
 	design::Blade blade{reg, std::move(model)};
 
+	// dump the initial data
+	blade.dumpData();
+
 	design::Airfoil::DesignData dd;
-	// going from shroud to hub
 	const auto& airfoils {blade.airfoilsCRef()};
-	for (auto it {airfoils.rbegin()}; it != airfoils.rend(); ++it)
-		dd = (*it)->design(dd);
+	// going from shroud to hub
+//	for (auto it {airfoils.rbegin()}; it != airfoils.rend(); ++it)
+//		dd = (*it)->design(dd);
+	// no we're not
+	for (auto& a : airfoils)
+		dd = a->design(dd);
 
 	blade.writeStationData(blade.cwd() / "blade.csv");
 	blade.dumpData();

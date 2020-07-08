@@ -27,7 +27,8 @@ Description
 #include "BLTransitionRatio.h"
 #include "BladeEfficiency.h"
 #include "CamberAngle.h"
-#include "CamberAngleScalingFactor.h"
+#include "CamberAngleDesignLimit.h"
+#include "CamberAngleRelDesignPrecision.h"
 #include "CamberPointSpacing.h"
 #include "Chord.h"
 #include "Density.h"
@@ -63,7 +64,8 @@ Description
 #include "SmootherIter.h"
 #include "Solidity.h"
 #include "StaggerAngle.h"
-#include "StaggerAngleDesignPrecision.h"
+#include "StaggerAngleRelDesignPrecision.h"
+#include "StagnationPointDesignPrecision.h"
 #include "StaticPressureDifference.h"
 #include "TargetStaticPressureDifference.h"
 #include "TargetTotalPressureDifference.h"
@@ -81,7 +83,6 @@ Description
 #include "YPlus.h"
 
 // distributed
-#include "CamberAngleScalingFactorDistribution.h"
 #include "MaxAbsBladeThicknessDistribution.h"
 #include "MaxPassageWidthDistribution.h"
 #include "SolidityDistribution.h"

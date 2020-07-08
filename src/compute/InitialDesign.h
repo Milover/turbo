@@ -67,10 +67,10 @@ Float computeCamberAngle
 (
 	const Vector& c_1,			// abs. fluid inlet velocity
 	const Vector& c_2,			// abs. fluid outlet velocity
-	const Vector& U, 			// blade velocity
-	const Float& coeff = 1.0	// camber angle scaling factor
-	//const Float i = 0.0,		// incidence angle
-	//const Float delta = 0.0		// deviation angle
+	const Vector& U 			// blade velocity
+	//const Float i = 0.0		// incidence angle
+	//const Float delta = 0.0	// deviation angle
+	//const Float coeff = 1.0	// camber angle scaling factor
 ) noexcept;
 
 

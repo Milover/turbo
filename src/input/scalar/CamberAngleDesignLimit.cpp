@@ -8,7 +8,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "StaggerAngleDesignPrecision.h"
+#include "CamberAngleDesignLimit.h"
 
 #include "General.h"
 
@@ -21,13 +21,13 @@ namespace input
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
 
-StaggerAngleDesignPrecision::StaggerAngleDesignPrecision() noexcept
+CamberAngleDesignLimit::CamberAngleDesignLimit() noexcept
 :
-	PVBase {1e-3}
+	PVBase {5.0}
 {}
 
 
-StaggerAngleDesignPrecision::StaggerAngleDesignPrecision(const Float f)
+CamberAngleDesignLimit::CamberAngleDesignLimit(const Float f)
 :
 	PVBase {f}
 {}
@@ -35,7 +35,7 @@ StaggerAngleDesignPrecision::StaggerAngleDesignPrecision(const Float f)
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-String StaggerAngleDesignPrecision::getName() const
+String CamberAngleDesignLimit::getName() const
 {
 	return name;
 }

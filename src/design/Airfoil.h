@@ -23,6 +23,8 @@ SourceFiles
 #ifndef DESIGN_AIRFOIL_H
 #define DESIGN_AIRFOIL_H
 
+#include <deque>
+#include <type_traits>
 #include <utility>
 
 #include "CsvReader.h"
@@ -32,6 +34,7 @@ SourceFiles
 #include "ProfileMesh.h"
 #include "Registry.h"
 #include "TurboBase.h"
+#include "Utility.h"
 #include "Variables.h"
 #include "Vector.h"
 
@@ -114,21 +117,25 @@ private:
 
 	// Member functions
 
-		//- Iteratively adjust stagger angle such that the total pressure
+		//- Iteratively adjust a parameter such that the total pressure
 		//	is either the target total pressure or the maximum achievable.
 		//	Does nothing is existing total pressure is greater or equal
-		//	to target total pressure.
-		void adjustCamberAngle();
+		//	to target total pressure. Currently supports adjusting the
+		//	camber and stagger angle.
+		template<typename Param>
+		void adjustParameter(Pair<Float> limits);
 
-		//- Iteratively adjust stagger angle such that the total pressure
-		//	is either the target total pressure or the maximum achievable.
-		//	Does nothing is existing total pressure is greater or equal
-		//	to target total pressure.
-		void adjustStaggerAngle();
-		
 		//- Iteratively adjust stagger angle such that the stagnation point
 		//	is aligned with LE
-		void alignStagnationPoint(DesignData& dd);
+		void alignStagnationPoint
+		(
+			DesignData& dd,
+			bool flagOnFinish = true
+		);
+
+		//- Iteratively adjust stagger angle such that the stagnation point
+		//	is aligned with LE, don't store design data or flag when done
+		void alignStagnationPoint();
 
 		//- Compute and store turbulence properties
 		void computeTurbulence() const;
@@ -222,6 +229,237 @@ public:
 		[[maybe_unused]] SimData simulate();
 
 };
+
+
+// * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
+
+// FIXME: this is a provisional implementation and should be rewriten
+template<typename Param>
+void Airfoil::adjustParameter(Pair<Float> limits)
+{
+	static_assert
+	(
+		std::is_same_v<input::CamberAngle, Param>
+	 || std::is_same_v<input::StaggerAngle, Param>
+	);
+
+	if (pressureCheck())
+		return;
+
+	// FIXME: if we're restarting we should grab 'delay' previous sim results
+	const auto delay {11ul};			// XXX: user input or something?
+	Float increment;
+
+	std::deque<Uptr<SimData>> simCache;
+	std::deque<Param> paramCache;
+	Float paramStep;
+
+	for (auto i {0ul}; i < data_->cref<input::MaxDesignIter>().value(); ++i)
+	{
+		build();
+
+		if (paramCache.empty())
+		{
+			if constexpr (std::is_same_v<input::CamberAngle, Param>)
+			{
+				paramStep = data_->cref<input::CamberAngle>().value()
+						  * data_->cref<input::CamberAngleRelDesignPrecision>().value();
+
+				writer_->writeComment("adjusting camber angle");
+			}
+			else if constexpr (std::is_same_v<input::StaggerAngle, Param>)
+			{
+				paramStep = data_->cref<input::StaggerAngle>().value()
+						  * data_->cref<input::StaggerAngleRelDesignPrecision>().value();
+
+				writer_->writeComment("adjusting stagger angle");
+			}
+		}
+
+		auto& dpReq {data_->cref<input::TargetTotalPressureDifference>()};
+		auto& param {data_->ref<Param>()};
+
+		paramCache.emplace_back(param);
+		simCache.emplace_back
+		(
+			new SimData {simulate()}
+		);
+		postprocess(*simCache.back());
+
+		// stop if we've reached target pressure
+		if
+		(
+			pressureCheck
+			(
+				*simCache.back()->dpTot,
+				data_->cref<input::DesignPressureRelTolerance>()
+			)
+		)
+		{
+			writer_->writeComment("target pressure satisfied");
+			break;
+		}
+
+		bool lessThan
+		{
+			!isGreaterOrEqual
+			(
+				simCache.back()->dpTot->value(),
+				dpReq.value()
+			)
+		};
+
+		// check if the difference between the current and the required
+		// value is bigger than the difference between the base and the
+		// required value
+		auto diffCheck = [](auto&& base, auto&& current, auto&& req) -> bool
+		{
+			return !isGreaterOrEqual
+			(
+				std::abs(req - base),
+				std::abs(req - current)
+			);
+		};
+
+		// Start checking whether we're moving toward the required pressure
+		// after an initial delay. We require the abs. difference between the
+		// simulated pressure and the target pressure to be increasing for
+		// 'delay - 1' consecutive iterations for us to stop searching
+		if (simCache.size() == delay)
+		{
+			bool increasing {true};
+
+			for (auto it {simCache.begin() + 1}; it != simCache.end(); ++it)
+			{
+				increasing = increasing
+						  && diffCheck
+						  	 (
+							 	simCache.front()->dpTot->value(),
+								(*it)->dpTot->value(),
+								dpReq.value()
+							 );
+				++it;
+			}
+
+			if (increasing)
+			{
+				// remove redundant cases
+				for (auto it {simCache.begin() + 1}; it != simCache.end(); ++it)
+					std::filesystem::remove_all((*it)->simDir);
+
+				simCache.back().reset
+				(
+					simCache.front().release()
+				);
+				param = paramCache.front();
+				build();
+
+				if (lessThan)
+					writer_->writeComment
+					(
+						"target pressure not satisfied, "
+						"max pressure achieved in case: ",
+						simCache.back()->simId
+					);
+				else
+					writer_->writeComment
+					(
+						"target pressure not satisfied, "
+						"min pressure achieved in case: ",
+						simCache.back()->simId
+					);
+				break;
+			}
+
+			paramCache.pop_front();
+			simCache.pop_front();
+		}
+
+		// increment/decrement parameter and rerun
+		if (simCache.size() < 2)
+		{
+			if (lessThan)
+				increment = paramStep;
+			else
+				increment = -paramStep;
+		}
+		else
+		{
+			auto dp {(*simCache.rbegin())->dpTot->value()};
+			auto dpOld {(*(simCache.rbegin() + 1))->dpTot->value()};
+
+			if
+			(
+				lessThan && dpOld < dpReq.value()
+			)
+				increment = std::abs(increment);
+			else if
+			(
+				!lessThan && dpOld > dpReq.value()
+			)
+				increment = -std::abs(increment);
+			else
+			{
+				auto paramOld {(paramCache.rbegin() + 1)->value()};
+
+				increment = math::interpolate
+							(
+								dpReq.value(),
+								dpOld,
+								dp,
+								paramOld,
+								param.value()
+							)
+						  - param.value();
+			}
+		}
+
+		// stop here if we don't intend to simulate afterwards
+		if
+		(
+			i == data_->cref<input::MaxDesignIter>().value() - 1
+		)
+		{
+			writer_->writeComment
+			(
+				"target pressure not satisfied, max iter reached"
+			);
+			break;
+		}
+
+		// if we've incremented the camber angle and the target pressure
+		// hasn't been satisfied, we realign before incrementing again
+		if constexpr (std::is_same_v<input::CamberAngle, Param>)
+		{
+			std::cout << "realigning: " << filename.stem() << '\n';
+
+			writer_->writeComment("realigning");
+			writer_->flush();
+
+			alignStagnationPoint();
+		}
+
+		// increment and check
+		auto tmp {param.value()};
+		param.set(param.value() + increment);
+		if
+		(
+			!isInRange(param.value(), limits.first, limits.second)
+		)
+		{
+			param.set(tmp);
+
+			writer_->writeComment
+			(
+				"target pressure not satisfied, parameter limits reached"
+			);
+			break;
+		}
+	}
+
+	postprocess(*simCache.back(), false, true);
+	writer_->flush();
+}
 
 
 // * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * * //
@@ -378,6 +616,9 @@ Airfoil::SimData::SimData
 		new Vector {csvFMM.cref<6>().back()}
 	);
 }
+
+
+
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

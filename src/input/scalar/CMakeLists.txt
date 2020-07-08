@@ -15,7 +15,8 @@ set(SRC
 	BLTransitionRatio.cpp
 	BladeEfficiency.cpp
 	CamberAngle.cpp
-	CamberAngleScalingFactor.cpp
+	CamberAngleDesignLimit.cpp
+	CamberAngleRelDesignPrecision.cpp
 	CamberPointSpacing.cpp
 	Chord.cpp
 	Density.cpp
@@ -51,7 +52,8 @@ set(SRC
 	SmootherIter.cpp
 	Solidity.cpp
 	StaggerAngle.cpp
-	StaggerAngleDesignPrecision.cpp
+	StaggerAngleRelDesignPrecision.cpp
+	StagnationPointDesignPrecision.cpp
 	StaticPressureDifference.cpp
 	TargetStaticPressureDifference.cpp
 	TargetTotalPressureDifference.cpp
