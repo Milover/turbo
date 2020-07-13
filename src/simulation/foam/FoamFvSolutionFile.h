@@ -39,7 +39,7 @@ R"delim(FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include                "../turbo_values"
+#include                    "../turbo_values"
 
 solvers
 {
@@ -50,7 +50,7 @@ solvers
 
         minIter             3;
         maxIter             100;
-        nPreSweeps          1;
+        nPreSweeps          0;
         nPostSweeps         2;
         nFinestSweeps       2;
 

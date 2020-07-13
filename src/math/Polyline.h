@@ -12,11 +12,14 @@ Class
 Description
 	Polyline class.
 
+	WARNING: this guy is probably fucked
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef MATH_POLYLINE_H
 #define MATH_POLYLINE_H
 
+#include <algorithm>
 #include <cmath>
 #include <istream>
 #include <ostream>
@@ -133,8 +136,8 @@ public:
 	// Member operators
 
 		//- Call operator,
-		//	returns value interpolated at t, where t is in range [0, 1],
-		//	extrapolates if t is out of range
+		//	returns piecewise interpolated value at t, where t is in range [0, 1],
+		//	clamps if t is out of range
 		[[nodiscard]] auto operator()(const Float t) noexcept(ndebug);
 
 };
@@ -230,23 +233,54 @@ auto Polyline<T>::operator()(const Float t) noexcept(ndebug)
 {
 	if (this->points_.empty())
 		error(FUNC_INFO, "polyline is empty");
+	else if (this->points_.size() == 1)
+		return this->points_.front();
 
 	using SizeType = typename decltype(this->points_)::size_type;
 
-	auto val
+	auto nPts {this->points_.size()};
+	Float p {std::clamp(t, 0.0, 1.0)};
+
+	// find upper bound of interval
+	auto upper
 	{
-		t * static_cast<Float>(this->points_.size() - 1)
-	};
-	auto a
-	{
-		static_cast<SizeType>(std::floor(val))
-	};
-	auto b
-	{
-		static_cast<SizeType>(std::ceil(val))
+		static_cast<SizeType>
+		(
+			std::ceil
+			(
+				p * static_cast<Float>(nPts)
+			)
+		)
 	};
 
-	return lerp(points_[a], points_[b], t);
+	// fake clamp
+	if (upper <= 0)
+		upper = 1;
+	else if (upper > nPts - 1)
+		upper = nPts - 1;
+
+	// get values at boundaries of inteval
+	auto a {this->points_[upper-1]};
+	auto b {this->points_[upper]};
+
+	// find value at which to interpolate
+	Float p1
+	{
+		static_cast<Float>(upper) / static_cast<Float>(nPts - 1)
+	};
+
+	Float p0;
+	if (upper == 1)
+		p0 = 0.0;
+	else
+		p0 = static_cast<Float>(upper - 1) / static_cast<Float>(nPts - 1);
+
+	Float val
+	{
+		(p - p0) / (p1 - p0)
+	};
+
+	return lerp(a, b, val);
 }
 
 

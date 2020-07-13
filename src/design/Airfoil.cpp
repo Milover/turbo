@@ -39,16 +39,16 @@ namespace design
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
-void Airfoil::alignStagnationPoint()
+Airfoil::SimData Airfoil::alignStagnationPoint()
 {
 	DesignData dd;
 
-	alignStagnationPoint(dd, false);
+	return alignStagnationPoint(dd, false);
 }
 
 
 // FIXME: we should rethink this
-void Airfoil::alignStagnationPoint
+Airfoil::SimData Airfoil::alignStagnationPoint
 (
 	DesignData& dd,
 	bool flagOnFinish
@@ -65,11 +65,12 @@ void Airfoil::alignStagnationPoint
 	}
 
 	bool initialSign;
+	SimData sd;
 
 	for (auto i {0ul}; i < data_->cref<input::MaxDesignIter>().value(); ++i)
 	{
 		build();
-		auto sd {simulate()};
+		sd = simulate();
 
 		postprocess(sd);
 		sd.stagnationPoint->z() = profile.radius();
@@ -120,6 +121,8 @@ void Airfoil::alignStagnationPoint
 	dd.staggerAngleAlignment = data_->cref<input::StaggerAngle>().totalCorrection();
 
 	writer_->flush();
+
+	return sd;
 }
 
 
@@ -295,8 +298,6 @@ void Airfoil::postprocess
 			simData.eta->value()
 		);
 		writer_->flush();
-
-		profile.writeCsv(simData.simDir / "profile.csv");
 	}
 
 	// store to registry
@@ -572,7 +573,7 @@ bool Airfoil::pressureCheck
 }
 
 
-Airfoil::SimData Airfoil::simulate()
+Airfoil::SimData Airfoil::simulate(bool writeProfile)
 {
 	// compute and store monitoring plane positions and
 	// periodic patch translation vectors
@@ -609,6 +610,9 @@ Airfoil::SimData Airfoil::simulate()
 	);
 
 	simulation::Simulator sim {*data_, simId_, cwd_};
+
+	if (writeProfile)
+		profile.writeCsv(sim.caseDirectory / "profile.csv");
 
 	auto mesh {this->mesh()};
 	mesh->setCwd(sim.caseDirectory);

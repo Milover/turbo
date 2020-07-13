@@ -197,19 +197,25 @@ void Blade::build()
 	auto profiles {prepProfiles()};
 
 // FIXME: should be added at some point
-// std::filesystem::create_directory(cwd_ / "profiles");
-// auto count {0};
-// for (auto& p : profiles)
-// {
-// 	String name {"profile."};
-// 	name += std::to_string(count);
-// 
-// 	Path tmp {cwd_ / "profiles" / name.c_str()};
-// 
-// 	p.writeCsv(tmp);
-// 
-// 	++count;
-// }
+//std::filesystem::create_directory(cwd_ / "profiles");
+//auto count {0};
+//for (auto& p : profiles)
+//{
+//	String name {"profile."};
+//	name += std::to_string(count);
+//
+//	Path tmp {cwd_ / "profiles" / name.c_str()};
+//
+//	p.writeCsv(tmp);
+//
+//	++count;
+//}
+
+// FIXME: we should add this at some point
+//for (auto& p : profiles)
+//{
+//	new geometry::Spline {p.getContour()};
+//}
 
 	if (profiles.empty())
 		return;
@@ -297,6 +303,9 @@ void Blade::build()
 			}
 		}
 	);
+
+//	write();
+//	std::exit(0);
 }
 
 

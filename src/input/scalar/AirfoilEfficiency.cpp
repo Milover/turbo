@@ -29,7 +29,7 @@ namespace input
 
 AirfoilEfficiency::AirfoilEfficiency(const Float f)
 :
-	LVBase {f}
+	PVBase {f}
 {}
 
 

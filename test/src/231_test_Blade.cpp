@@ -12,10 +12,7 @@ Description
 	TODO: some numeric (comparison) tests would be nice,
 		  mostly visuals checks for now
 
-	NOTE:
-		Generic axial fan design test case.
-		Full numeric iterative design.
-		Companion to test 231.
+	NOTE: Generic axial fan design test case.
 
 
 \*---------------------------------------------------------------------------*/
@@ -54,29 +51,29 @@ int main(int argc, char* argv[])
 			// general
 			{"Density",								"1.2"},
 			{"DynamicViscosity",					"1.8206e-5"},
-			{"BladeEfficiency",						"0.4"},
+			{"BladeEfficiency",						"0.85"},
 			{"Rps",									"16.0"},	// 960 min-1
-			{"TargetStaticPressureDifference",		"200"},
+			{"TargetStaticPressureDifference",		"100"},
 			{"TurbulenceReferenceLengthScaleRatio",	"0.1"},		// default
 			{"TurbulenceIntensity",					"0.05"},	// default
-			{"VolumeFlowRate",						"5.5556"},	// 20000 m3h-1
+			{"VolumeFlowRate",						"7.37"},	// 26458 m3h-1
 			// blade
 			{"HubRadius",							"0.1"},
 			//{"IncidenceAngle",					"0"},		// disabled
 			{"MaxAbsBladeThicknessDistribution",	"(0.01 0.008)"},// optional
 			{"MaxPassageWidthDistribution",			"(0.15)"},		// optional
-			{"NumberOfBlades",						"6"},
+			{"NumberOfBlades",						"8"},
 			{"NumberOfStations",					"5"},
 			{"ShroudRadius",						"0.5"},
 			{"TipClearance",						"0"},		// default
-			{"SolidityDistribution",				"(1 0.4)"},	// nondefault
+			{"SolidityDistribution",			"(1.2 0.8)"},	// nondefault
 			//{"CamberAngleScalingFactorDistribution","(1.0 3.0)"},		// disabled
 			{"SkewDistribution",					"NoSkew"},	// deafult
 			{"HubSkewAngle",						"0.0"},		// default
 			{"ShroudSkewAngle",						"0.0"},		// default
 			{"BezierSkewRelativeRadius",			"0.5"},		// default
-			//{"VortexDistributionExponent",			"1.3"},	// optional
-			{"RootOutletVelocity",			"(7.36834 -2 0)"},	// optional
+			{"VortexDistributionExponent",			"-1"},		// optional
+			//{"RootOutletVelocity",			"(9.77477 -2.56 0)"},	// optional
 			// airfoil
 			{"Thickness",				"Naca4DigitThickness"},	// default
 			//{"DeviationAngle",						"0"},	// disabled
@@ -89,7 +86,7 @@ int main(int argc, char* argv[])
 			{"StagnationPointDesignPrecision",		"2.5e-4"},	// nondefault
 			{"StaggerAngleRelDesignPrecision",		"0.25"},	// default
 			{"CamberAngleRelDesignPrecision",		"0.25"},	// nondefault
-			{"CamberAngleDesignLimit",				"5.0"},		// default
+			{"CamberAngleDesignLimit",				"3.0"},		// default
 			{"MaxDesignIter",						"100"},		// default
 			// mesh
 			{"ProfileMeshGenerator","ProfileTetMeshGenerator"},	// default
@@ -113,7 +110,6 @@ int main(int argc, char* argv[])
 	// dump the initial data
 	blade.dumpData();
 
-	// full design
 	design::Airfoil::DesignData dd;
 	const auto& airfoils {blade.airfoilsCRef()};
 	for (auto& a : airfoils)

@@ -96,6 +96,9 @@ public:
 
 			// Constructors
 
+				//- Default constructor
+				inline SimData() = default;
+
 				//- Construct by reading the simulation files
 				inline SimData
 				(
@@ -126,16 +129,17 @@ private:
 		void adjustParameter(Pair<Float> limits);
 
 		//- Iteratively adjust stagger angle such that the stagnation point
-		//	is aligned with LE
-		void alignStagnationPoint
+		//	is aligned with LE. Returns the SimData for the last simulation.
+		SimData alignStagnationPoint
 		(
 			DesignData& dd,
 			bool flagOnFinish = true
 		);
 
 		//- Iteratively adjust stagger angle such that the stagnation point
-		//	is aligned with LE, don't store design data or flag when done
-		void alignStagnationPoint();
+		//	is aligned with LE, don't store design data or flag when done.
+		//	Returns the SimData for the last simulation.
+		SimData alignStagnationPoint();
 
 		//- Compute and store turbulence properties
 		void computeTurbulence() const;
@@ -225,8 +229,10 @@ public:
 			const input::DesignPressureRelTolerance& tol
 		) const;
 
-		//- Prep and run simulation, return the simulation data
-		[[maybe_unused]] SimData simulate();
+		//- Prep and run simulation, return the simulation data.
+		//	Writes the profile in the simulation directory in .csv format
+		//	if writeProfile == true. Assumes that the profile is built.
+		[[maybe_unused]] SimData simulate(bool writeProfile = true);
 
 };
 
@@ -278,13 +284,29 @@ void Airfoil::adjustParameter(Pair<Float> limits)
 
 		auto& dpReq {data_->cref<input::TargetTotalPressureDifference>()};
 		auto& param {data_->ref<Param>()};
-
 		paramCache.emplace_back(param);
-		simCache.emplace_back
-		(
-			new SimData {simulate()}
-		);
-		postprocess(*simCache.back());
+
+		// handle different cases
+		if constexpr (std::is_same_v<input::CamberAngle, Param>)
+		{
+			std::cout << "realigning: " << filename.stem() << '\n';
+
+			writer_->writeComment("realigning");
+			writer_->flush();
+
+			simCache.emplace_back
+			(
+				new SimData {alignStagnationPoint()}
+			);
+		}
+		else if constexpr (std::is_same_v<input::StaggerAngle, Param>)
+		{
+			simCache.emplace_back
+			(
+				new SimData {simulate()}
+			);
+			postprocess(*simCache.back());
+		}
 
 		// stop if we've reached target pressure
 		if
@@ -427,18 +449,6 @@ void Airfoil::adjustParameter(Pair<Float> limits)
 			break;
 		}
 
-		// if we've incremented the camber angle and the target pressure
-		// hasn't been satisfied, we realign before incrementing again
-		if constexpr (std::is_same_v<input::CamberAngle, Param>)
-		{
-			std::cout << "realigning: " << filename.stem() << '\n';
-
-			writer_->writeComment("realigning");
-			writer_->flush();
-
-			alignStagnationPoint();
-		}
-
 		// increment and check
 		auto tmp {param.value()};
 		param.set(param.value() + increment);
@@ -566,14 +576,34 @@ Airfoil::SimData::SimData
 			static_cast<std::size_t>(csvFMM.cref<0>().back())
 		}
 	);
-	dp.reset
+	// FIXME: 
+	// 		It is possible that we end up in a turbine regime due to the
+	// 		combination of the stagnation point being too far on the suction
+	// 		(top) side and poor mesh quality at the leading edge for profiles
+	// 		at higher radii, so the pressure difference ends up being negative.
+	// 		So we simply play dumb and set it to zero, hoping this will be
+	// 		resolved during the design process.
+	if
 	(
-		new input::StaticPressureDifference
-		{
-			reg.cref<input::Density>().value()
-		  * (csvPSFV_o.cref<1>().back() - csvPSFV_i.cref<1>().back())
-		}
-	);
+		isLessOrEqual
+		(
+			csvPSFV_o.cref<1>().back()
+		  - csvPSFV_i.cref<1>().back(), 0.0
+		)
+	)
+		dp.reset
+		(
+			new input::StaticPressureDifference {0.0}
+		);
+	else
+		dp.reset
+		(
+			new input::StaticPressureDifference
+			{
+				reg.cref<input::Density>().value()
+			  * (csvPSFV_o.cref<1>().back() - csvPSFV_i.cref<1>().back())
+			}
+		);
 	w_2.reset
 	(
 		new input::OutletRelativeVelocity {csvPSFV_o.cref<2>().back()}
@@ -616,9 +646,6 @@ Airfoil::SimData::SimData
 		new Vector {csvFMM.cref<6>().back()}
 	);
 }
-
-
-
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

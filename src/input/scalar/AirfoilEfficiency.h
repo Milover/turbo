@@ -24,8 +24,8 @@ SourceFiles
 #include "BladeVelocity.h"
 #include "General.h"
 #include "InletVelocity.h"
-#include "LimitedValue.h"
 #include "Pitch.h"
+#include "PositiveValue.h"
 #include "TotalPressureDifference.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -41,7 +41,7 @@ namespace input
 
 class AirfoilEfficiency final
 :
-	public LimitedValue<Float, 0, 1>
+	public PositiveValue<Float>
 {
 public:
 
