@@ -245,8 +245,9 @@ void Airfoil::loadLastState()
 	{
 		if (std::filesystem::is_directory(p))
 		{
-			auto tmp {p.extension().string()};
-			tmp.erase(0, 1);
+			// FIXME: what if we find a random directory?
+			auto tmp {p.extension().string()};	// get the '.xx' from 'case.xx'
+			tmp.erase(0, 1);					// remove the '.' from '.xx'
 			auto simId {converter(tmp)};
 
 			if (simId >= lastCase.first)
@@ -259,12 +260,16 @@ void Airfoil::loadLastState()
 	if (lastCase.second.empty())
 		return;
 
+	// TODO: implement a dedicated messaging system
+	std::cout << "loading state from: " << lastCase.second  << '\n';
+
 	build
 	(
 		Profile {lastCase.second / "profile.csv"}
 	);
 	simId_ = lastCase.first + 1;
 
+	// XXX: should we require a sim to be run/present?
 	SimData sd
 	{
 		lastCase.first,
@@ -346,6 +351,15 @@ Airfoil::Airfoil
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
+// TODO:
+// 		We shouldn't rebuild if we already have a profile, because this will
+// 		discard the previous one which we might not have generated ourselves
+// 		i.e. we could have read it from somewhere. We should only modify the
+// 		profile we already have i.e. we should have separate functions for
+// 		generating an initial profile and subsequent modifications
+// 		(like a build()/update() type thing) or alternatively a way to reset
+// 		the profile we might have (technically we can do this now since our
+// 		profile is public data, but maybe we should make this more obvious?)
 void Airfoil::build(Profile&& p)
 {
 	if (p.empty())
@@ -435,7 +449,7 @@ void Airfoil::build(Profile&& p)
 }
 
 
-// FIXME:
+// TODO:
 // 		Implement:
 // 			Foam files (atleast function object files) should be classes which
 // 			should know what kind of data the function object generates,
@@ -448,6 +462,7 @@ Airfoil::DesignData Airfoil::design(const DesignData& supplied)
 {
 	if (std::filesystem::exists(cwd_ / "SKIP"))
 	{
+		// TODO: implement a dedicated messaging system
 		std::cout << "skipping: " << filename.stem() << '\n';
 
 		if (profile.empty())
@@ -498,14 +513,14 @@ Airfoil::DesignData Airfoil::design(const DesignData& supplied)
 
 	if (!std::filesystem::exists(cwd_ / "ALIGNED"))
 	{
-		// FIXME: implement a dedicated messaging system
+		// TODO: implement a dedicated messaging system
 		std::cout << "aligning stagnation point: " << filename.stem() << '\n';
 		alignStagnationPoint(dd);
 	}
 
 	Pair<Float> limits;
 
-	// FIXME: implement a dedicated messaging system
+	// TODO: implement a dedicated messaging system
 	std::cout << "adjusting camber angle: " << filename.stem() << '\n';
 
 	limits.first = 0.0;
@@ -513,7 +528,7 @@ Airfoil::DesignData Airfoil::design(const DesignData& supplied)
 				  * data_->cref<input::CamberAngleDesignLimit>().value();
 	adjustParameter<input::CamberAngle>(limits);
 
-	// FIXME: implement a dedicated messaging system
+	// TODO: implement a dedicated messaging system
 	std::cout << "adjusting stagger angle: " << filename.stem() << '\n';
 
 	limits.first = 0.0;

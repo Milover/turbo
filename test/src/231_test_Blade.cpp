@@ -113,7 +113,8 @@ int main(int argc, char* argv[])
 	design::Airfoil::DesignData dd;
 	const auto& airfoils {blade.airfoilsCRef()};
 	for (auto& a : airfoils)
-		dd = a->design(dd);
+		a->build();
+		//dd = a->design(dd);
 
 	blade.writeStationData(blade.cwd() / "blade.csv");
 	blade.dumpData();
