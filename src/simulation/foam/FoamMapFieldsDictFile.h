@@ -44,8 +44,6 @@ patchMap
 
 cuttingPatches
 (
-    inlet
-	outlet
 	periodic_top
 	periodic_bot
 	wall_top

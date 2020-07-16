@@ -73,9 +73,9 @@ runApplication setSet -latestTime -noVTK -batch ./system/setSet.batch >> log.tur
 # initialize
 if [ -d $prev_case ]
 then
-	runApplication mapFields -noFunctionObjects -mapMethod 'mapNearest' \
-							 -sourceTime 'latestTime' $prev_case >> log.turbo
 	prep_mesh
+	runParallel mapFieldsPar -noFunctionObjects \
+							 -sourceTime 'latestTime' $prev_case >> log.turbo
 else
 	prep_mesh
 	#runParallel potentialFoam -writep -writePhi -initialiseUBCs >> log.turbo
@@ -88,7 +88,7 @@ runParallel $application >> log.turbo
 runApplication reconstructPar -latestTime >> log.turbo
 
 # cleanup
-rm -rf processor*
+rm -rf ${prev_case}/processor*
 )"
 };
 

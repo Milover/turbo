@@ -53,7 +53,7 @@ divSchemes
 {
     default         none;
 
-    div(phi,U)      bounded Gauss linearUpwind grad(U);
+    div(phi,U)      bounded Gauss linearUpwindV grad(U);
     div(div(phi,U)) Gauss linear;
 
     div(phi,k)      bounded Gauss upwind;
