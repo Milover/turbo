@@ -520,20 +520,26 @@ Airfoil::DesignData Airfoil::design(const DesignData& supplied)
 
 	Pair<Float> limits;
 
-	// TODO: implement a dedicated messaging system
-	std::cout << "adjusting camber angle: " << filename.stem() << '\n';
+	if (!std::filesystem::exists(cwd_ / "NO_CAMBER_ADJUST"))
+	{
+		// TODO: implement a dedicated messaging system
+		std::cout << "adjusting camber angle: " << filename.stem() << '\n';
 
-	limits.first = 0.0;
-	limits.second = data_->cref<input::CamberAngle>().value()
-				  * data_->cref<input::CamberAngleDesignLimit>().value();
-	adjustParameter<input::CamberAngle>(limits);
+		limits.first = 0.0;
+		limits.second = data_->cref<input::CamberAngle>().value()
+					  * data_->cref<input::CamberAngleDesignLimit>().value();
+		adjustParameter<input::CamberAngle>(limits);
+	}
 
-	// TODO: implement a dedicated messaging system
-	std::cout << "adjusting stagger angle: " << filename.stem() << '\n';
+	if (!std::filesystem::exists(cwd_ / "NO_STAGGER_ADJUST"))
+	{
+		// TODO: implement a dedicated messaging system
+		std::cout << "adjusting stagger angle: " << filename.stem() << '\n';
 
-	limits.first = 0.0;
-	limits.second = 0.5 * pi;
-	adjustParameter<input::StaggerAngle>(limits);
+		limits.first = 0.0;
+		limits.second = 0.5 * pi;
+		adjustParameter<input::StaggerAngle>(limits);
+	}
 
 	dumpData();
 
