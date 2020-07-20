@@ -10,7 +10,14 @@ License
 
 #include "HubRadius.h"
 
+#include "BladeEfficiency.h"
+#include "Density.h"
 #include "General.h"
+#include "RootOutletVelocity.h"
+#include "Rps.h"
+#include "ShroudRadius.h"
+#include "TargetStaticPressureDifference.h"
+#include "VortexDistributionExponent.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -24,6 +31,33 @@ namespace input
 HubRadius::HubRadius(const Float f)
 :
 	PVBase {f}
+{}
+
+
+HubRadius::HubRadius
+(
+	const RootOutletVelocity& c_2_h,
+	const TargetStaticPressureDifference& dp_req,
+	const BladeEfficiency& eta,
+	const Rps& rps,
+	const VortexDistributionExponent& n,
+	const ShroudRadius& r_s,
+	const Density& rho
+)
+:
+	HubRadius
+	{
+		compute::computeHubRadius
+		(
+			c_2_h.value(),
+			dp_req.value(),
+			eta.value(),
+			rps.value(),
+			n.value(),
+			r_s.value(),
+			rho.value()
+		)
+	}
 {}
 
 

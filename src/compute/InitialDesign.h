@@ -99,6 +99,21 @@ Float computeFluidAngle
 ) noexcept;
 
 
+//- Find a hub radius for a given vortex distribution and hub swirl such that
+//	the requested work (pressure difference) is obtained.
+//	Does no checking whatsoever.
+Float computeHubRadius
+(
+	const Vector& c_2_h,	// abs. root (hub) fluid outlet velocity
+	const Float dp_req,		// (requested) static pressure difference
+	const Float eta,		// (blade) efficiency
+	const Float N,			// rev. per second
+	const Float n,			// vortex distribution exponent
+	const Float r_s,		// shroud radius
+	const Float rho			// density
+);
+
+
 //- Compute inlet velocity
 //  NOTE: no pre-swirl is assumed
 Vector computeInletVelocity

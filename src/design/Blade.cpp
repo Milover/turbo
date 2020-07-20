@@ -39,36 +39,9 @@ namespace design
 
 void Blade::construct()
 {
-	input::KinematicViscosity nu
-	{
-		data_->cref<input::Density>(),
-		data_->cref<input::DynamicViscosity>()
-	};
-	input::InletVelocity c_1
-	{
-		data_->cref<input::VolumeFlowRate>(),
-		data_->cref<input::HubRadius>(),
-		data_->cref<input::ShroudRadius>()
-	};
-	input::TurbulenceKineticEnergy k
-	{
-		c_1,
-		data_->cref<input::TurbulenceIntensity>()
-	};
-	input::SolidityDistribution solidityDistr
-	{
-		data_->cref<input::SolidityDistribution>()
-	};
-	input::storeAll
-	(
-		*data_,
-		std::move(c_1),
-		std::move(k),
-		std::move(nu),
-		std::move(solidityDistr)
-	);
 
-	// we allow these to be user input
+	// we determine the design mode here sort of
+	// TODO: move this to somewhere more appropriate
 	if
 	(
 		!data_->storeFromInput<input::RootOutletVelocity>()
@@ -100,6 +73,54 @@ void Blade::construct()
 				data_->cref<input::Density>()
 			}
 		);
+	else if
+	(
+		!data_->storeFromInput<input::HubRadius>()
+	)
+		data_->store
+		(
+			input::HubRadius
+			{
+				data_->cref<input::RootOutletVelocity>(),
+				data_->cref<input::TargetStaticPressureDifference>(),
+				data_->cref<input::BladeEfficiency>(),
+				data_->cref<input::Rps>(),
+				data_->cref<input::VortexDistributionExponent>(),
+				data_->cref<input::ShroudRadius>(),
+				data_->cref<input::Density>()
+			}
+		);
+
+
+	// we always compute these
+	input::KinematicViscosity nu
+	{
+		data_->cref<input::Density>(),
+		data_->cref<input::DynamicViscosity>()
+	};
+	input::InletVelocity c_1
+	{
+		data_->cref<input::VolumeFlowRate>(),
+		data_->cref<input::HubRadius>(),
+		data_->cref<input::ShroudRadius>()
+	};
+	input::TurbulenceKineticEnergy k
+	{
+		c_1,
+		data_->cref<input::TurbulenceIntensity>()
+	};
+	input::SolidityDistribution solidityDistr
+	{
+		data_->cref<input::SolidityDistribution>()
+	};
+	input::storeAll
+	(
+		*data_,
+		std::move(c_1),
+		std::move(k),
+		std::move(nu),
+		std::move(solidityDistr)
+	);
 
 	// these are optional
 	data_->storeFromInput<input::MaxAbsBladeThicknessDistribution>();

@@ -134,6 +134,58 @@ Float computeFluidAngle
 }
 
 
+Float computeHubRadius
+(
+	const Vector& c_2_h,	// abs. root (hub) fluid outlet velocity
+	const Float dp_req,		// (requested) static pressure difference
+	const Float eta,		// (blade) efficiency
+	const Float N,			// rev. per second
+	const Float n,			// vortex distribution exponent
+	const Float r_s,		// shroud radius
+	const Float rho			// density
+)
+{
+	Float M_1 {2.0 * n + 2.0};
+	Float M_2 {n + 3.0};
+
+	Float K_1
+	{
+		0.5 * dp_req * M_1 * M_2
+	};
+	Float K_2
+	{
+		0.5 * rho * std::pow(c_2_h.y(), 2) * M_2
+	};
+	Float K_3	// we didn't keep track of signs => |c_2_h.y()|
+	{
+		-eta * rho * 2.0 * pi * N * std::abs(c_2_h.y()) * M_1
+	};
+
+	auto f = [&](const auto& r_h)
+	{
+		return K_2 * std::pow(r_s, M_1)
+			 + K_3 * std::pow(r_s, M_2) * std::pow(r_h, n)
+			 + K_1 * std::pow(r_s, 2) * std::pow(r_h, 2.0 * n)
+			 - (K_1 * K_2) * std::pow(r_h, M_1)
+			 - k_3 * std::pow(r_h, M_1 + 1.0);
+	};
+	auto dfdr = [&](const auto& r_h)
+	{
+		return n * K_3 * std::pow(r_s, M_2) * std::pow(r_h, n - 1.0)
+			 + 2.0 * n * K_1 * std::pow(r_s, 2) * std::pow(r_h, 2.0 * n - 1.0)
+			 - M_1 * (K_1 + K_2) * std::pow(r_h, M_1 - 1.0)
+			 - (M_1 + 1.0) * K_3 * std::pow(r_h, M_1);
+	};
+	auto r_h {math::NewtonRaphson {}(0.5 * r_s, f, dfdr)};
+
+	// XXX: should we check here or let someone else handle?
+	if (!isInRange(r_h, 0.0, r_s))
+		error("hub radius out of range: [0, r_shroud]");
+
+	return r_h;
+}
+
+
 Vector computeInletVelocity 
 (
 	const Float Q,			// volume flow rate
